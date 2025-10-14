@@ -1,26 +1,116 @@
 @import "tailwindcss";
 
+/* Design tokens (DC) - RGB triples for alpha-friendly usage */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colors (rgb triples so we can use rgb(var(--dc-...)/<alpha>)) */
+  --dc-bg: 255 255 255;          /* #FFFFFF - Page background */
+  --dc-bg-soft: 247 249 251;     /* #F7F9FB - Subtle sections */
+  --dc-surface: 255 255 255;     /* #FFFFFF - Cards, modals */
+  --dc-border: 209 213 219;      /* #D1D5DB - Dividers */
+
+  --dc-text: 17 24 39;           /* #111827 - Body text */
+  --dc-text-muted: 75 85 99;     /* #4B5563 - Secondary text */
+
+  --dc-brand: 0 163 155;         /* #00A39B - Links, accents */
+  --dc-navy: 41 35 92;           /* #29235C - Headings on light */
+
+  --dc-primary: 0 97 93;         /* #00615D - Primary buttons */
+  --dc-on-primary: 255 255 255;  /* #FFFFFF - Text on primary */
+
+  --dc-success: 15 118 110;      /* #0F766E */
+  --dc-warning: 180 83 9;        /* #B45309 */
+  --dc-error:   185 28 28;       /* #B91C1C */
+
+  --dc-focus: 0 163 155;         /* #00A39B - Focus ring */
+
+  /* Helpful aliases (hex/rgb) for backwards compatibility with existing classes */
+  --color-brand: #00A39B; /* kept for existing bg-[--color-brand] usage */
+  --color-indigo-dc: #29235C;
+  --font-sans: ui-sans-serif, system-ui, Segoe UI, Roboto, Arial, "Noto Sans";
+
+  /* Map old semantic tokens to new DC tokens so legacy code continues to work */
+  --bg-1: rgb(var(--dc-bg));
+  --bg-2: rgb(var(--dc-bg-soft));
+  --text: rgb(var(--dc-text));
+  --muted: rgb(var(--dc-text-muted));
+  --card: rgb(var(--dc-surface));
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Reduced motion and accessibility helpers */
+.skip-link:focus{position:static!important;display:inline-block;padding:.5rem .75rem;background:#fff;color:#000;border-radius:.5rem}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Dark theme tokens - toggle by applying .dark to body */
+.dark{
+  --dc-bg: 14 16 38;             /* #0E1026 */
+  --dc-bg-soft: 22 26 47;        /* #161A2F */
+  --dc-surface: 22 26 47;        /* #161A2F */
+  --dc-border: 42 47 74;         /* #2A2F4A */
+
+  --dc-text: 243 244 246;        /* #F3F4F6 */
+  --dc-text-muted: 199 203 209;  /* #C7CBD1 */
+
+  --dc-brand: 0 163 155;         /* #00A39B */
+  --dc-navy: 41 35 92;           /* #29235C */
+
+  --dc-primary: 0 97 93;         /* #00615D */
+  --dc-on-primary: 255 255 255;  /* #FFFFFF */
+
+  --dc-success: 34 197 94;       /* #22C55E */
+  --dc-warning: 234 179 8;       /* #EAB308 */
+  --dc-error: 239 68 68;         /* #EF4444 */
+
+  --dc-focus: 0 163 155;         /* #00A39B */
+
+  /* Backwards-compatible mappings */
+  --bg-1: rgb(var(--dc-bg));
+  --bg-2: rgb(var(--dc-bg-soft));
+  --text: rgb(var(--dc-text));
+  --muted: rgb(var(--dc-text-muted));
+  --card: rgb(var(--dc-surface));
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/* Fluid typography using clamp() - rem base respects user settings */
+html{font-size:100%;-webkit-text-size-adjust:100%}
+/* utility classes for fluid text - use per element */
+.text-fluid-xs{font-size:clamp(0.75rem, 0.6rem + 0.6vw, 0.875rem);line-height:1.5}
+.text-fluid-sm{font-size:clamp(0.875rem, 0.8rem + 0.8vw, 1rem);line-height:1.5}
+.text-fluid-md{font-size:clamp(1rem, 1rem + 0.9vw, 1.125rem);line-height:1.5}
+.text-fluid-lg{font-size:clamp(1.125rem, 1.05rem + 1.2vw, 1.5rem);line-height:1.4}
+.text-fluid-xl{font-size:clamp(1.5rem, 1.2rem + 2.2vw, 2.25rem);line-height:1.2}
+
+/* Tooltip (simple, accessible) */
+.dc-tooltip{position:relative}
+.dc-tooltip[aria-label]:hover::after,.dc-tooltip[aria-label]:focus::after{content:attr(aria-label);position:absolute;left:50%;transform:translateX(-50%) translateY(-0.5rem);bottom:100%;white-space:nowrap;background:var(--card);color:var(--text);padding:0.35rem 0.5rem;border-radius:0.35rem;font-size:0.875rem;box-shadow:0 4px 12px rgba(0,0,0,0.25)}
+
+/* Hamburger animation */
+.hambtn{display:inline-grid;place-items:center}
+.hambtn .lines{width:1.5rem;height:1rem;position:relative}
+.hambtn .lines span{position:absolute;left:0;right:0;height:2px;background:var(--text);display:block;transition:transform .25s ease,opacity .2s ease,top .25s ease}
+.hambtn .lines span:nth-child(1){top:0}
+.hambtn .lines span:nth-child(2){top:50%;transform:translateY(-50%)}
+.hambtn .lines span:nth-child(3){bottom:0}
+.hambtn.open .lines span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.hambtn.open .lines span:nth-child(2){opacity:0}
+.hambtn.open .lines span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+
+/* Utility to prevent wrapping and allow truncation */
+.no-wrap{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Responsive helpers */
+.container-min{min-width:0}
+
+/* Design token helpers */
+.bg-dc-surface-98{background-color:rgb(var(--dc-surface)/0.98)}
+.bg-dc-surface-90{background-color:rgb(var(--dc-surface)/0.9)}
+.border-dc{border-color:rgb(var(--dc-border)/0.12)}
+.text-dc{color:rgb(var(--dc-text))}
+.text-dc-muted{color:rgb(var(--dc-text-muted))}
+.hover-dc-soft:hover{background-color:rgb(var(--dc-text)/0.06)}
+.ring-dc-focus:focus-visible{outline:none;box-shadow:0 0 0 4px rgb(var(--dc-focus)/0.16)}
+
+/* small utilities for legacy patterns */
+.divider-dc{background-color:rgb(var(--dc-border)/0.2)}
+
