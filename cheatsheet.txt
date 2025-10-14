@@ -1,0 +1,49 @@
+# Git Cheat Sheet
+
+# Clone a repository
+git clone <repo-url>
+
+# Check status
+git status
+
+# Add all changes
+git add .
+
+# Commit changes
+git commit -m "Your commit message"
+
+# Push to remote
+git push
+
+# Pull latest changes
+git pull
+
+# Create a new branch
+git checkout -b <branch-name>
+
+# Switch branches
+git checkout <branch-name>
+
+# Merge a branch into current branch
+git merge <branch-name>
+
+# View commit history
+git log --oneline
+
+# Stash changes
+git stash
+
+# Apply stashed changes
+git stash apply
+
+# Remove a file from staging
+git reset <file>
+
+# Undo last commit (keep changes)
+git reset --soft HEAD~1
+
+# Show differences
+git diff
+
+# Delete a branch
+git branch -d <branch-name>
