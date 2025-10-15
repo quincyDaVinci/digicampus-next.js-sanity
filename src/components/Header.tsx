@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import Image from 'next/image'
 import { useLanguage } from "@/lib/language"
 
 type Item = { label: string; href: string }
@@ -16,6 +17,8 @@ const MENUS: Menu[] = [
 
 export default function Header(): React.ReactElement {
   const { lang: language, setLang: setLanguage } = useLanguage()
+  const [liveMessage, setLiveMessage] = useState('')
+  const firstLangRender = useRef(true)
   const [scrolled, setScrolled] = useState(false)
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -27,10 +30,10 @@ export default function Header(): React.ReactElement {
     try {
       const stored = localStorage.getItem("dc_dark")
       setDark(stored === "true")
-    } catch (e) {}
+    } catch {}
   }, [])
   useEffect(() => {
-    try { localStorage.setItem("dc_dark", dark ? "true" : "false") } catch (e) {}
+    try { localStorage.setItem("dc_dark", dark ? "true" : "false") } catch {}
     if (typeof document !== "undefined") document.body.classList.toggle("dark", dark)
   }, [dark])
 
@@ -59,11 +62,24 @@ export default function Header(): React.ReactElement {
     setLanguage(l)
   }
 
+  // announce language changes politely but skip the initial set to avoid spurious announcement
+  useEffect(() => {
+    if (firstLangRender.current) {
+      firstLangRender.current = false
+      return
+    }
+    setLiveMessage(language === 'nl' ? 'Nederlands geselecteerd' : 'English selected')
+    const t = setTimeout(() => setLiveMessage(''), 2000)
+    return () => clearTimeout(t)
+  }, [language])
+
   return (
     <header ref={navRef} role="banner"
       className={["sticky top-0 z-50 transition-all duration-300 motion-reduce:transition-none", scrolled ? "backdrop-blur shadow-lg" : "bg-transparent"].join(" ")}
       style={scrolled ? { backgroundColor: 'rgb(var(--dc-bg) / 0.3)' } : undefined}
     >
+      {/* polite live region for language changes (screen-reader only) */}
+      <div aria-live="polite" className="sr-only" role="status">{liveMessage}</div>
       <nav aria-label="Hoofd" className={["mx-auto max-w-7xl px-4 sm:px-6", scrolled ? "py-2" : "py-4"].join(" ")}> 
         {/* Desktop grid: 2x2 */}
         <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-4 items-start w-full" style={{ minHeight: "8rem" }}>
@@ -71,9 +87,11 @@ export default function Header(): React.ReactElement {
           <div className="col-start-1 row-start-1 flex items-start min-w-0">
             <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 rounded-lg">
               <span className="sr-only">Digicampus homepage</span>
-              <img
+              <Image
                 src={dark ? "/assets/images/logo-digicampus-dark.svg" : "/assets/images/logo-digicampus-light.svg"}
                 alt="Digicampus logo"
+                width={320}
+                height={80}
                 className={[scrolled ? "h-12" : "h-16", "w-auto drop-shadow max-w-[60vw] sm:max-w-[320px]"].join(" ")}
                 style={{ maxWidth: "320px" }}
               />
@@ -134,8 +152,8 @@ export default function Header(): React.ReactElement {
             </span>
           </button>
 
-          <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 rounded-lg">
-            <img src="/assets/images/logo-digicampus.svg" alt="Digicampus logo" className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
+            <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 rounded-lg">
+            <Image src="/assets/images/logo-digicampus.svg" alt="Digicampus logo" width={160} height={40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
           </Link>
 
           <div className="flex items-center gap-2">
