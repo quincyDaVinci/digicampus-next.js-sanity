@@ -114,3 +114,5 @@ html{font-size:100%;-webkit-text-size-adjust:100%}
 /* small utilities for legacy patterns */
 .divider-dc{background-color:rgb(var(--dc-border)/0.2)}
 
+.animate-marquee{animation:dc-marquee 40s linear infinite;will-change:transform}
+@keyframes dc-marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
