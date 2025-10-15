@@ -1,10 +1,11 @@
 import './globals.css'
-import Header from '@/components/Header'
 import { LanguageProvider } from '@/lib/language'
+import Header from '@/components/Header'
 
 export const metadata = { title: 'Digicampus' }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  
   return (
     <html>
       <body className="min-h-screen bg-gradient-to-r from-[var(--bg-1)] to-[var(--bg-2)] text-[var(--text)]">
