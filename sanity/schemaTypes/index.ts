@@ -10,6 +10,9 @@ import {ctaBannerType} from './ctaBannerType'
 import {heroSectionType} from './heroSectionType'
 import {homePageType} from './homePageType'
 import {linkFieldType} from './linkFieldType'
+import {pageColumnType} from './pageColumnType'
+import {pageSectionType} from './pageSectionType'
+import {pageType} from './pageType'
 import {partnerLogoType, partnersSectionType} from './partnersSectionType'
 import {projectCardType, projectsSectionType} from './projectCardType'
 import {textImageSectionType} from './textImageSectionType'
@@ -22,6 +25,9 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     postType,
     authorType,
     linkFieldType,
+    pageColumnType,
+    pageSectionType,
+    pageType,
     heroSectionType,
     videoSectionType,
     textImageSectionType,

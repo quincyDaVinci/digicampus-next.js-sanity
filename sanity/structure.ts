@@ -1,15 +1,30 @@
+import {BookOpenIcon, FileTextIcon} from './lib/featherIcons'
 import type {StructureResolver} from 'sanity/structure'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title('Blog')
+    .title('Content')
     .items([
-      S.documentTypeListItem('post').title('Posts'),
-      S.documentTypeListItem('category').title('Categories'),
-      S.documentTypeListItem('author').title('Authors'),
+      S.listItem()
+        .title('Paginas')
+        .icon(FileTextIcon)
+        .schemaType('page')
+        .child(S.documentTypeList('page').title('Paginas')),
+      S.listItem()
+        .title('Blog')
+        .icon(BookOpenIcon)
+        .child(
+          S.list()
+            .title('Blog')
+            .items([
+              S.documentTypeListItem('post').title('Posts'),
+              S.documentTypeListItem('category').title('Categories'),
+              S.documentTypeListItem('author').title('Authors'),
+            ]),
+        ),
       S.divider(),
       ...S.documentTypeListItems().filter(
-        (item) => item.getId() && !['post', 'category', 'author'].includes(item.getId()!),
+        (item) => item.getId() && !['page', 'post', 'category', 'author'].includes(item.getId()!),
       ),
     ])
