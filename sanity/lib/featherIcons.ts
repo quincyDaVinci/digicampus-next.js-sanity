@@ -6,8 +6,10 @@ export {
   HomeIcon,
   ImageIcon,
   LayersIcon,
+  ShieldIcon,
   TagIcon,
   UserIcon,
   UsersIcon,
   VideoIcon,
+  ZapIcon,
 } from '../../src/components/icons/FeatherIcons'
