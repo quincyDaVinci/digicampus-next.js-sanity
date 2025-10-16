@@ -1,11 +1,18 @@
 import { forwardRef } from 'react'
 import type { SVGProps } from 'react'
 
+/**
+ * Props shared by all Feather icons in this file.
+ *
+ * Accessibility contract:
+ * - Provide a `title` when the icon conveys meaning (it will render <title> and set role="img").
+ * - Omit `title` for purely decorative icons; the component will set `aria-hidden="true"` and role="presentation".
+ * - You can explicitly control hiding with `ariaHidden` if needed.
+ */
 type FeatherIconProps = Omit<SVGProps<SVGSVGElement>, 'ref'> & {
+  /** Optional accessible title; when present, role becomes `img` and `aria-hidden` is unset. */
   title?: string
-  /**
-   * Convenience override for computed aria-hidden. If not provided, it is derived from `title`.
-   */
+  /** Override for computed aria-hidden. When omitted, it is derived from `title`. */
   ariaHidden?: boolean
 }
 export type FeatherIconComponent = ReturnType<typeof createIcon>
@@ -22,6 +29,18 @@ function createIcon(children: React.ReactNode) {
   return forwardRef<SVGSVGElement, FeatherIconProps>(function FeatherIcon({ title, role, ariaHidden, ...props }, ref) {
     const computedRole = role ?? (title ? 'img' : 'presentation')
     const computedAriaHidden = ariaHidden ?? (title ? undefined : true)
+
+    if (process.env.NODE_ENV !== 'production') {
+      // Warn if conflicting props that harm accessibility
+      if (title && computedAriaHidden) {
+        // eslint-disable-next-line no-console
+        console.warn('[FeatherIcon] Received `title` along with `ariaHidden=true`. This hides the icon from assistive tech despite having a title. Prefer omitting `ariaHidden` or removing `title`.')
+      }
+      if (!title && computedRole === 'img') {
+        // eslint-disable-next-line no-console
+        console.warn('[FeatherIcon] Role set to `img` without a `title`. Provide a `title` or omit role to allow the component to set `presentation` + `aria-hidden`.')
+      }
+    }
 
     return (
       <svg
