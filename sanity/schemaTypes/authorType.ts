@@ -1,4 +1,4 @@
-import {UserIcon} from '@sanity/icons'
+import { UserIcon } from '../lib/featherIcons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
 export const authorType = defineType({

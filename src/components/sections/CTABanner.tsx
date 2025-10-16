@@ -1,6 +1,7 @@
 import Image from 'next/image'
-import Link from 'next/link'
 
+import { ArrowRightIcon } from '@/components/icons/FeatherIcons'
+import { HybridBadge, HybridCard, HybridLinkButton, HybridSection } from '@/components/ui/HybridComponents'
 import { urlForImage } from '@/lib/sanityImage'
 import { CtaBannerData } from '@/types/homepage'
 
@@ -13,55 +14,54 @@ export default function CTABanner({ data }: CTABannerProps) {
     return null
   }
 
-  const { heading, body, cta, image } = data
+  const { heading, body, cta, image, stylePreset } = data
   // Check if image has a valid asset reference
   const hasValidImage = image && typeof image === 'object' && 'asset' in image
   const imageUrl = hasValidImage ? urlForImage(image)?.width(720).height(480).fit('crop').url() : null
 
   return (
-    <section className="bg-[rgb(var(--dc-primary))]" aria-labelledby="cta-banner-heading">
-      <div className="mx-auto max-w-6xl px-6 py-16 text-[rgb(var(--dc-on-primary))]">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-center">
-          <div className="lg:w-2/3">
+    <HybridSection aria-labelledby="cta-banner-heading" variant={stylePreset ?? 'contrast'}>
+      <div className="mx-auto max-w-6xl px-6 py-20">
+        <HybridCard tone="contrast" className="flex flex-col gap-8 lg:flex-row lg:items-center">
+          <div className="flex-1 space-y-4">
+            <HybridBadge tone="contrast" aria-hidden>
+              Samenwerken
+            </HybridBadge>
             {heading ? (
-              <h2
-                id="cta-banner-heading"
-                className="text-3xl font-semibold text-[rgb(var(--dc-on-primary))]"
-              >
+              <h2 id="cta-banner-heading" className="text-3xl font-semibold">
                 {heading}
               </h2>
             ) : null}
             {body ? (
-              <p className="mt-4 max-w-2xl text-lg text-[rgb(var(--dc-on-primary)/0.85)]">
+              <p className="text-lg text-[rgb(var(--dc-on-primary)/0.85)]">
                 {body}
               </p>
             ) : null}
             {cta?.href && cta.label ? (
-              <div className="mt-8">
-                <Link
-                  href={cta.href}
-                  className="inline-flex items-center justify-center rounded-full bg-[rgb(var(--dc-on-primary))] px-6 py-3 text-base font-semibold text-[rgb(var(--dc-primary))] shadow focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-on-primary)/0.6)]"
-                >
-                  {cta.label}
-                </Link>
-              </div>
+              <HybridLinkButton
+                href={cta.href}
+                variant="primary"
+                icon={<ArrowRightIcon aria-hidden focusable="false" />}
+              >
+                {cta.label}
+              </HybridLinkButton>
             ) : null}
           </div>
           {imageUrl ? (
-            <div className="lg:w-1/3">
-              <div className="relative aspect-video overflow-hidden rounded-3xl border border-[rgb(var(--dc-on-primary)/0.2)] bg-[rgb(var(--dc-on-primary)/0.1)]">
+            <div className="flex-1">
+              <div className="relative aspect-video overflow-hidden rounded-3xl border border-[rgb(var(--dc-on-primary)/0.18)] bg-[rgb(var(--dc-on-primary)/0.12)]">
                 <Image
                   src={imageUrl}
                   alt={image?.alt || ''}
                   fill
-                  sizes="(min-width: 1024px) 20rem, 100vw"
+                  sizes="(min-width: 1024px) 22rem, 100vw"
                   className="object-cover"
                 />
               </div>
             </div>
           ) : null}
-        </div>
+        </HybridCard>
       </div>
-    </section>
+    </HybridSection>
   )
 }

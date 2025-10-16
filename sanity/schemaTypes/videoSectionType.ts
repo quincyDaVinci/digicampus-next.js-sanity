@@ -1,4 +1,4 @@
-import { VideoIcon } from '@sanity/icons'
+import { VideoIcon } from '../lib/featherIcons'
 import { defineField, defineType } from 'sanity'
 
 export const videoSectionType = defineType({
@@ -7,6 +7,20 @@ export const videoSectionType = defineType({
   type: 'object',
   icon: VideoIcon,
   fields: [
+    defineField({
+      name: 'stylePreset',
+      title: 'Stijlvariant',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Gebalanceerd', value: 'structured' },
+          { title: 'Verfrissend', value: 'fresh' },
+          { title: 'Contrasterend', value: 'contrast' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'structured',
+    }),
     defineField({
       name: 'title',
       title: 'Titel',

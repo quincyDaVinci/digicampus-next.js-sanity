@@ -1,5 +1,6 @@
 import Image from 'next/image'
 
+import { HybridCard, HybridSection } from '@/components/ui/HybridComponents'
 import { urlForImage } from '@/lib/sanityImage'
 import { TextImageSectionData } from '@/types/homepage'
 
@@ -17,6 +18,8 @@ export default function TextImageSection({ data }: TextImageSectionProps) {
     body,
     image,
     imagePosition = 'right',
+    stylePreset,
+    cardTone = 'surface',
   } = data
 
   // Check if image has a valid asset reference
@@ -24,30 +27,27 @@ export default function TextImageSection({ data }: TextImageSectionProps) {
   const imageUrl = hasValidImage ? urlForImage(image)?.width(900).height(675).fit('crop').url() : null
 
   return (
-    <section className="bg-dc-surface-98" aria-labelledby="story-heading">
+    <HybridSection className="overflow-hidden" aria-labelledby="story-heading" variant={stylePreset ?? 'structured'}>
       <div
         className={`mx-auto flex max-w-6xl flex-col items-center gap-10 px-6 py-20 ${
           imagePosition === 'left' ? 'md:flex-row' : 'md:flex-row-reverse'
         }`}
       >
-        <div className="flex-1">
+        <HybridCard as="div" tone={cardTone} className="flex-1">
           {heading ? (
-            <h2
-              id="story-heading"
-              className="text-3xl font-semibold text-[rgb(var(--dc-on-surface))]"
-            >
+            <h2 id="story-heading" className="text-3xl font-semibold">
               {heading}
             </h2>
           ) : null}
           {body ? (
-            <p className="mt-4 text-lg leading-relaxed text-[rgb(var(--dc-on-surface-variant))]">
+            <p className="text-lg leading-relaxed text-[rgb(var(--dc-text)/0.75)] dark:text-[rgb(var(--dc-text)/0.8)]">
               {body}
             </p>
           ) : null}
-        </div>
+        </HybridCard>
         {imageUrl ? (
           <div className="flex-1">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-dc bg-dc-surface-98 shadow-lg">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-[rgb(var(--dc-border)/0.25)] bg-[rgb(var(--dc-surface))] shadow-2xl">
               <Image
                 src={imageUrl}
                 alt={image?.alt || ''}
@@ -60,6 +60,6 @@ export default function TextImageSection({ data }: TextImageSectionProps) {
           </div>
         ) : null}
       </div>
-    </section>
+    </HybridSection>
   )
 }

@@ -1,4 +1,4 @@
-import { UsersIcon } from '@sanity/icons'
+import { UsersIcon } from '../lib/featherIcons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 export const partnerLogoType = defineType({
@@ -41,6 +41,20 @@ export const partnersSectionType = defineType({
   type: 'object',
   icon: UsersIcon,
   fields: [
+    defineField({
+      name: 'stylePreset',
+      title: 'Stijlvariant',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Verfrissend', value: 'fresh' },
+          { title: 'Gebalanceerd', value: 'structured' },
+          { title: 'Contrasterend', value: 'contrast' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'fresh',
+    }),
     defineField({
       name: 'heading',
       title: 'Titel',

@@ -1,11 +1,11 @@
-import { MdLayers } from 'react-icons/md'
+import { LayersIcon } from '../lib/featherIcons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 export const projectCardType = defineType({
   name: 'projectCard',
   title: 'Project kaart',
   type: 'object',
-  icon: MdLayers,
+  icon: LayersIcon,
   fields: [
     defineField({
       name: 'title',
@@ -39,6 +39,20 @@ export const projectCardType = defineType({
         }),
       ],
     }),
+    defineField({
+      name: 'tone',
+      title: 'Kaartstijl',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Neutraal', value: 'surface' },
+          { title: 'Accent', value: 'accent' },
+          { title: 'Contrasterend', value: 'contrast' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'surface',
+    }),
   ],
   preview: {
     select: {
@@ -53,8 +67,22 @@ export const projectsSectionType = defineType({
   name: 'projectsSection',
   title: 'Projecten sectie',
   type: 'object',
-  icon: MdLayers,
+  icon: LayersIcon,
   fields: [
+    defineField({
+      name: 'stylePreset',
+      title: 'Stijlvariant',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Gebalanceerd', value: 'structured' },
+          { title: 'Verfrissend', value: 'fresh' },
+          { title: 'Contrasterend', value: 'contrast' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'structured',
+    }),
     defineField({
       name: 'heading',
       title: 'Titel',

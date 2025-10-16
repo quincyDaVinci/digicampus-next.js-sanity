@@ -9,6 +9,7 @@ export interface HeroSectionData {
   heading?: string
   intro?: string
   cta?: LinkField
+  stylePreset?: 'fresh' | 'structured' | 'contrast'
 }
 
 export interface VideoSectionData {
@@ -16,6 +17,7 @@ export interface VideoSectionData {
   description?: string
   videoUrl?: string
   videoTitle?: string
+  stylePreset?: 'fresh' | 'structured' | 'contrast'
 }
 
 export interface TextImageSectionData {
@@ -23,6 +25,8 @@ export interface TextImageSectionData {
   body?: string
   image?: SanityImageSource & { alt?: string }
   imagePosition?: 'left' | 'right'
+  stylePreset?: 'fresh' | 'structured' | 'contrast'
+  cardTone?: 'surface' | 'accent' | 'contrast'
 }
 
 export interface CtaBannerData {
@@ -30,12 +34,15 @@ export interface CtaBannerData {
   body?: string
   cta?: LinkField
   image?: SanityImageSource & { alt?: string }
+  stylePreset?: 'fresh' | 'structured' | 'contrast'
 }
 
 export interface BlogSectionData {
   heading?: string
   description?: string
   maxPosts?: number
+  stylePreset?: 'fresh' | 'structured' | 'contrast'
+  cardTone?: 'surface' | 'accent' | 'contrast'
 }
 
 export interface ProjectCardData {
@@ -43,12 +50,14 @@ export interface ProjectCardData {
   description?: string
   link?: LinkField
   image?: SanityImageSource & { alt?: string }
+  tone?: 'surface' | 'accent' | 'contrast'
 }
 
 export interface ProjectsSectionData {
   heading?: string
   description?: string
   projects?: ProjectCardData[]
+  stylePreset?: 'fresh' | 'structured' | 'contrast'
 }
 
 export interface PartnerLogoData {
@@ -59,6 +68,30 @@ export interface PartnerLogoData {
 export interface PartnersSectionData {
   heading?: string
   logos?: PartnerLogoData[]
+  stylePreset?: 'fresh' | 'structured' | 'contrast'
+}
+
+export type HybridComponentVariant = 'feature' | 'callout'
+export type HybridComponentTone = 'surface' | 'accent' | 'contrast'
+export type HybridIconKey =
+  | 'flag'
+  | 'layers'
+  | 'zap'
+  | 'shield'
+  | 'users'
+  | 'book-open'
+
+export interface HybridComponentData {
+  _key: string
+  _type: 'hybridComponent'
+  variant?: HybridComponentVariant
+  tone?: HybridComponentTone
+  eyebrow?: string
+  title?: string
+  body?: string
+  icon?: HybridIconKey
+  cta?: LinkField
+  stylePreset?: 'fresh' | 'structured' | 'contrast'
 }
 
 export interface HomePageData {
@@ -69,6 +102,7 @@ export interface HomePageData {
   blogSection?: BlogSectionData
   projectsSection?: ProjectsSectionData
   partnersSection?: PartnersSectionData
+  hybridComponents?: HybridComponentData[]
 }
 
 export interface BlogPostCard {

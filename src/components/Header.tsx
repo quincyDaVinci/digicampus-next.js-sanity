@@ -3,6 +3,8 @@
 import React, { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import Image from 'next/image'
+import { ArrowRightIcon, ChevronDownIcon, CloseIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from '@/components/icons/FeatherIcons'
+import { HybridLinkButton } from '@/components/ui/HybridComponents'
 import { useLanguage } from "@/lib/language"
 
 type Item = { label: string; href: string }
@@ -100,7 +102,14 @@ export default function Header(): React.ReactElement {
 
           {/* Top-right: Dark mode, language, search */}
           <div className="col-start-2 row-start-1 flex items-center gap-3 justify-end min-w-0">
-            <button aria-pressed={dark} aria-label={dark ? "Schakel lichtmodus in" : "Schakel donker modus in"} onClick={() => setDark(d => !d)} className="px-2 py-1 rounded-lg border text-white bg-transparent focus-visible:outline-none" style={{ borderColor: 'rgb(var(--dc-border) / 0.2)', color: 'rgb(var(--dc-text))', boxShadow: 'none' }} onFocus={(e)=> e.currentTarget.style.boxShadow = `0 0 0 4px rgb(var(--dc-focus) / 0.2)`} onBlur={(e)=> e.currentTarget.style.boxShadow = ''}>{dark ? "🌙" : "🌞"}</button>
+            <button
+              aria-pressed={dark}
+              aria-label={dark ? "Schakel lichtmodus in" : "Schakel donker modus in"}
+              onClick={() => setDark(d => !d)}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgb(var(--dc-border)/0.2)] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+            >
+              {dark ? <MoonIcon aria-hidden focusable="false" /> : <SunIcon aria-hidden focusable="false" />}
+            </button>
 
             <div role="group" aria-label="Taal switch" className="flex items-center gap-0">
               <button type="button" onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} aria-label="Schakel naar Nederlands" className={["px-3 py-1 focus-visible:outline-none transition-colors text-fluid-sm", language === "nl" ? "font-bold" : ""].join(" ")} style={language === "nl" ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'rgb(var(--dc-text) / 0.8)' }}>NL {language === "nl" && <span className="sr-only">(actief)</span>}</button>
@@ -111,7 +120,9 @@ export default function Header(): React.ReactElement {
               <form role="search" className="relative min-w-0">
               <label htmlFor="q" className="sr-only">Zoeken</label>
               <input id="q" name="q" type="search" placeholder="Search" className="w-28 sm:w-44 rounded-full outline-none px-4 py-2 pr-9 min-w-0 text-fluid-sm" style={{ backgroundColor: 'rgb(var(--dc-text) / 0.06)', color: 'rgb(var(--dc-text))', border: '1px solid rgb(var(--dc-border) / 0.2)' }} onFocus={(e)=> { e.currentTarget.style.boxShadow = `0 0 0 4px rgb(var(--dc-focus) / 0.12)`; }} onBlur={(e)=> { e.currentTarget.style.boxShadow = ''; }} />
-              <span aria-hidden className="absolute right-2 top-1/2 -translate-y-1/2">🔍</span>
+              <span aria-hidden className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--dc-text)/0.75)]">
+                <SearchIcon aria-hidden focusable="false" />
+              </span>
             </form>
           </div>
 
@@ -121,7 +132,7 @@ export default function Header(): React.ReactElement {
               <div key={m.label} className="relative">
                 <button aria-expanded={openIndex === MENUS.indexOf(m)} aria-controls={`menu-${MENUS.indexOf(m)}`} onClick={() => setOpenIndex(openIndex === MENUS.indexOf(m) ? null : MENUS.indexOf(m))} className="inline-flex items-center gap-2 rounded-lg px-2 py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 whitespace-nowrap dc-tooltip" aria-label={m.label} title={m.label}>
                   <span className="no-wrap text-fluid-md" aria-hidden>{m.label}</span>
-                  <svg aria-hidden viewBox="0 0 20 20" className="h-4 w-4"><path fill="currentColor" d="M5.5 7.5 10 12l4.5-4.5"/></svg>
+                  <ChevronDownIcon aria-hidden focusable="false" className="h-4 w-4" />
                 </button>
 
                 <div id={`menu-${MENUS.indexOf(m)}`} role="menu" aria-label={m.label} className={["absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl transition-opacity duration-150 motion-reduce:transition-none", openIndex === MENUS.indexOf(m) ? "opacity-100" : "opacity-0 pointer-events-none"].join(" ")} style={{ backgroundColor: 'rgb(var(--dc-surface) / 0.98)', border: '1px solid rgb(var(--dc-border) / 0.1)', color: 'rgb(var(--dc-text))' }}>
@@ -137,19 +148,23 @@ export default function Header(): React.ReactElement {
 
           {/* Bottom-right: Contact CTA */}
           <div className="col-start-2 row-start-2 flex items-end justify-end">
-            <Link href="/contact" className="rounded-full font-semibold px-5 py-2 text-fluid-md shadow-lg hover:scale-105 hover:brightness-110 transition-all duration-200 focus-visible:outline-none" style={{ minWidth: '6rem', whiteSpace: 'nowrap', backgroundColor: 'rgb(var(--dc-primary))', color: 'rgb(var(--dc-on-primary))', border: '2px solid rgb(var(--dc-border) / 0.15)' }} onFocus={(e)=> e.currentTarget.style.boxShadow = `0 0 0 4px rgb(var(--dc-focus) / 0.18)`} onBlur={(e)=> e.currentTarget.style.boxShadow = ''}>Contact</Link>
+            <HybridLinkButton href="/contact" variant="primary" icon={<ArrowRightIcon aria-hidden focusable="false" />} className="font-semibold">
+              Contact
+            </HybridLinkButton>
           </div>
         </div>
 
         {/* Mobile top row with hamburger on left and controls on right */}
         <div className="md:hidden flex items-center justify-between">
-          <button aria-expanded={mobileOpen} aria-controls="mobile-menu" onClick={() => setMobileOpen(v => !v)} className={["hambtn", mobileOpen ? "open" : ""].join(" ")} aria-label="Open menu">
+          <button
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-menu"
+            onClick={() => setMobileOpen(v => !v)}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgb(var(--dc-border)/0.2)] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+            aria-label={mobileOpen ? "Sluit menu" : "Open menu"}
+          >
+            {mobileOpen ? <CloseIcon aria-hidden focusable="false" /> : <MenuIcon aria-hidden focusable="false" />}
             <span className="sr-only">Menu</span>
-            <span className="lines" aria-hidden>
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
           </button>
 
             <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 rounded-lg">
@@ -157,7 +172,14 @@ export default function Header(): React.ReactElement {
           </Link>
 
           <div className="flex items-center gap-2">
-            <button onClick={() => setDark(d => !d)} aria-pressed={dark} aria-label={dark ? "Schakel lichtmodus in" : "Schakel donker modus in"} className="px-2 py-1 rounded-lg border text-white bg-transparent focus-visible:outline-none" style={{ borderColor: 'rgb(var(--dc-border) / 0.2)', color: 'rgb(var(--dc-text))' }}>{dark ? "🌙" : "🌞"}</button>
+            <button
+              onClick={() => setDark(d => !d)}
+              aria-pressed={dark}
+              aria-label={dark ? "Schakel lichtmodus in" : "Schakel donker modus in"}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgb(var(--dc-border)/0.2)] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+            >
+              {dark ? <MoonIcon aria-hidden focusable="false" /> : <SunIcon aria-hidden focusable="false" />}
+            </button>
             <div className="flex items-center gap-1">
               <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none text-fluid-sm", language === "nl" ? "" : ""].join(" ")} style={language === "nl" ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' } : { border: '1px solid rgb(var(--dc-border)/0.18)', color: 'rgb(var(--dc-text))' }}>NL</button>
               <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none text-fluid-sm", language === "en" ? "" : ""].join(" ")} style={language === "en" ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' } : { border: '1px solid rgb(var(--dc-border)/0.18)', color: 'rgb(var(--dc-text))' }}>EN</button>
@@ -186,7 +208,9 @@ export default function Header(): React.ReactElement {
             <div className="mt-3 flex items-center gap-2">
               <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 text-fluid-sm", language === "nl" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90"].join(" ")}>NL</button>
               <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 text-fluid-sm", language === "en" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90"].join(" ")}>EN</button>
-              <Link href="/contact" className="ml-auto rounded-full bg-[--color-brand] text-black font-semibold px-4 py-2 text-fluid-md shadow-lg border-2 border-white/20 hover:scale-105 hover:brightness-110 transition-all duration-200 focus-visible:ring-4 focus-visible:ring-yellow-300">Contact</Link>
+              <HybridLinkButton href="/contact" variant="primary" icon={<ArrowRightIcon aria-hidden focusable="false" />} className="ml-auto">
+                Contact
+              </HybridLinkButton>
             </div>
 
             <form role="search" className="mt-3">

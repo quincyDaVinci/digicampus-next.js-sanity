@@ -5,6 +5,7 @@ import {categoryType} from './categoryType'
 import {postType} from './postType'
 import {authorType} from './authorType'
 import {blogSectionType} from './blogSectionType'
+import {hybridComponentType} from './hybridComponentType'
 import {ctaBannerType} from './ctaBannerType'
 import {heroSectionType} from './heroSectionType'
 import {homePageType} from './homePageType'
@@ -30,6 +31,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     projectsSectionType,
     partnerLogoType,
     partnersSectionType,
+    hybridComponentType,
     homePageType,
   ],
 }
