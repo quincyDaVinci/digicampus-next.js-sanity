@@ -1,12 +1,26 @@
-import { MdCampaign } from 'react-icons/md'
+import { LayersIcon } from '../lib/featherIcons'
 import { defineField, defineType } from 'sanity'
 
 export const heroSectionType = defineType({
   name: 'heroSection',
   title: 'Hero sectie',
   type: 'object',
-  icon: MdCampaign,
+  icon: LayersIcon,
   fields: [
+    defineField({
+      name: 'stylePreset',
+      title: 'Stijlvariant',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Verfrissend', value: 'fresh' },
+          { title: 'Gebalanceerd', value: 'structured' },
+          { title: 'Contrasterend', value: 'contrast' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'fresh',
+    }),
     defineField({
       name: 'heading',
       title: 'Titel',

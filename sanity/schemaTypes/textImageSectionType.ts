@@ -1,12 +1,26 @@
-import { ImagesIcon } from '@sanity/icons'
+import { ImageIcon } from '../lib/featherIcons'
 import { defineField, defineType } from 'sanity'
 
 export const textImageSectionType = defineType({
   name: 'textWithImageSection',
   title: 'Tekst met afbeelding',
   type: 'object',
-  icon: ImagesIcon,
+  icon: ImageIcon,
   fields: [
+    defineField({
+      name: 'stylePreset',
+      title: 'Sectiestijl',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Gebalanceerd', value: 'structured' },
+          { title: 'Verfrissend', value: 'fresh' },
+          { title: 'Contrasterend', value: 'contrast' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'structured',
+    }),
     defineField({
       name: 'heading',
       title: 'Titel',
@@ -46,6 +60,20 @@ export const textImageSectionType = defineType({
         ],
         layout: 'radio',
       },
+    }),
+    defineField({
+      name: 'cardTone',
+      title: 'Kaartaccent',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Neutraal', value: 'surface' },
+          { title: 'Accent', value: 'accent' },
+          { title: 'Contrasterend', value: 'contrast' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'surface',
     }),
   ],
   preview: {

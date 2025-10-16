@@ -1,12 +1,26 @@
-import { MdCampaign } from 'react-icons/md'
+import { FlagIcon } from '../lib/featherIcons'
 import { defineField, defineType } from 'sanity'
 
 export const ctaBannerType = defineType({
   name: 'ctaBanner',
   title: 'CTA banner',
   type: 'object',
-  icon: MdCampaign,
+  icon: FlagIcon,
   fields: [
+    defineField({
+      name: 'stylePreset',
+      title: 'Stijlvariant',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Contrasterend', value: 'contrast' },
+          { title: 'Verfrissend', value: 'fresh' },
+          { title: 'Gebalanceerd', value: 'structured' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'contrast',
+    }),
     defineField({
       name: 'heading',
       title: 'Titel',

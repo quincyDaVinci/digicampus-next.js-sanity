@@ -1,12 +1,26 @@
-import { DocumentTextIcon } from '@sanity/icons'
+import { BookOpenIcon } from '../lib/featherIcons'
 import { defineField, defineType } from 'sanity'
 
 export const blogSectionType = defineType({
   name: 'blogSection',
   title: 'Blog sectie',
   type: 'object',
-  icon: DocumentTextIcon,
+  icon: BookOpenIcon,
   fields: [
+    defineField({
+      name: 'stylePreset',
+      title: 'Stijlvariant',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Gebalanceerd', value: 'structured' },
+          { title: 'Verfrissend', value: 'fresh' },
+          { title: 'Contrasterend', value: 'contrast' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'structured',
+    }),
     defineField({
       name: 'heading',
       title: 'Titel',
@@ -26,6 +40,20 @@ export const blogSectionType = defineType({
       type: 'number',
       initialValue: 3,
       validation: (rule) => rule.min(1).max(6),
+    }),
+    defineField({
+      name: 'cardTone',
+      title: 'Kaartstijl',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Neutraal', value: 'surface' },
+          { title: 'Accent', value: 'accent' },
+          { title: 'Contrasterend', value: 'contrast' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'surface',
     }),
   ],
   preview: {

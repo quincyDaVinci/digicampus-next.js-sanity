@@ -13,6 +13,7 @@ High-level architecture (why/how)
   - `src/app/layout.tsx`, `src/app/page.tsx` — app shell and landing page.
   - `src/app/globals.css` — global CSS and the design tokens (see "Design tokens" below).
   - `src/components/` — reusable UI; `Header.tsx` is a good example of site conventions (client component, dark toggle, responsive menu).
+- `src/components/ui/HybridComponents.tsx` exposes the hybrid design system primitives (section, card, button, badge) that blend DaisyUI visuals with NL Design System semantics. Prefer these over ad-hoc markup for new UI.
 - CMS: `sanity/` contains Sanity Studio config and schemas used by the site. `sanity/lib/client.ts` and `sanity.config.ts` are integration points.
 - API: Minimal Next API routes live under `src/app/api/` (e.g. `src/app/api/env/route.ts`).
 - Public assets: `public/assets/images/` (logo SVGs, etc.).
@@ -27,6 +28,7 @@ Project-specific conventions to follow
 - Accessibility patterns visible in the codebase:
   - Skip link `.skip-link` is present in `globals.css`.
   - Focus rings use token `--dc-focus`. Prefer visible focus state and `aria-*` attributes already used in `Header.tsx`.
+- Feather icons live in `src/components/icons/FeatherIcons.tsx`. Import icons from this module (or from `sanity/lib/featherIcons` inside Studio schemas) instead of other icon libraries.
 - Component types:
   - Many components are client components (look for the `"use client"` pragma at top). If you convert to server components, be mindful of hooks and browser APIs used.
 
@@ -63,6 +65,8 @@ Files to read for more context
 
 - `src/app/globals.css` — tokens, utilities, accessibility helpers
 - `src/components/Header.tsx` — practical examples for dark-mode, responsive nav, and token usage
+- `src/components/sections/HybridComponentGallery.tsx` — renders Sanity-driven hybrid components; useful reference when wiring new modular sections.
+- `sanity/schemaTypes/hybridComponentType.ts` — schema for the hybrid building blocks surfaced in Studio.
 - `sanity/` folder — CMS schemas and client setup
 - `package.json` — scripts and dependencies
 
