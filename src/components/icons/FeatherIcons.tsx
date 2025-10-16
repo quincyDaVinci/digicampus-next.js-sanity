@@ -1,7 +1,13 @@
 import { forwardRef } from 'react'
 import type { SVGProps } from 'react'
 
-type FeatherIconProps = Omit<SVGProps<SVGSVGElement>, 'ref'> & { title?: string }
+type FeatherIconProps = Omit<SVGProps<SVGSVGElement>, 'ref'> & {
+  title?: string
+  /**
+   * Convenience override for computed aria-hidden. If not provided, it is derived from `title`.
+   */
+  ariaHidden?: boolean
+}
 export type FeatherIconComponent = ReturnType<typeof createIcon>
 
 const baseStrokeProps: Pick<SVGProps<SVGSVGElement>, 'fill' | 'stroke' | 'strokeWidth' | 'strokeLinecap' | 'strokeLinejoin'> = {
