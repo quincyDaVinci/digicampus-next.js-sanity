@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import Image from 'next/image'
 import { ArrowRightIcon, ChevronDownIcon, CloseIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from '@/components/icons/FeatherIcons'
-import { HybridLinkButton } from '@/components/ui/HybridComponents'
 import { useLanguage } from "@/lib/language"
 
 type Item = { label: string; href: string }
@@ -148,9 +147,14 @@ export default function Header(): React.ReactElement {
 
           {/* Bottom-right: Contact CTA */}
           <div className="col-start-2 row-start-2 flex items-end justify-end">
-            <HybridLinkButton href="/contact" variant="primary" icon={<ArrowRightIcon aria-hidden focusable="false" />} className="font-semibold">
-              Contact
-            </HybridLinkButton>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+              style={{ backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))', border: '1px solid rgb(var(--dc-border)/0.2)' }}
+            >
+              <span>Contact</span>
+              <ArrowRightIcon aria-hidden focusable="false" />
+            </Link>
           </div>
         </div>
 
@@ -208,9 +212,14 @@ export default function Header(): React.ReactElement {
             <div className="mt-3 flex items-center gap-2">
               <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 text-fluid-sm", language === "nl" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90"].join(" ")}>NL</button>
               <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 text-fluid-sm", language === "en" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90"].join(" ")}>EN</button>
-              <HybridLinkButton href="/contact" variant="primary" icon={<ArrowRightIcon aria-hidden focusable="false" />} className="ml-auto">
-                Contact
-              </HybridLinkButton>
+              <Link
+                href="/contact"
+                className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+                style={{ backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))', border: '1px solid rgb(var(--dc-border)/0.2)' }}
+              >
+                <span>Contact</span>
+                <ArrowRightIcon aria-hidden focusable="false" />
+              </Link>
             </div>
 
             <form role="search" className="mt-3">
