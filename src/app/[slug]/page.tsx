@@ -22,11 +22,11 @@ const blogCardSelection = `
   ...,
   "resolvedPost": select(
     selectionMode == 'manual' => post->{${blogCardFields}},
-    selectionMode == 'automatic' && automaticSort == 'author' && defined(author._ref) => *[_type == 'post' && author._ref == ^.author._ref] | order(publishedAt desc)[0...coalesce(^.limit, 1)]{${blogCardFields}},
-    selectionMode == 'automatic' && automaticSort == 'oldest' => *[_type == 'post'] | order(publishedAt asc)[0...coalesce(^.limit, 1)]{${blogCardFields}},
-    selectionMode == 'automatic' && automaticSort == 'popular' => *[_type == 'post'] | order(coalesce(popularity, 0) desc, publishedAt desc)[0...coalesce(^.limit, 1)]{${blogCardFields}},
-    selectionMode == 'automatic' && automaticSort == 'date' => *[_type == 'post'] | order(publishedAt desc)[0...coalesce(^.limit, 1)]{${blogCardFields}},
-    selectionMode == 'automatic' => *[_type == 'post'] | order(publishedAt desc)[0...coalesce(^.limit, 1)]{${blogCardFields}}
+    selectionMode == 'automatic' && automaticSort == 'author' && defined(author._ref) => *[_type == 'post' && author._ref == ^.author._ref] | order(publishedAt desc)[0..0]{${blogCardFields}},
+    selectionMode == 'automatic' && automaticSort == 'oldest' => *[_type == 'post'] | order(publishedAt asc)[0..0]{${blogCardFields}},
+    selectionMode == 'automatic' && automaticSort == 'popular' => *[_type == 'post'] | order(coalesce(popularity, 0) desc, publishedAt desc)[0..0]{${blogCardFields}},
+    selectionMode == 'automatic' && automaticSort == 'date' => *[_type == 'post'] | order(publishedAt desc)[0..0]{${blogCardFields}},
+    selectionMode == 'automatic' => *[_type == 'post'] | order(publishedAt desc)[0..0]{${blogCardFields}}
   )
 `
 
