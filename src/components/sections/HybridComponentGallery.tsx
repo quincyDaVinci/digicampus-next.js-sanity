@@ -1,5 +1,11 @@
 import { ArrowRightIcon, featherIconMap } from '@/components/icons/FeatherIcons'
-import { HybridBadge, HybridCard, HybridLinkButton, HybridSection } from '@/components/ui/HybridComponents'
+import {
+  HybridBadge,
+  HybridCard,
+  HybridLinkButton,
+  HybridSection,
+  type SectionVariant,
+} from '@/components/ui/HybridComponents'
 import {
   type HybridComponentData,
   type HybridComponentTone,
@@ -23,6 +29,21 @@ const badgeToneByCard: Record<HybridComponentTone, 'accent' | 'muted' | 'contras
 
 const sectionVariantFallback = 'structured' as const
 
+const variantPreviewInfo: Record<SectionVariant, { label: string; description: string }> = {
+  structured: {
+    label: 'Structured',
+    description: 'Neutrale achtergrond voor de meeste contentblokken.',
+  },
+  fresh: {
+    label: 'Fresh',
+    description: 'Lichte variant met dezelfde toegankelijkheidswaarden als structured.',
+  },
+  contrast: {
+    label: 'Contrast',
+    description: 'Gebruik spaarzaam voor CTA’s of andere accenten.',
+  },
+}
+
 interface HybridComponentGalleryProps {
   components?: HybridComponentData[]
 }
@@ -35,6 +56,7 @@ export default function HybridComponentGallery({ components }: HybridComponentGa
   }
 
   const firstVariant = items.find((item) => item.stylePreset)?.stylePreset ?? sectionVariantFallback
+  const previewVariants: SectionVariant[] = ['structured', 'fresh', 'contrast']
 
   return (
     <HybridSection variant={firstVariant} aria-labelledby="hybrid-components-heading">
@@ -46,10 +68,26 @@ export default function HybridComponentGallery({ components }: HybridComponentGa
           <h2 id="hybrid-components-heading" className="text-3xl font-semibold text-[rgb(var(--dc-text))] dark:text-[rgb(var(--dc-text))]">
             Modulair toegankelijke componenten
           </h2>
-          <p className="text-lg text-[rgb(var(--dc-text)/0.78)] dark:text-[rgb(var(--dc-text)/0.82)]">
+          <p className="text-lg text-[rgb(var(--dc-text)/0.88)] dark:text-[rgb(var(--dc-text)/0.9)]">
             Deze hybride bibliotheek combineert de expressieve styling van DaisyUI met de WCAG-patronen van het NL Design System.
             Elk onderdeel is beschikbaar in de Sanity Studio pagina-builder.
           </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Sectiestijl voorbeelden">
+          {previewVariants.map((variant) => {
+            const info = variantPreviewInfo[variant]
+
+            return (
+              <article
+                key={variant}
+                aria-label={info.label}
+                className={`hy-section hy-section--${variant} rounded-3xl border-2 border-[rgb(var(--dc-border)/0.45)] p-6 shadow-sm`}
+              >
+                <h3 className="text-sm font-semibold uppercase tracking-wide">{info.label}</h3>
+                <p className="mt-2 text-sm leading-relaxed [color:inherit]">{info.description}</p>
+              </article>
+            )
+          })}
         </div>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((component) => {
@@ -76,7 +114,7 @@ export default function HybridComponentGallery({ components }: HybridComponentGa
                     </h3>
                   ) : null}
                   {component.body ? (
-                    <p className="text-base leading-relaxed text-[rgb(var(--dc-text)/0.75)] dark:text-[rgb(var(--dc-text)/0.8)]">
+                    <p className="text-base leading-relaxed text-[rgb(var(--dc-text)/0.85)] dark:text-[rgb(var(--dc-text)/0.88)]">
                       {component.body}
                     </p>
                   ) : null}
@@ -86,6 +124,7 @@ export default function HybridComponentGallery({ components }: HybridComponentGa
                       variant={buttonVariant}
                       icon={<ArrowRightIcon aria-hidden focusable="false" />}
                       className="mt-auto self-start"
+                      aria-label={`${component.cta.label} – ${component.title ?? 'component'}`}
                     >
                       {component.cta.label}
                     </HybridLinkButton>

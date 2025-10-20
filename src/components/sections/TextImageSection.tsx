@@ -24,7 +24,7 @@ export default function TextImageSection({ data }: TextImageSectionProps) {
 
   // Check if image has a valid asset reference
   const hasValidImage = image && typeof image === 'object' && 'asset' in image
-  const imageUrl = hasValidImage ? urlForImage(image)?.width(900).height(675).fit('crop').url() : null
+  const imageUrl = hasValidImage ? urlForImage(image)?.width(900).height(675).fit('max').url() : null
 
   return (
     <HybridSection className="overflow-hidden" aria-labelledby="story-heading" variant={stylePreset ?? 'structured'}>
@@ -40,20 +40,20 @@ export default function TextImageSection({ data }: TextImageSectionProps) {
             </h2>
           ) : null}
           {body ? (
-            <p className="text-lg leading-relaxed text-[rgb(var(--dc-text)/0.75)] dark:text-[rgb(var(--dc-text)/0.8)]">
+            <p className="text-lg leading-relaxed text-[rgb(var(--dc-text)/0.88)] dark:text-[rgb(var(--dc-text)/0.92)]">
               {body}
             </p>
           ) : null}
         </HybridCard>
         {imageUrl ? (
           <div className="flex-1">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-[rgb(var(--dc-border)/0.25)] bg-[rgb(var(--dc-surface))] shadow-2xl">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border-2 border-[rgb(var(--dc-border)/0.45)] bg-[rgb(var(--dc-surface))] shadow-2xl">
               <Image
                 src={imageUrl}
                 alt={image?.alt || ''}
                 fill
                 sizes="(min-width: 768px) 33rem, 100vw"
-                className="object-cover"
+                className="object-contain"
                 priority
               />
             </div>

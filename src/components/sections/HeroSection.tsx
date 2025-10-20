@@ -28,7 +28,7 @@ export default function HeroSection({ data }: HeroSectionProps) {
             </h1>
           ) : null}
           {intro ? (
-            <p className="mt-6 max-w-2xl text-lg text-[rgb(var(--dc-text)/0.78)] dark:text-[rgb(var(--dc-text)/0.82)]">
+            <p className="mt-6 max-w-2xl text-lg text-[rgb(var(--dc-text)/0.88)] dark:text-[rgb(var(--dc-text)/0.9)]">
               {intro}
             </p>
           ) : null}
@@ -38,6 +38,7 @@ export default function HeroSection({ data }: HeroSectionProps) {
                 href={cta.href}
                 variant="primary"
                 icon={<ArrowRightIcon aria-hidden focusable="false" />}
+                aria-label={`${cta.label}${heading ? ` – ${heading}` : ''}`}
               >
                 {cta.label}
               </HybridLinkButton>

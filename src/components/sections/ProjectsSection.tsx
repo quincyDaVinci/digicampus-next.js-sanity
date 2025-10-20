@@ -30,7 +30,7 @@ export default function ProjectsSection({ data }: ProjectsSectionProps) {
             </h2>
           ) : null}
           {description ? (
-            <p className="max-w-3xl text-lg text-[rgb(var(--dc-text)/0.78)] dark:text-[rgb(var(--dc-text)/0.82)]">
+            <p className="max-w-3xl text-lg text-[rgb(var(--dc-text)/0.88)] dark:text-[rgb(var(--dc-text)/0.9)]">
               {description}
             </p>
           ) : null}
@@ -38,19 +38,19 @@ export default function ProjectsSection({ data }: ProjectsSectionProps) {
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project, index) => {
             const hasValidImage = project.image && typeof project.image === 'object' && 'asset' in project.image
-            const imageUrl = hasValidImage ? urlForImage(project.image)?.width(600).height(400).fit('crop').url() : null
+            const imageUrl = hasValidImage ? urlForImage(project.image)?.width(600).height(400).fit('max').url() : null
             const tone = project.tone ?? 'surface'
 
             return (
               <HybridCard key={`${project.title ?? 'project'}-${index}`} tone={tone} className="h-full overflow-hidden">
                 {imageUrl ? (
-                  <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl">
+                  <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl border-2 border-[rgb(var(--dc-border)/0.45)] bg-[rgb(var(--dc-surface))]">
                     <Image
                       src={imageUrl}
                       alt={project.image?.alt || ''}
                       fill
                       sizes="(min-width: 1280px) 20rem, (min-width: 768px) 50vw, 100vw"
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
                 ) : null}
@@ -64,7 +64,7 @@ export default function ProjectsSection({ data }: ProjectsSectionProps) {
                     </h3>
                   ) : null}
                   {project.description ? (
-                    <p className="text-base text-[rgb(var(--dc-text)/0.75)] dark:text-[rgb(var(--dc-text)/0.8)]">
+                    <p className="text-base text-[rgb(var(--dc-text)/0.85)] dark:text-[rgb(var(--dc-text)/0.88)]">
                       {project.description}
                     </p>
                   ) : null}
@@ -75,6 +75,7 @@ export default function ProjectsSection({ data }: ProjectsSectionProps) {
                     variant="secondary"
                     icon={<ArrowRightIcon aria-hidden focusable="false" />}
                     className="self-start"
+                    aria-label={`${project.link.label} – ${project.title ?? 'Project'}`}
                   >
                     {project.link.label}
                   </HybridLinkButton>

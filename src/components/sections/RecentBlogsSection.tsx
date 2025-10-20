@@ -33,7 +33,7 @@ export default function RecentBlogsSection({ data, posts }: RecentBlogsSectionPr
             </h2>
           )}
           {data?.description ? (
-            <p className="max-w-3xl text-lg text-[rgb(var(--dc-text)/0.78)] dark:text-[rgb(var(--dc-text)/0.82)]">
+            <p className="max-w-3xl text-lg text-[rgb(var(--dc-text)/0.88)] dark:text-[rgb(var(--dc-text)/0.9)]">
               {data.description}
             </p>
           ) : null}
@@ -42,18 +42,18 @@ export default function RecentBlogsSection({ data, posts }: RecentBlogsSectionPr
           {posts.length > 0 ? (
             posts.map((post) => {
               const hasValidImage = post.mainImage && typeof post.mainImage === 'object' && 'asset' in post.mainImage
-              const imageUrl = hasValidImage ? urlForImage(post.mainImage)?.width(600).height(400).fit('crop').url() : null
+              const imageUrl = hasValidImage ? urlForImage(post.mainImage)?.width(600).height(400).fit('max').url() : null
 
               return (
                 <HybridCard key={post._id} tone={cardTone} className="h-full overflow-hidden">
                   {imageUrl ? (
-                    <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl">
+                    <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl border-2 border-[rgb(var(--dc-border)/0.45)] bg-[rgb(var(--dc-surface))]">
                       <Image
                         src={imageUrl}
                         alt={post.mainImage?.alt || ''}
                         fill
                         sizes="(min-width: 1280px) 20rem, (min-width: 768px) 50vw, 100vw"
-                        className="object-cover"
+                        className="object-contain"
                       />
                     </div>
                   ) : null}
@@ -62,14 +62,14 @@ export default function RecentBlogsSection({ data, posts }: RecentBlogsSectionPr
                       <h3 className="text-xl font-semibold text-[rgb(var(--dc-text))] dark:text-[rgb(var(--dc-text))]">
                         <Link
                           href={`/blog/${post.slug}`}
-                          className="focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+                          className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-[rgb(var(--dc-focus))] focus-visible:outline-offset-2"
                         >
                           {post.title}
                         </Link>
                       </h3>
                     ) : null}
                     {post.publishedAt ? (
-                      <p className="flex items-center gap-2 text-sm text-[rgb(var(--dc-text)/0.65)] dark:text-[rgb(var(--dc-text)/0.7)]">
+                      <p className="flex items-center gap-2 text-sm text-[rgb(var(--dc-text)/0.78)] dark:text-[rgb(var(--dc-text)/0.82)]">
                         <CalendarIcon aria-hidden focusable="false" />
                         {new Intl.DateTimeFormat('nl-NL', {
                           day: '2-digit',
@@ -79,7 +79,7 @@ export default function RecentBlogsSection({ data, posts }: RecentBlogsSectionPr
                       </p>
                     ) : null}
                     {post.summary ? (
-                      <p className="text-base text-[rgb(var(--dc-text)/0.75)] dark:text-[rgb(var(--dc-text)/0.8)]">
+                      <p className="text-base text-[rgb(var(--dc-text)/0.85)] dark:text-[rgb(var(--dc-text)/0.88)]">
                         {post.summary}
                       </p>
                     ) : null}
@@ -97,7 +97,7 @@ export default function RecentBlogsSection({ data, posts }: RecentBlogsSectionPr
               )
             })
           ) : (
-            <p className="text-[rgb(var(--dc-text)/0.75)]">Er zijn nog geen blogs gepubliceerd.</p>
+            <p className="text-[rgb(var(--dc-text)/0.88)]">Er zijn nog geen blogs gepubliceerd.</p>
           )}
         </div>
       </div>

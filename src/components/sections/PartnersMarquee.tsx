@@ -54,7 +54,7 @@ export default function PartnersMarquee({ data }: PartnersMarqueeProps) {
                     className="object-contain"
                   />
                 ) : (
-                  <span className="text-sm font-semibold text-[rgb(var(--dc-text)/0.7)]">
+                  <span className="text-sm font-semibold text-[rgb(var(--dc-text)/0.85)]">
                     {logo.name}
                   </span>
                 )}
