@@ -76,9 +76,20 @@ export const HybridButton = forwardRef<HTMLButtonElement, HybridButtonProps>(fun
   ref,
 ) {
   const resolvedClassName = cn(BUTTON_VARIANT_CLASSNAMES[variant], className)
+  const { ['aria-label']: ariaLabelProp, ...restProps } = props as typeof props & {
+    'aria-label'?: string
+  }
+  const accessibleLabel =
+    ariaLabelProp ?? (typeof children === 'string' ? children : undefined)
 
   return (
-    <button ref={ref} type={type} className={resolvedClassName} {...props}>
+    <button
+      ref={ref}
+      type={type}
+      className={resolvedClassName}
+      aria-label={accessibleLabel}
+      {...restProps}
+    >
       {renderButtonChildren({ icon, iconPosition, children })}
     </button>
   )
@@ -107,6 +118,11 @@ export function HybridLinkButton({
   ...props
 }: HybridLinkButtonProps) {
   const resolvedClassName = cn(BUTTON_VARIANT_CLASSNAMES[variant], className)
+  const { ['aria-label']: ariaLabelProp, ...restProps } = props as typeof props & {
+    'aria-label'?: string
+  }
+  const accessibleLabel =
+    ariaLabelProp ?? (typeof children === 'string' ? children : undefined)
 
   return (
     <Link
@@ -117,7 +133,8 @@ export function HybridLinkButton({
       shallow={shallow}
       locale={locale}
       className={resolvedClassName}
-      {...props}
+      aria-label={accessibleLabel}
+      {...restProps}
     >
       {renderButtonChildren({ icon, iconPosition, children })}
     </Link>
