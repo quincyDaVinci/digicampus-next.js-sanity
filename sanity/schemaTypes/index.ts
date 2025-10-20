@@ -17,6 +17,13 @@ import {partnerLogoType, partnersSectionType} from './partnersSectionType'
 import {projectCardType, projectsSectionType} from './projectCardType'
 import {textImageSectionType} from './textImageSectionType'
 import {videoSectionType} from './videoSectionType'
+import {backgroundComponentType} from './components/backgroundComponentType'
+import {imageComponentType} from './components/imageComponentType'
+import {richTextComponentType} from './components/richTextComponentType'
+import {videoComponentType} from './components/videoComponentType'
+import {buttonComponentType} from './components/buttonComponentType'
+import {blogCardComponentType} from './components/blogCardComponentType'
+import {carouselComponentType} from './components/carouselComponentType'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -39,5 +46,12 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     partnersSectionType,
     hybridComponentType,
     homePageType,
+    backgroundComponentType,
+    imageComponentType,
+    richTextComponentType,
+    videoComponentType,
+    buttonComponentType,
+    blogCardComponentType,
+    carouselComponentType,
   ],
 }

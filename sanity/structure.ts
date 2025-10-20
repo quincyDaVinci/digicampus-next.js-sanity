@@ -7,10 +7,14 @@ export const structure: StructureResolver = (S) =>
     .title('Content')
     .items([
       S.listItem()
-        .title('Paginas')
+        .title('Pages')
         .icon(FileTextIcon)
         .schemaType('page')
-        .child(S.documentTypeList('page').title('Paginas')),
+        .child(
+          S.documentTypeList('page')
+            .title('Pages')
+            .defaultOrdering([{field: 'title', direction: 'asc'}]),
+        ),
       S.listItem()
         .title('Blog')
         .icon(BookOpenIcon)
