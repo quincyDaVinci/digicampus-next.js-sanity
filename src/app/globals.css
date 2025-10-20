@@ -138,7 +138,7 @@ html{font-size:100%;-webkit-text-size-adjust:100%}
   .hy-section--contrast .hy-btn--secondary{background:rgb(var(--dc-on-primary)/0.18);color:rgb(var(--dc-on-primary));border-color:transparent;}
   .hy-section--contrast .hy-btn--ghost{color:rgb(var(--dc-on-primary));border-color:rgb(var(--dc-on-primary)/0.35);}
 
-  .hy-card{display:flex;flex-direction:column;gap:1rem;padding:1.5rem;border-radius:1.5rem;border:1px solid rgb(var(--dc-border)/0.18);background:rgb(var(--dc-surface));box-shadow:0 20px 40px rgb(var(--dc-text)/0.08);transition:transform .25s ease,box-shadow .25s ease,background-color .25s ease;color:rgb(var(--dc-text));}
+  .hy-card{display:flex;flex-direction:column;gap:1rem;padding:1.5rem;border-radius:1.5rem;border:1px solid rgb(var(--dc-border)/0.32);background:rgb(var(--dc-surface));box-shadow:0 20px 40px rgb(var(--dc-text)/0.08);transition:transform .25s ease,box-shadow .25s ease,background-color .25s ease;color:rgb(var(--dc-text));}
   .hy-card:hover{transform:translateY(-4px);box-shadow:0 28px 50px rgb(var(--dc-text)/0.12);}
   .hy-card:focus-within{outline:none;box-shadow:0 0 0 4px rgb(var(--dc-focus)/0.22),0 20px 40px rgb(var(--dc-text)/0.12);}
   .hy-card--accent{background:linear-gradient(140deg,rgb(var(--dc-primary)/0.12) 0%,rgb(var(--dc-surface)) 40%,rgb(var(--dc-brand)/0.1) 100%);border-color:rgb(var(--dc-primary)/0.24);}
@@ -163,7 +163,7 @@ html{font-size:100%;-webkit-text-size-adjust:100%}
   .hy-badge{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .75rem;border-radius:999px;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;line-height:1.1;}
   .hy-badge--accent{background:rgb(var(--dc-primary)/0.12);color:rgb(var(--dc-primary));}
   .hy-badge--muted{background:rgb(var(--dc-text)/0.06);color:rgb(var(--dc-text)/0.75);}
-  .hy-badge--contrast{background:rgb(var(--dc-on-primary)/0.18);color:rgb(var(--dc-on-primary));}
+  .hy-badge--error{background:rgb(var(--dc-error)/0.12);color:rgb(var(--dc-error));}
 
   .hy-eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:.5rem;display:inline-flex;align-items:center;gap:.4rem;}
   .hy-eyebrow--accent{color:rgb(var(--dc-primary));}
