@@ -38,6 +38,7 @@ export default function HeroSection({ data }: HeroSectionProps) {
                 href={cta.href}
                 variant="primary"
                 icon={<ArrowRightIcon aria-hidden focusable="false" />}
+                aria-label={cta.ariaLabel ?? cta.label}
               >
                 {cta.label}
               </HybridLinkButton>

@@ -86,6 +86,7 @@ export default function HybridComponentGallery({ components }: HybridComponentGa
                       variant={buttonVariant}
                       icon={<ArrowRightIcon aria-hidden focusable="false" />}
                       className="mt-auto self-start"
+                      aria-label={component.cta.ariaLabel ?? component.cta.label}
                     >
                       {component.cta.label}
                     </HybridLinkButton>

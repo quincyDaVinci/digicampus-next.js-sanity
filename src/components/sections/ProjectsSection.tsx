@@ -38,19 +38,19 @@ export default function ProjectsSection({ data }: ProjectsSectionProps) {
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project, index) => {
             const hasValidImage = project.image && typeof project.image === 'object' && 'asset' in project.image
-            const imageUrl = hasValidImage ? urlForImage(project.image)?.width(600).height(400).fit('crop').url() : null
+            const imageUrl = hasValidImage ? urlForImage(project.image)?.width(600).height(400).fit('max').url() : null
             const tone = project.tone ?? 'surface'
 
             return (
               <HybridCard key={`${project.title ?? 'project'}-${index}`} tone={tone} className="h-full overflow-hidden">
                 {imageUrl ? (
-                  <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl">
+                  <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl border border-[rgb(var(--dc-border))] bg-[rgb(var(--dc-surface))] p-4">
                     <Image
                       src={imageUrl}
                       alt={project.image?.alt || ''}
                       fill
                       sizes="(min-width: 1280px) 20rem, (min-width: 768px) 50vw, 100vw"
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
                 ) : null}
@@ -75,6 +75,9 @@ export default function ProjectsSection({ data }: ProjectsSectionProps) {
                     variant="secondary"
                     icon={<ArrowRightIcon aria-hidden focusable="false" />}
                     className="self-start"
+                    aria-label={
+                      project.link.ariaLabel ?? `${project.link.label} - ${project.title ?? 'Project'}`
+                    }
                   >
                     {project.link.label}
                   </HybridLinkButton>

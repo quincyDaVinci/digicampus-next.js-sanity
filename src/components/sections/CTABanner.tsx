@@ -17,7 +17,7 @@ export default function CTABanner({ data }: CTABannerProps) {
   const { heading, body, cta, image, stylePreset } = data
   // Check if image has a valid asset reference
   const hasValidImage = image && typeof image === 'object' && 'asset' in image
-  const imageUrl = hasValidImage ? urlForImage(image)?.width(720).height(480).fit('crop').url() : null
+  const imageUrl = hasValidImage ? urlForImage(image)?.width(720).height(480).fit('max').url() : null
 
   return (
     <HybridSection aria-labelledby="cta-banner-heading" variant={stylePreset ?? 'contrast'}>
@@ -42,6 +42,7 @@ export default function CTABanner({ data }: CTABannerProps) {
                 href={cta.href}
                 variant="primary"
                 icon={<ArrowRightIcon aria-hidden focusable="false" />}
+                aria-label={cta.ariaLabel ?? cta.label}
               >
                 {cta.label}
               </HybridLinkButton>
@@ -49,13 +50,13 @@ export default function CTABanner({ data }: CTABannerProps) {
           </div>
           {imageUrl ? (
             <div className="flex-1">
-              <div className="relative aspect-video overflow-hidden rounded-3xl border border-[rgb(var(--dc-on-primary)/0.18)] bg-[rgb(var(--dc-on-primary)/0.12)]">
+              <div className="relative aspect-video overflow-hidden rounded-3xl border border-[rgb(var(--dc-on-primary))] bg-[rgb(var(--dc-on-primary)/0.12)] p-4">
                 <Image
                   src={imageUrl}
                   alt={image?.alt || ''}
                   fill
                   sizes="(min-width: 1024px) 22rem, 100vw"
-                  className="object-cover"
+                  className="object-contain"
                 />
               </div>
             </div>

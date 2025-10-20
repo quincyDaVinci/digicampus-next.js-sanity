@@ -35,7 +35,11 @@ const fallbackHomePage: HomePageData = {
     heading: 'Samen bouwen aan een toekomstbestendige digitale overheid',
     intro:
       'Digicampus is het innovatieplatform waar overheid, markt, wetenschap en samenleving samenwerken aan betrouwbare digitale diensten.',
-    cta: { label: 'Ontdek onze labs', href: '/labs' },
+    cta: {
+      label: 'Ontdek onze labs',
+      href: '/labs',
+      ariaLabel: 'Ontdek onze labs bij Digicampus',
+    },
     stylePreset: 'fresh',
   },
   videoSection: {
@@ -58,7 +62,11 @@ const fallbackHomePage: HomePageData = {
     heading: 'Doe mee met onze innovatieprojecten',
     body:
       'Heb je een vraagstuk rondom digitale overheid? Sluit aan bij een bestaand traject of start samen een nieuw experiment.',
-    cta: { label: 'Plan een kennismaking', href: '/contact' },
+    cta: {
+      label: 'Plan een kennismaking',
+      href: '/contact',
+      ariaLabel: 'Plan een kennismakingsafspraak met Digicampus',
+    },
     stylePreset: 'contrast',
   },
   blogSection: {
@@ -77,21 +85,33 @@ const fallbackHomePage: HomePageData = {
         title: 'Digitale identiteit',
         description:
           'Met publieke partners ontwerpen we toegankelijke en veilige manieren om online zaken te regelen.',
-        link: { label: 'Lees meer', href: '/projecten/digitale-identiteit' },
+        link: {
+          label: 'Lees meer',
+          href: '/projecten/digitale-identiteit',
+          ariaLabel: 'Lees meer over Digitale identiteit',
+        },
         tone: 'surface',
       },
       {
         title: 'Datadelen met regie',
         description:
           'We verkennen hoe inwoners grip houden op hun gegevens wanneer organisaties samenwerken in ecosystemen.',
-        link: { label: 'Bekijk initiatief', href: '/projecten/datadelen' },
+        link: {
+          label: 'Bekijk initiatief',
+          href: '/projecten/datadelen',
+          ariaLabel: 'Bekijk initiatief Datadelen met regie',
+        },
         tone: 'accent',
       },
       {
         title: 'Samenwerkende loketten',
         description:
           'Gemeenten en uitvoeringsorganisaties verbeteren de dienstverlening rondom levensgebeurtenissen.',
-        link: { label: 'Ontdek het lab', href: '/projecten/loketten' },
+        link: {
+          label: 'Ontdek het lab',
+          href: '/projecten/loketten',
+          ariaLabel: 'Ontdek het lab Samenwerkende loketten',
+        },
         tone: 'contrast',
       },
     ],
@@ -117,7 +137,11 @@ const fallbackHomePage: HomePageData = {
       title: 'Co-creatie met partners',
       body: 'We brengen overheid, markt en wetenschap samen in labs waar prototypes snel met echte gebruikers worden getest.',
       icon: 'layers',
-      cta: { label: 'Bekijk onze labs', href: '/labs' },
+      cta: {
+        label: 'Bekijk onze labs',
+        href: '/labs',
+        ariaLabel: 'Bekijk onze labs in de hybride bibliotheek',
+      },
       stylePreset: 'structured',
     },
     {
@@ -129,7 +153,11 @@ const fallbackHomePage: HomePageData = {
       title: 'Start een gezamenlijk traject',
       body: 'Heb je een vraagstuk rondom publieke dienstverlening? Onze coaches helpen bij het vormgeven van een veilig experiment.',
       icon: 'flag',
-      cta: { label: 'Plan een intake', href: '/contact' },
+      cta: {
+        label: 'Plan een intake',
+        href: '/contact',
+        ariaLabel: 'Plan een intake voor een nieuw traject',
+      },
       stylePreset: 'fresh',
     },
     {

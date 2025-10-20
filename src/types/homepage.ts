@@ -3,6 +3,7 @@ import { SanityImageSource } from '@sanity/image-url/lib/types/types'
 export interface LinkField {
   href: string
   label: string
+  ariaLabel?: string
 }
 
 export interface HeroSectionData {
