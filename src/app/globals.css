@@ -6,12 +6,16 @@
   --dc-bg: 255 255 255;          /* #FFFFFF - Page background */
   --dc-bg-soft: 247 249 251;     /* #F7F9FB - Subtle sections */
   --dc-surface: 255 255 255;     /* #FFFFFF - Cards, modals */
-  --dc-border: 209 213 219;      /* #D1D5DB - Dividers */
+
+  /* ↑ bumped to 3:1 vs bg (was 1.47:1) */
+  --dc-border: 146 149 153;      /* #929599 - Dividers */
 
   --dc-text: 17 24 39;           /* #111827 - Body text */
   --dc-text-muted: 75 85 99;     /* #4B5563 - Secondary text */
 
-  --dc-brand: 0 163 155;         /* #00A39B - Links, accents */
+  /* ↑ darkened to pass 4.5:1 on #FFF and 4.5:1 on #F7F9FB */
+  --dc-brand: 0 129 122;         /* #00817A - Links, accents */
+
   --dc-navy: 41 35 92;           /* #29235C - Headings on light */
 
   --dc-primary: 0 97 93;         /* #00615D - Primary buttons */
@@ -21,14 +25,15 @@
   --dc-warning: 180 83 9;        /* #B45309 */
   --dc-error:   185 28 28;       /* #B91C1C */
 
-  --dc-focus: 0 163 155;         /* #00A39B - Focus ring */
+  /* use brand for focus; new brand now AA on light */
+  --dc-focus: 0 129 122;         /* #00817A */
 
-  /* Helpful aliases (hex/rgb) for backwards compatibility with existing classes */
-  --color-brand: #00A39B; /* kept for existing bg-[--color-brand] usage */
+  /* Helpful aliases */
+  --color-brand: #00817A; /* kept for existing bg-[--color-brand] usage */
   --color-indigo-dc: #29235C;
   --font-sans: ui-sans-serif, system-ui, Segoe UI, Roboto, Arial, "Noto Sans";
 
-  /* Map old semantic tokens to new DC tokens so legacy code continues to work */
+  /* Legacy mappings */
   --bg-1: rgb(var(--dc-bg));
   --bg-2: rgb(var(--dc-bg-soft));
   --text: rgb(var(--dc-text));
@@ -47,15 +52,20 @@
   --dc-bg: 14 16 38;             /* #0E1026 */
   --dc-bg-soft: 22 26 47;        /* #161A2F */
   --dc-surface: 22 26 47;        /* #161A2F */
-  --dc-border: 42 47 74;         /* #2A2F4A */
+
+  /* ↑ bumped to 3:1 vs dark bg (was 1.43:1) */
+  --dc-border: 93 97 117;        /* #5D6175 */
 
   --dc-text: 243 244 246;        /* #F3F4F6 */
   --dc-text-muted: 199 203 209;  /* #C7CBD1 */
 
-  --dc-brand: 0 163 155;         /* #00A39B */
-  --dc-navy: 41 35 92;           /* #29235C */
+  --dc-brand: 0 163 155;         /* #00A39B - AA vs dark bg */
 
-  --dc-primary: 0 97 93;         /* #00615D */
+  /* ↑ lightened so headings remain AA on dark bg */
+  --dc-navy: 124 121 156;        /* #7C799C */
+
+  /* ↑ lightened so the filled button hits 3:1 vs bg, while #FFF text stays ≥4.5:1 */
+  --dc-primary: 18 108 104;      /* #126C68 */
   --dc-on-primary: 255 255 255;  /* #FFFFFF */
 
   --dc-success: 34 197 94;       /* #22C55E */
@@ -64,13 +74,14 @@
 
   --dc-focus: 0 163 155;         /* #00A39B */
 
-  /* Backwards-compatible mappings */
+  /* Legacy mappings */
   --bg-1: rgb(var(--dc-bg));
   --bg-2: rgb(var(--dc-bg-soft));
   --text: rgb(var(--dc-text));
   --muted: rgb(var(--dc-text-muted));
   --card: rgb(var(--dc-surface));
 }
+
 
 /* Fluid typography using clamp() - rem base respects user settings */
 html{font-size:100%;-webkit-text-size-adjust:100%}
