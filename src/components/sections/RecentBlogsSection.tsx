@@ -42,18 +42,19 @@ export default function RecentBlogsSection({ data, posts }: RecentBlogsSectionPr
           {posts.length > 0 ? (
             posts.map((post) => {
               const hasValidImage = post.mainImage && typeof post.mainImage === 'object' && 'asset' in post.mainImage
-              const imageUrl = hasValidImage ? urlForImage(post.mainImage)?.width(600).height(400).fit('crop').url() : null
+              const imageUrl = hasValidImage ? urlForImage(post.mainImage)?.width(600).height(400).fit('max').url() : null
 
               return (
                 <HybridCard key={post._id} tone={cardTone} className="h-full overflow-hidden">
                   {imageUrl ? (
-                    <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl">
+                    <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl border-2 border-[rgb(var(--dc-border))] bg-[rgb(var(--dc-surface))]">
                       <Image
                         src={imageUrl}
                         alt={post.mainImage?.alt || ''}
                         fill
                         sizes="(min-width: 1280px) 20rem, (min-width: 768px) 50vw, 100vw"
-                        className="object-cover"
+                        className="object-contain"
+                        style={{ objectFit: 'contain' }}
                       />
                     </div>
                   ) : null}

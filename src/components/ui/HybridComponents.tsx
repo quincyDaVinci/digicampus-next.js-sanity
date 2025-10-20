@@ -19,7 +19,7 @@ export interface HybridSectionProps extends React.HTMLAttributes<HTMLElement> {
 
 export function HybridSection({ as: Component = 'section', variant = 'structured', className, ...props }: HybridSectionProps) {
   const resolvedClassName = cn(SECTION_VARIANTS[variant], className)
-  return <Component {...props} className={resolvedClassName} />
+  return <Component {...props} className={resolvedClassName} data-variant={variant} />
 }
 
 export type CardTone = 'surface' | 'accent' | 'contrast'
@@ -72,13 +72,29 @@ export interface HybridButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonE
 }
 
 export const HybridButton = forwardRef<HTMLButtonElement, HybridButtonProps>(function HybridButton(
-  { variant = 'primary', icon, iconPosition = 'end', className, children, type = 'button', ...props },
+  {
+    variant = 'primary',
+    icon,
+    iconPosition = 'end',
+    className,
+    children,
+    type = 'button',
+    'aria-label': ariaLabel,
+    ...props
+  },
   ref,
 ) {
   const resolvedClassName = cn(BUTTON_VARIANT_CLASSNAMES[variant], className)
+  const computedAriaLabel = ariaLabel ?? (typeof children === 'string' ? children : undefined)
 
   return (
-    <button ref={ref} type={type} className={resolvedClassName} {...props}>
+    <button
+      ref={ref}
+      type={type}
+      className={resolvedClassName}
+      aria-label={computedAriaLabel}
+      {...props}
+    >
       {renderButtonChildren({ icon, iconPosition, children })}
     </button>
   )
@@ -104,9 +120,11 @@ export function HybridLinkButton({
   scroll,
   shallow,
   locale,
+  'aria-label': ariaLabel,
   ...props
 }: HybridLinkButtonProps) {
   const resolvedClassName = cn(BUTTON_VARIANT_CLASSNAMES[variant], className)
+  const computedAriaLabel = ariaLabel ?? (typeof children === 'string' ? children : undefined)
 
   return (
     <Link
@@ -117,6 +135,7 @@ export function HybridLinkButton({
       shallow={shallow}
       locale={locale}
       className={resolvedClassName}
+      aria-label={computedAriaLabel}
       {...props}
     >
       {renderButtonChildren({ icon, iconPosition, children })}

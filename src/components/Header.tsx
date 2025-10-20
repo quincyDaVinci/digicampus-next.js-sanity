@@ -106,7 +106,7 @@ export default function Header(): React.ReactElement {
               aria-pressed={dark}
               aria-label={dark ? "Schakel lichtmodus in" : "Schakel donker modus in"}
               onClick={() => setDark(d => !d)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgb(var(--dc-border)/0.2)] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgb(var(--dc-border))] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none"
             >
               {dark ? <MoonIcon aria-hidden focusable="false" /> : <SunIcon aria-hidden focusable="false" />}
             </button>
@@ -119,7 +119,24 @@ export default function Header(): React.ReactElement {
 
               <form role="search" className="relative min-w-0">
               <label htmlFor="q" className="sr-only">Zoeken</label>
-              <input id="q" name="q" type="search" placeholder="Search" className="w-28 sm:w-44 rounded-full outline-none px-4 py-2 pr-9 min-w-0 text-fluid-sm" style={{ backgroundColor: 'rgb(var(--dc-text) / 0.06)', color: 'rgb(var(--dc-text))', border: '1px solid rgb(var(--dc-border) / 0.2)' }} onFocus={(e)=> { e.currentTarget.style.boxShadow = `0 0 0 4px rgb(var(--dc-focus) / 0.12)`; }} onBlur={(e)=> { e.currentTarget.style.boxShadow = ''; }} />
+              <input
+                id="q"
+                name="q"
+                type="search"
+                placeholder="Search"
+                className="w-28 min-w-0 rounded-full px-4 py-2 pr-9 text-fluid-sm outline-none sm:w-44"
+                style={{
+                  backgroundColor: 'rgb(var(--dc-text) / 0.06)',
+                  color: 'rgb(var(--dc-text))',
+                  border: '1px solid rgb(var(--dc-border))',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.boxShadow = `0 0 0 4px rgb(var(--dc-focus) / 0.35)`
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.boxShadow = ''
+                }}
+              />
               <span aria-hidden className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--dc-text)/0.75)]">
                 <SearchIcon aria-hidden focusable="false" />
               </span>
@@ -135,7 +152,16 @@ export default function Header(): React.ReactElement {
                   <ChevronDownIcon aria-hidden focusable="false" className="h-4 w-4" />
                 </button>
 
-                <div id={`menu-${MENUS.indexOf(m)}`} role="menu" aria-label={m.label} className={["absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl transition-opacity duration-150 motion-reduce:transition-none", openIndex === MENUS.indexOf(m) ? "opacity-100" : "opacity-0 pointer-events-none"].join(" ")} style={{ backgroundColor: 'rgb(var(--dc-surface) / 0.98)', border: '1px solid rgb(var(--dc-border) / 0.1)', color: 'rgb(var(--dc-text))' }}>
+                <div
+                  id={`menu-${MENUS.indexOf(m)}`}
+                  role="menu"
+                  aria-label={m.label}
+                  className={[
+                    "absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl transition-opacity duration-150 motion-reduce:transition-none",
+                    openIndex === MENUS.indexOf(m) ? "opacity-100" : "opacity-0 pointer-events-none",
+                  ].join(" ")}
+                  style={{ backgroundColor: 'rgb(var(--dc-surface) / 0.98)', border: '1px solid rgb(var(--dc-border))', color: 'rgb(var(--dc-text))' }}
+                >
                   <ul className="py-2">
                       {m.items.map(it => (
                       <li key={it.href}><Link href={it.href} role="menuitem" onClick={() => setOpenIndex(null)} className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm" style={{ color: 'rgb(var(--dc-text))' }}>{it.label}</Link></li>
@@ -160,7 +186,7 @@ export default function Header(): React.ReactElement {
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
             onClick={() => setMobileOpen(v => !v)}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgb(var(--dc-border)/0.2)] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgb(var(--dc-border))] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none"
             aria-label={mobileOpen ? "Sluit menu" : "Open menu"}
           >
             {mobileOpen ? <CloseIcon aria-hidden focusable="false" /> : <MenuIcon aria-hidden focusable="false" />}
@@ -176,20 +202,45 @@ export default function Header(): React.ReactElement {
               onClick={() => setDark(d => !d)}
               aria-pressed={dark}
               aria-label={dark ? "Schakel lichtmodus in" : "Schakel donker modus in"}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgb(var(--dc-border)/0.2)] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgb(var(--dc-border))] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none"
             >
               {dark ? <MoonIcon aria-hidden focusable="false" /> : <SunIcon aria-hidden focusable="false" />}
             </button>
             <div className="flex items-center gap-1">
-              <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none text-fluid-sm", language === "nl" ? "" : ""].join(" ")} style={language === "nl" ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' } : { border: '1px solid rgb(var(--dc-border)/0.18)', color: 'rgb(var(--dc-text))' }}>NL</button>
-              <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none text-fluid-sm", language === "en" ? "" : ""].join(" ")} style={language === "en" ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' } : { border: '1px solid rgb(var(--dc-border)/0.18)', color: 'rgb(var(--dc-text))' }}>EN</button>
+              <button
+                onClick={() => changeLanguage("nl")}
+                aria-pressed={language === "nl"}
+                className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none text-fluid-sm", language === "nl" ? "" : ""].join(" ")}
+                style={
+                  language === "nl"
+                    ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' }
+                    : { border: '1px solid rgb(var(--dc-border))', color: 'rgb(var(--dc-text))' }
+                }
+              >
+                NL
+              </button>
+              <button
+                onClick={() => changeLanguage("en")}
+                aria-pressed={language === "en"}
+                className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none text-fluid-sm", language === "en" ? "" : ""].join(" ")}
+                style={
+                  language === "en"
+                    ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' }
+                    : { border: '1px solid rgb(var(--dc-border))', color: 'rgb(var(--dc-text))' }
+                }
+              >
+                EN
+              </button>
             </div>
           </div>
         </div>
 
         {/* Mobile panel */}
         <div id="mobile-menu" className={["md:hidden transition-all duration-300 overflow-hidden motion-reduce:transition-none", mobileOpen ? "max-h-[80vh] mt-3" : "max-h-0"].join(" ")}>
-          <div className="rounded-2xl p-3 backdrop-blur" style={{ border: '1px solid rgb(var(--dc-border)/0.1)', backgroundColor: 'rgb(var(--dc-surface)/0.9)', color: 'rgb(var(--dc-text))' }}>
+          <div
+            className="rounded-2xl p-3 backdrop-blur"
+            style={{ border: '1px solid rgb(var(--dc-border))', backgroundColor: 'rgb(var(--dc-surface)/0.9)', color: 'rgb(var(--dc-text))' }}
+          >
             <ul className="space-y-2">
               {MENUS.map(m => (
                 <li key={m.label}>

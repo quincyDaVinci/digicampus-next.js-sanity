@@ -1,5 +1,11 @@
 import { ArrowRightIcon, featherIconMap } from '@/components/icons/FeatherIcons'
-import { HybridBadge, HybridCard, HybridLinkButton, HybridSection } from '@/components/ui/HybridComponents'
+import {
+  HybridBadge,
+  HybridCard,
+  HybridLinkButton,
+  HybridSection,
+  type SectionVariant,
+} from '@/components/ui/HybridComponents'
 import {
   type HybridComponentData,
   type HybridComponentTone,
@@ -22,6 +28,24 @@ const badgeToneByCard: Record<HybridComponentTone, 'accent' | 'muted' | 'contras
 }
 
 const sectionVariantFallback = 'structured' as const
+
+const sectionPreviews: Array<{ variant: SectionVariant; title: string; description: string }> = [
+  {
+    variant: 'structured',
+    title: 'Standaard sectie',
+    description: 'Zachte achtergrond voor neutrale contentblokken.',
+  },
+  {
+    variant: 'fresh',
+    title: 'Accent sectie',
+    description: 'Voegt een subtiel accentkader toe voor nadruk zonder schreeuwerig te zijn.',
+  },
+  {
+    variant: 'contrast',
+    title: 'CTA sectie',
+    description: 'Volledig contrasterende achtergrond die direct in het oog springt.',
+  },
+]
 
 interface HybridComponentGalleryProps {
   components?: HybridComponentData[]
@@ -50,6 +74,21 @@ export default function HybridComponentGallery({ components }: HybridComponentGa
             Deze hybride bibliotheek combineert de expressieve styling van DaisyUI met de WCAG-patronen van het NL Design System.
             Elk onderdeel is beschikbaar in de Sanity Studio pagina-builder.
           </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3" aria-label="Visuele voorbeelden van sectiestijlen">
+          {sectionPreviews.map((preview) => (
+            <div key={preview.variant} className="style-preview-card" role="group" aria-labelledby={`style-preview-${preview.variant}`}>
+              <div
+                id={`style-preview-${preview.variant}`}
+                className="style-preview-card__swatch"
+                data-variant={preview.variant}
+                aria-hidden
+              >
+                {preview.title}
+              </div>
+              <p className="text-sm text-[rgb(var(--dc-text)/0.72)] dark:text-[rgb(var(--dc-text)/0.76)]">{preview.description}</p>
+            </div>
+          ))}
         </div>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((component) => {
