@@ -7,116 +7,79 @@ export const pageSectionType = defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Interne naam',
+      title: '🏷️ Interne naam',
       type: 'string',
-      description: 'Gebruik dit om secties in de lijst snel terug te vinden (niet zichtbaar op de website).',
+      description: 'Geef de sectie een herkenbare naam zodat je hem later snel terugvindt. Niet zichtbaar op de website.',
     }),
     defineField({
       name: 'layout',
-      title: 'Lay-out instellingen',
+      title: '🧱 Opbouw',
       type: 'object',
       options: {
-        collapsible: true,
-        collapsed: false,
+        collapsible: false,
       },
       fields: [
         defineField({
           name: 'contentWidth',
-          title: 'Breedte inhoud',
+          title: '📏 Breedte van de inhoud',
           type: 'string',
+          description: 'Bepaal hoe breed de contentlijn mag worden. Breder is ideaal voor visuals, smaller voor tekst.',
           options: {
             list: [
-              {title: 'Smalle kolom', value: 'narrow'},
-              {title: 'Standaard', value: 'default'},
-              {title: 'Breed', value: 'wide'},
-              {title: 'Volledige breedte', value: 'full'},
+              {title: '📄 Standaard', value: 'default'},
+              {title: '📰 Breed', value: 'wide'},
+              {title: '🧘 Volledige breedte', value: 'full'},
+              {title: '✏️ Compact', value: 'narrow'},
             ],
             layout: 'radio',
+            direction: 'horizontal',
           },
           initialValue: 'default',
         }),
         defineField({
-          name: 'paddingY',
-          title: 'Verticale ruimte',
+          name: 'verticalSpacing',
+          title: '↕️ Ruimte boven & onder',
           type: 'string',
+          description: 'Hoeveel ademruimte krijgt de sectie? Kies compact voor korte snippets of luchtig voor hero’s.',
           options: {
             list: [
-              {title: 'Geen', value: 'none'},
-              {title: 'Klein', value: 'sm'},
-              {title: 'Normaal', value: 'md'},
-              {title: 'Groot', value: 'lg'},
-              {title: 'Extra groot', value: 'xl'},
-            ],
-          },
-          initialValue: 'lg',
-        }),
-        defineField({
-          name: 'paddingX',
-          title: 'Horizontale ruimte',
-          type: 'string',
-          options: {
-            list: [
-              {title: 'Geen', value: 'none'},
-              {title: 'Compact', value: 'sm'},
-              {title: 'Normaal', value: 'md'},
-              {title: 'Ruim', value: 'lg'},
-            ],
-          },
-          initialValue: 'md',
-        }),
-        defineField({
-          name: 'componentSpacing',
-          title: 'Ruimte tussen componenten',
-          type: 'string',
-          options: {
-            list: [
-              {title: 'Compact', value: 'tight'},
-              {title: 'Normaal', value: 'normal'},
-              {title: 'Ruim', value: 'relaxed'},
-            ],
-          },
-          initialValue: 'normal',
-        }),
-        defineField({
-          name: 'horizontalAlignment',
-          title: 'Horizontale uitlijning',
-          type: 'string',
-          options: {
-            list: [
-              {title: 'Links', value: 'left'},
-              {title: 'Midden', value: 'center'},
-              {title: 'Rechts', value: 'right'},
+              {title: '🥪 Compact', value: 'cozy'},
+              {title: '😌 Ruim', value: 'roomy'},
+              {title: '🌬️ Luchtig', value: 'airy'},
             ],
             layout: 'radio',
+            direction: 'horizontal',
+          },
+          initialValue: 'roomy',
+        }),
+        defineField({
+          name: 'alignment',
+          title: '🧭 Uitlijning van de inhoud',
+          type: 'string',
+          description: 'Kies of teksten en knoppen netjes links uitlijnen of vriendelijk gecentreerd worden weergegeven.',
+          options: {
+            list: [
+              {title: '⬅️ Links', value: 'left'},
+              {title: '↔️ Midden', value: 'center'},
+            ],
+            layout: 'radio',
+            direction: 'horizontal',
           },
           initialValue: 'left',
-        }),
-        defineField({
-          name: 'verticalAlignment',
-          title: 'Verticale uitlijning',
-          type: 'string',
-          options: {
-            list: [
-              {title: 'Boven', value: 'top'},
-              {title: 'Midden', value: 'center'},
-              {title: 'Onder', value: 'bottom'},
-            ],
-            layout: 'radio',
-          },
-          initialValue: 'top',
         }),
       ],
     }),
     defineField({
       name: 'background',
-      title: 'Achtergrond',
+      title: '🎨 Achtergrond',
       type: 'backgroundComponent',
-      description: 'Kies optioneel een aangepaste achtergrond voor deze sectie.',
+      description: 'Geef de sectie een eigen sfeer met een toon, patroon of subtiele lijn.',
     }),
     defineField({
       name: 'columns',
-      title: 'Kolommen',
+      title: '📚 Kolommen',
       type: 'array',
+      description: 'Bepaal hoe de inhoud in kolommen wordt verdeeld. Sleep om de volgorde snel aan te passen.',
       of: [defineArrayMember({type: 'pageColumn'})],
       validation: (rule) => rule.min(1).error('Voeg ten minste één kolom toe aan de sectie.'),
     }),
@@ -125,7 +88,7 @@ export const pageSectionType = defineType({
     select: {
       title: 'title',
       columns: 'columns',
-      background: 'background.mode',
+      background: 'background.tone',
     },
     prepare({title, columns, background}) {
       const count = columns?.length ?? 0
@@ -133,7 +96,7 @@ export const pageSectionType = defineType({
         title: title || 'Nieuwe sectie',
         subtitle: [
           count ? `${count} kolom${count === 1 ? '' : 'men'}` : 'Nog geen kolommen',
-          background ? `Achtergrond: ${background}` : undefined,
+          background ? `🎨 ${background}` : undefined,
         ]
           .filter(Boolean)
           .join(' · '),

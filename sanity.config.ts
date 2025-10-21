@@ -12,7 +12,7 @@ import {presentationTool, defineLocations} from 'sanity/presentation'
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
 import {apiVersion, dataset, projectId} from './sanity/env'
 import {schema} from './sanity/schemaTypes'
-import {structure} from './sanity/structure'
+import {structure, defaultDocumentNode} from './sanity/structure'
 import {customDocumentActions} from './sanity/lib/documentActions'
 
 export default defineConfig({
@@ -25,7 +25,7 @@ export default defineConfig({
     actions: customDocumentActions,
   },
   plugins: [
-    structureTool({structure}),
+    structureTool({structure, defaultDocumentNode}),
     presentationTool({
       previewUrl: {
         origin: 'http://localhost:3000',
@@ -67,7 +67,7 @@ export default defineConfig({
             select: {
               title: 'title',
             },
-            resolve: (doc) => ({
+            resolve: () => ({
               locations: [
                 {
                   title: 'Home',

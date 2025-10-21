@@ -1,5 +1,5 @@
-import { HomeIcon } from '../lib/featherIcons'
-import { defineArrayMember, defineField, defineType } from 'sanity'
+import {HomeIcon} from '../lib/featherIcons'
+import {defineArrayMember, defineField, defineType} from 'sanity'
 
 export const homePageType = defineType({
   name: 'homePage',
@@ -54,7 +54,7 @@ export const homePageType = defineType({
       name: 'hybridComponents',
       title: 'Hybride componenten',
       type: 'array',
-      of: [defineArrayMember({ type: 'hybridComponent' })],
+      of: [defineArrayMember({type: 'hybridComponent'})],
       validation: (rule) => rule.max(6),
     }),
   ],

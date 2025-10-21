@@ -9,29 +9,27 @@ export type DesignTokenValue =
   | 'navy'
   | 'text'
 
+export type BackgroundTone = 'surface' | 'soft' | 'brand' | 'contrast'
+export type BackgroundTexture = 'none' | 'dots' | 'grid'
+
+export interface SanityImageValue {
+  asset?: {
+    _ref?: string
+    url?: string
+    metadata?: {
+      lqip?: string
+      dimensions?: {width: number; height: number}
+    }
+  }
+  alt?: string
+  caption?: string
+}
+
 export interface BackgroundComponent {
   _type: 'backgroundComponent'
-  mode?: 'color' | 'gradient' | 'image' | 'texture'
-  colorToken?: DesignTokenValue
-  secondaryColorToken?: DesignTokenValue
-  customColor?: string | null
-  image?: {
-    asset?: {
-      _ref?: string
-      url?: string
-      metadata?: {
-        lqip?: string
-        dimensions?: {width: number; height: number}
-      }
-    }
-    alt?: string
-    caption?: string
-  }
-  imageTint?: DesignTokenValue
-  imageTintOpacity?: number | null
-  texture?: 'none' | 'dots' | 'grid' | 'diagonal'
-  overlay?: DesignTokenValue
-  overlayOpacity?: number | null
+  tone?: BackgroundTone
+  texture?: BackgroundTexture
+  showDivider?: boolean
   ariaLabel?: string
 }
 
@@ -43,7 +41,7 @@ export interface LinkField {
 export interface ImageComponent {
   _type: 'imageComponent'
   _key: string
-  image?: BackgroundComponent['image']
+  image?: SanityImageValue
   displayWidth?: 'narrow' | 'default' | 'wide' | 'full'
   alignment?: 'left' | 'center' | 'right'
   rounded?: boolean
@@ -71,7 +69,7 @@ export interface VideoComponent {
       url?: string
     }
   }
-  poster?: BackgroundComponent['image']
+  poster?: SanityImageValue
   title: string
   transcript?: string
   captionsFile?: {
@@ -105,7 +103,7 @@ export interface BlogCardResolvedPost {
   slug?: string
   publishedAt?: string
   summary?: string
-  mainImage?: BackgroundComponent['image']
+  mainImage?: SanityImageValue
   author?: {
     name?: string
   }
@@ -145,20 +143,15 @@ export type PageComponent =
 export interface PageColumn {
   _key: string
   width: '1/1' | '1/2' | '1/3' | '2/3'
-  horizontalAlignment?: 'flex-start' | 'center' | 'flex-end' | 'stretch'
-  verticalAlignment?: 'flex-start' | 'center' | 'flex-end'
-  componentSpacing?: 'tight' | 'normal' | 'relaxed'
-  placement?: 'top' | 'bottom' | 'left' | 'right'
+  align?: 'start' | 'center' | 'end'
+  spacing?: 'tight' | 'normal' | 'relaxed'
   components: PageComponent[]
 }
 
 export interface SectionLayout {
   contentWidth?: 'narrow' | 'default' | 'wide' | 'full'
-  paddingY?: 'none' | 'sm' | 'md' | 'lg' | 'xl'
-  paddingX?: 'none' | 'sm' | 'md' | 'lg'
-  componentSpacing?: 'tight' | 'normal' | 'relaxed'
-  horizontalAlignment?: 'left' | 'center' | 'right'
-  verticalAlignment?: 'top' | 'center' | 'bottom'
+  verticalSpacing?: 'cozy' | 'roomy' | 'airy'
+  alignment?: 'left' | 'center'
 }
 
 export interface PageSection {

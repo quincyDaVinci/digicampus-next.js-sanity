@@ -1,12 +1,23 @@
-import {BookOpenIcon, FileTextIcon, HomeIcon, LayersIcon, UsersIcon, TagIcon} from './lib/featherIcons'
-import type {StructureResolver} from 'sanity/structure'
+import {
+  BookOpenIcon,
+  FileTextIcon,
+  HomeIcon,
+  LayersIcon,
+  UsersIcon,
+  TagIcon,
+} from './lib/featherIcons'
+import type {DefaultDocumentNodeResolver, StructureResolver} from 'sanity/structure'
 
-// https://www.sanity.io/docs/structure-builder-cheat-sheet
+import PreviewPane from './lib/PreviewPane'
+
+const previewOptions = {
+  previewBaseUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+}
+
 export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
     .items([
-      // Pages section with nested structure
       S.listItem()
         .title('Pages')
         .icon(FileTextIcon)
@@ -14,7 +25,6 @@ export const structure: StructureResolver = (S) =>
           S.list()
             .title('Pages')
             .items([
-              // Premade pages subsection
               S.listItem()
                 .title('Premade Pages')
                 .icon(HomeIcon)
@@ -26,35 +36,28 @@ export const structure: StructureResolver = (S) =>
                         .id('homePage')
                         .schemaType('homePage')
                         .title('Home Page'),
-                      // Add more premade page templates here in the future
-                    ])
+                    ]),
                 ),
               S.divider(),
-              // All other pages
               S.listItem()
                 .title('All Pages')
                 .icon(FileTextIcon)
                 .child(
                   S.documentTypeList('page')
                     .title('All Pages')
-                    .defaultOrdering([{field: 'title', direction: 'asc'}])
+                    .defaultOrdering([{field: 'title', direction: 'asc'}]),
                 ),
-            ])
+            ]),
         ),
-      
-      // Blogs section
       S.listItem()
         .title('Blogs')
         .icon(BookOpenIcon)
         .child(
           S.documentTypeList('post')
             .title('Blog Posts')
-            .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
+            .defaultOrdering([{field: 'publishedAt', direction: 'desc'}]),
         ),
-      
       S.divider(),
-      
-      // Navigation section
       S.listItem()
         .title('Navigation')
         .icon(LayersIcon)
@@ -66,26 +69,35 @@ export const structure: StructureResolver = (S) =>
                 .id('navigation')
                 .schemaType('navigation')
                 .title('Header Navigation'),
-              // Add footer navigation or other nav items here if needed
-            ])
+              S.documentListItem()
+                .id('footerNavigation')
+                .schemaType('footerNavigation')
+                .title('Footer Navigation'),
+            ]),
         ),
-      
       S.divider(),
-      
-      // Team Members
       S.documentTypeListItem('author')
         .title('Team Members')
         .icon(UsersIcon),
-      
       S.divider(),
-      
-      // Tags
       S.documentTypeListItem('tag')
         .title('Tags')
         .icon(TagIcon),
-      
-      // Categories
       S.documentTypeListItem('category')
         .title('Categories')
         .icon(TagIcon),
     ])
+
+export const defaultDocumentNode: DefaultDocumentNodeResolver = (S, {schemaType}) => {
+  if (['page', 'post', 'homePage'].includes(schemaType)) {
+    return S.document().views([
+      S.view.form().title('✏️ Bewerken'),
+      S.view
+        .component(PreviewPane)
+        .options(previewOptions)
+        .title('🔍 Preview'),
+    ])
+  }
+
+  return S.document().views([S.view.form()])
+}

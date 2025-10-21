@@ -1,4 +1,4 @@
-import { type SchemaTypeDefinition } from 'sanity'
+import {type SchemaTypeDefinition} from 'sanity'
 
 import {blockContentType} from './blockContentType'
 import {categoryType} from './categoryType'
@@ -26,13 +26,15 @@ import {videoComponentType} from './components/videoComponentType'
 import {buttonComponentType} from './components/buttonComponentType'
 import {blogCardComponentType} from './components/blogCardComponentType'
 import {carouselComponentType} from './components/carouselComponentType'
+import {footerNavigationType} from './footerNavigationType'
 
-export const schema: { types: SchemaTypeDefinition[] } = {
+export const schema: {types: SchemaTypeDefinition[]} = {
   types: [
     blockContentType,
     categoryType,
     tagType,
     navigationType,
+    footerNavigationType,
     postType,
     authorType,
     linkFieldType,

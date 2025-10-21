@@ -1,9 +1,9 @@
 import {LayersIcon} from '../lib/featherIcons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-export const navigationType = defineType({
-  name: 'navigation',
-  title: 'Navigation',
+export const footerNavigationType = defineType({
+  name: 'footerNavigation',
+  title: 'Footer Navigation',
   type: 'document',
   icon: LayersIcon,
   __experimental_actions: ['update', 'publish'],
@@ -12,53 +12,46 @@ export const navigationType = defineType({
       name: 'title',
       title: 'Titel',
       type: 'string',
-      initialValue: 'Header Navigation',
+      initialValue: 'Footer Navigation',
       readOnly: true,
     }),
     defineField({
-      name: 'menuItems',
-      title: '📁 Hoofdmenu',
+      name: 'columns',
+      title: '📚 Footer kolommen',
       type: 'array',
-      description: 'Voeg hoofdnavigatie toe. Gebruik subitems voor dropdowns.',
+      description: 'Maak logische kolommen zoals “Over ons” of “Contact”. Voeg binnen elke kolom links toe.',
       of: [
         defineArrayMember({
           type: 'object',
-          name: 'menuItem',
-          title: 'Menu item',
+          name: 'footerColumn',
+          title: 'Footer kolom',
           fields: [
             defineField({
-              name: 'label',
-              title: '🏷️ Label',
+              name: 'heading',
+              title: '🏷️ Kolomtitel',
               type: 'string',
-              validation: (Rule) => Rule.required(),
+              validation: (rule) => rule.required(),
             }),
             defineField({
-              name: 'href',
-              title: '🔗 Link',
-              type: 'string',
-              description: 'Voer een URL of slug in. Bijvoorbeeld /over-ons.',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'items',
-              title: '🪄 Sub items (optioneel)',
+              name: 'links',
+              title: '🔗 Links',
               type: 'array',
               of: [
                 defineArrayMember({
                   type: 'object',
-                  name: 'subMenuItem',
+                  name: 'footerLink',
                   fields: [
                     defineField({
                       name: 'label',
-                      title: '🏷️ Label',
+                      title: 'Label',
                       type: 'string',
-                      validation: (Rule) => Rule.required(),
+                      validation: (rule) => rule.required(),
                     }),
                     defineField({
                       name: 'href',
-                      title: '🔗 Link',
+                      title: 'URL of pagina',
                       type: 'string',
-                      validation: (Rule) => Rule.required(),
+                      validation: (rule) => rule.required(),
                     }),
                   ],
                   preview: {
@@ -69,17 +62,18 @@ export const navigationType = defineType({
                   },
                 }),
               ],
+              validation: (rule) => rule.min(1).error('Voeg minstens één link toe'),
             }),
           ],
           preview: {
             select: {
-              title: 'label',
-              items: 'items',
+              title: 'heading',
+              links: 'links',
             },
-            prepare({title, items}) {
+            prepare({title, links}) {
               return {
-                title,
-                subtitle: items?.length ? `${items.length} sub-items` : 'Geen sub-items',
+                title: title || 'Footer kolom',
+                subtitle: links?.length ? `${links.length} links` : 'Nog geen links',
               }
             },
           },
@@ -90,7 +84,7 @@ export const navigationType = defineType({
   preview: {
     prepare() {
       return {
-        title: 'Header Navigation',
+        title: 'Footer Navigation',
       }
     },
   },

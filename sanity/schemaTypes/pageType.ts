@@ -54,28 +54,43 @@ export const pageType = defineType({
         rule
           .min(1)
           .error('Een pagina heeft minstens één sectie nodig.')
-          .custom((sections) => {
+          .custom((sections: unknown) => {
             if (!Array.isArray(sections)) {
               return 'Voeg minimaal één sectie toe.'
             }
 
-            const countH1 = (item: any): number => {
-              if (!item) return 0
+            type RichTextComponentValue = {
+              _type?: string
+              content?: Array<{style?: string}>
+            }
+
+            type CarouselComponentValue = {
+              _type?: string
+              items?: ComponentValue[]
+            }
+
+            type ComponentValue = RichTextComponentValue | CarouselComponentValue | {_type?: string}
+            type ColumnValue = {components?: ComponentValue[]}
+            type SectionValue = {columns?: ColumnValue[]}
+
+            const countH1 = (item?: ComponentValue | null): number => {
+              if (!item?._type) return 0
               if (item._type === 'richTextComponent') {
                 const blocks = Array.isArray(item.content) ? item.content : []
-                return blocks.filter((block: any) => block?.style === 'h1').length
+                return blocks.filter((block) => block?.style === 'h1').length
               }
               if (item._type === 'carouselComponent') {
-                return (item.items ?? []).reduce((sum: number, sub: any) => sum + countH1(sub), 0)
+                const carouselItems = (item as CarouselComponentValue).items ?? []
+                return carouselItems.reduce((sum, subItem) => sum + countH1(subItem), 0)
               }
               return 0
             }
 
-            const totalH1 = sections.reduce((sectionCount: number, section: any) => {
+            const totalH1 = (sections as SectionValue[]).reduce((sectionCount, section) => {
               const columns = Array.isArray(section?.columns) ? section.columns : []
-              const columnCount = columns.reduce((columnSum: number, column: any) => {
+              const columnCount = columns.reduce((columnSum, column) => {
                 const components = Array.isArray(column?.components) ? column.components : []
-                return columnSum + components.reduce((componentSum: number, component: any) => componentSum + countH1(component), 0)
+                return columnSum + components.reduce((componentSum, component) => componentSum + countH1(component), 0)
               }, 0)
               return sectionCount + columnCount
             }, 0)

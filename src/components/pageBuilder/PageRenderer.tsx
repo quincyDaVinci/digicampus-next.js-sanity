@@ -1,6 +1,6 @@
 import type {CSSProperties, ReactNode} from 'react'
 
-import BackgroundLayer from './BackgroundLayer'
+import BackgroundLayer, {getToneTextColor} from './BackgroundLayer'
 import BlogCard from './BlogCard'
 import ButtonBlock from './ButtonBlock'
 import Carousel from './Carousel'
@@ -9,19 +9,10 @@ import RichTextBlock from './RichTextBlock'
 import VideoBlock from './VideoBlock'
 import type {PageComponent, PageDocument, PageSection} from '@/types/pageBuilder'
 
-const paddingYMap = {
-  none: 'py-0',
-  sm: 'py-8',
-  md: 'py-12',
-  lg: 'py-16',
-  xl: 'py-24',
-} as const
-
-const paddingXMap = {
-  none: 'px-0',
-  sm: 'px-4',
-  md: 'px-6',
-  lg: 'px-8',
+const verticalSpacingMap = {
+  cozy: 'py-10',
+  roomy: 'py-16',
+  airy: 'py-24',
 } as const
 
 const contentWidthMap = {
@@ -31,10 +22,16 @@ const contentWidthMap = {
   full: 'max-w-none w-full',
 } as const
 
-const componentSpacingMap = {
+const columnSpacingMap = {
   tight: 'space-y-4',
   normal: 'space-y-6',
   relaxed: 'space-y-10',
+} as const
+
+const columnAlignMap = {
+  start: 'items-start text-left',
+  center: 'items-center text-center',
+  end: 'items-end text-right',
 } as const
 
 function renderComponent(component: PageComponent, depth = 0): ReactNode {
@@ -77,33 +74,26 @@ function renderComponent(component: PageComponent, depth = 0): ReactNode {
 
 function SectionContainer({section, children}: {section: PageSection; children: ReactNode}) {
   const layout = section.layout ?? {}
-  const paddingY = layout.paddingY ? paddingYMap[layout.paddingY] : paddingYMap.lg
-  const paddingX = layout.paddingX ? paddingXMap[layout.paddingX] : paddingXMap.md
+  const verticalSpacing = layout.verticalSpacing ? verticalSpacingMap[layout.verticalSpacing] : verticalSpacingMap.roomy
   const contentWidth = layout.contentWidth ? contentWidthMap[layout.contentWidth] : contentWidthMap.default
-  const horizontalAlignment = layout.horizontalAlignment ?? 'left'
-
-  const alignmentClass =
-    horizontalAlignment === 'center'
-      ? 'items-center'
-      : horizontalAlignment === 'right'
-        ? 'items-end'
-        : 'items-start'
+  const alignment = layout.alignment ?? 'left'
+  const alignmentClasses = alignment === 'center' ? 'items-center text-center' : 'items-start text-left'
+  const textColor = getToneTextColor(section.background?.tone)
 
   const containerClasses = [
-    'relative z-10 mx-auto flex w-full flex-col',
-    alignmentClass,
-    paddingX,
+    'relative z-10 mx-auto flex w-full flex-col gap-8 px-6 md:px-8',
+    alignmentClasses,
     contentWidth,
   ]
     .filter(Boolean)
     .join(' ')
 
   return (
-    <section className={`relative ${paddingY}`}>
+    <section className={`relative ${verticalSpacing}`}>
       {section.background ? <BackgroundLayer background={section.background} /> : null}
-      <div className={containerClasses} style={{color: 'rgb(var(--dc-text))'}}>
+      <div className={containerClasses} style={{color: textColor}}>
         {section.title ? (
-          <h2 className="mb-8 text-fluid-lg font-semibold text-[rgb(var(--dc-navy))]">
+          <h2 className="mb-6 text-fluid-lg font-semibold">
             {section.title}
           </h2>
         ) : null}
@@ -147,23 +137,11 @@ export default function PageRenderer({page}: {page: PageDocument}) {
               style={gridTemplate ? ({gridTemplateColumns: gridTemplate} as CSSProperties) : undefined}
             >
               {columns.map((column) => {
-                const spacingClass = column.componentSpacing ? componentSpacingMap[column.componentSpacing] : componentSpacingMap.normal
-                const verticalAlignment = column.verticalAlignment ?? 'flex-start'
-                let justifyContent = verticalAlignment
-                if (column.placement === 'bottom') justifyContent = 'flex-end'
-                if (column.placement === 'top') justifyContent = 'flex-start'
-                const alignItems = column.horizontalAlignment ?? 'flex-start'
-                const computedAlignItems = column.placement === 'left' ? 'flex-start' : column.placement === 'right' ? 'flex-end' : alignItems
+                const spacingClass = column.spacing ? columnSpacingMap[column.spacing] : columnSpacingMap.normal
+                const alignClass = column.align ? columnAlignMap[column.align] : columnAlignMap.start
 
                 return (
-                  <div
-                    key={column._key}
-                    className={`flex flex-col ${spacingClass}`}
-                    style={{
-                      justifyContent,
-                      alignItems: computedAlignItems,
-                    }}
-                  >
+                  <div key={column._key} className={`flex flex-col ${spacingClass} ${alignClass}`}>
                     {column.components?.map((component) => (
                       <div key={component._key}>{renderComponent(component, 0)}</div>
                     ))}

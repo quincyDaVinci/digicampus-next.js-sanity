@@ -1,97 +1,85 @@
 import type {CSSProperties} from 'react'
 
-import {urlFor} from '@sanity/lib/image'
+import type {BackgroundComponent, BackgroundTone} from '@/types/pageBuilder'
 
-import type {BackgroundComponent} from '@/types/pageBuilder'
-
-import {tokenToCss} from './colorUtils'
-
-interface BackgroundLayerProps {
-  background?: BackgroundComponent | null
-  className?: string
+const toneSettings: Record<BackgroundTone, {background: string; text: string; divider: string; pattern: string}> = {
+  surface: {
+    background: 'rgb(var(--dc-surface))',
+    text: 'rgb(var(--dc-navy))',
+    divider: 'rgba(15, 23, 42, 0.12)',
+    pattern: 'rgba(15, 23, 42, 0.06)',
+  },
+  soft: {
+    background: 'rgb(var(--dc-bg-soft))',
+    text: 'rgb(var(--dc-navy))',
+    divider: 'rgba(15, 23, 42, 0.12)',
+    pattern: 'rgba(15, 23, 42, 0.08)',
+  },
+  brand: {
+    background: 'rgb(var(--dc-brand))',
+    text: 'rgb(var(--dc-surface))',
+    divider: 'rgba(255, 255, 255, 0.25)',
+    pattern: 'rgba(255, 255, 255, 0.15)',
+  },
+  contrast: {
+    background: 'rgb(var(--dc-navy))',
+    text: 'rgb(var(--dc-surface))',
+    divider: 'rgba(255, 255, 255, 0.2)',
+    pattern: 'rgba(255, 255, 255, 0.12)',
+  },
 }
 
-export default function BackgroundLayer({background, className}: BackgroundLayerProps) {
+function getToneSetting(tone?: BackgroundTone) {
+  if (!tone) return toneSettings.surface
+  return toneSettings[tone] ?? toneSettings.surface
+}
+
+export function getToneTextColor(tone?: BackgroundTone) {
+  return getToneSetting(tone).text
+}
+
+export default function BackgroundLayer({background, className}: {background?: BackgroundComponent | null; className?: string}) {
   if (!background) return null
 
+  const tone = background.tone ?? 'surface'
+  const settings = getToneSetting(tone)
+  const layers: string[] = []
   const baseStyle: CSSProperties = {
     position: 'absolute',
     inset: 0,
     width: '100%',
     height: '100%',
     pointerEvents: 'none',
-    backgroundRepeat: 'no-repeat',
+    backgroundColor: settings.background,
+    backgroundRepeat: 'repeat',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
+    borderRadius: 'inherit',
+    boxShadow: background.showDivider
+      ? `inset 0 1px 0 0 ${settings.divider}, inset 0 -1px 0 0 ${settings.divider}`
+      : undefined,
   }
 
-  const layers: string[] = []
-  let backgroundColor: string | undefined
-
-  if (background.mode === 'color') {
-    backgroundColor = tokenToCss(background.colorToken) ?? background.customColor ?? tokenToCss('surface')
-  }
-
-  if (background.mode === 'gradient') {
-    const first = background.customColor ?? tokenToCss(background.colorToken) ?? tokenToCss('brand')
-    const second = tokenToCss(background.secondaryColorToken) ?? tokenToCss('primary') ?? first
-    layers.push(`linear-gradient(135deg, ${first}, ${second})`)
-  }
-
-  if (background.mode === 'image' && background.image?.asset) {
-    const tintColor = tokenToCss(background.imageTint, background.imageTintOpacity ?? 0.45)
-    if (tintColor) {
-      layers.push(`linear-gradient(${tintColor}, ${tintColor})`)
-    }
-    const imageUrl = urlFor(background.image).width(2400).fit('max').auto('format').url()
-    if (imageUrl) {
-      layers.push(`url(${imageUrl})`)
-    }
-  }
-
-  if (background.mode === 'texture') {
-    const base = tokenToCss(background.colorToken) ?? 'rgb(var(--dc-bg-soft))'
-    backgroundColor = base
-    const patternColor = tokenToCss('brand', 0.1) ?? 'rgba(0,0,0,0.05)'
+  if (background.texture && background.texture !== 'none') {
     switch (background.texture) {
       case 'dots':
-        layers.push(
-          `radial-gradient(circle at 1px 1px, ${patternColor} 1px, transparent 0)`,
-        )
+        layers.push(`radial-gradient(circle at 1px 1px, ${settings.pattern} 1px, transparent 0)`)
         baseStyle.backgroundSize = '24px 24px'
         break
       case 'grid':
         layers.push(
-          `linear-gradient(${patternColor} 1px, transparent 0), linear-gradient(90deg, ${patternColor} 1px, transparent 0)`,
+          `linear-gradient(${settings.pattern} 1px, transparent 0), linear-gradient(90deg, ${settings.pattern} 1px, transparent 0)`,
         )
         baseStyle.backgroundSize = '32px 32px'
         break
-      case 'diagonal':
-        layers.push(`repeating-linear-gradient(135deg, transparent, transparent 16px, ${patternColor} 16px, ${patternColor} 32px)`)
-        break
       default:
-        layers.push(`linear-gradient(${patternColor}, ${patternColor})`)
         break
     }
-  }
-
-  if (background.overlay) {
-    const overlayColor = tokenToCss(background.overlay, background.overlayOpacity ?? 0.32)
-    if (overlayColor) {
-      layers.unshift(`linear-gradient(${overlayColor}, ${overlayColor})`)
-    }
-  }
-
-  if (!layers.length && !backgroundColor) {
-    backgroundColor = 'rgb(var(--dc-bg-soft))'
   }
 
   const style: CSSProperties = {
     ...baseStyle,
-    backgroundColor,
     backgroundImage: layers.length ? layers.join(',') : undefined,
-    backgroundBlendMode: layers.length > 1 ? 'overlay, normal' : undefined,
-    borderRadius: 'inherit',
   }
 
   const isDecorative = !background.ariaLabel
