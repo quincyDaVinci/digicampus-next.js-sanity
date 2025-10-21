@@ -41,8 +41,62 @@
   --card: rgb(var(--dc-surface));
 }
 
-/* Reduced motion and accessibility helpers */
-.skip-link:focus{position:static!important;display:inline-block;padding:.5rem .75rem;background:#fff;color:#000;border-radius:.5rem}
+/* ========================================
+   Accessibility Utilities
+   ======================================== */
+
+/* Screen reader only (visually hidden but accessible) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Allow focus for keyboard navigation */
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Ensure focus is always visible for keyboard users */
+.focus-visible-always:focus {
+  outline: 2px solid rgb(var(--dc-focus));
+  outline-offset: 2px;
+}
+
+/* Skip link for keyboard navigation */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: rgb(var(--dc-primary));
+  color: rgb(var(--dc-on-primary));
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0;
+  z-index: 100;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid rgb(var(--dc-focus));
+  outline-offset: 2px;
+}
+
+/* Reduced motion preferences */
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }

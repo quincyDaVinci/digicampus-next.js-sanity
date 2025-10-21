@@ -27,15 +27,13 @@ export default function VideoBlock({component}: VideoBlockProps) {
             poster={component.poster?.asset?.url}
           >
             <source src={component.videoFile.asset.url} />
-            {component.captionsFile?.asset?.url ? (
-              <track
-                kind="captions"
-                src={component.captionsFile.asset.url}
-                srcLang="nl"
-                label="Nederlands"
-                default
-              />
-            ) : null}
+            <track
+              kind="captions"
+              src={component.captionsFile?.asset?.url || ''}
+              srcLang="nl"
+              label="Nederlands"
+              default={!!component.captionsFile?.asset?.url}
+            />
           </video>
         ) : component.videoUrl ? (
           <div className="relative pt-[56.25%]">
