@@ -5,47 +5,21 @@ interface VideoBlockProps {
 }
 
 export default function VideoBlock({component}: VideoBlockProps) {
-  const showControls = component.showControls ?? true
-  const muted = component.muted ?? true
-  const autoPlay = component.autoPlay ?? false
-  const loop = component.loop ?? false
-  const title = component.title || 'Video'
   const transcriptId = component.transcript ? `${component._key}-transcript` : undefined
 
   return (
-    <section className="w-full space-y-4" aria-label={title}>
-      <div className="relative w-full overflow-hidden rounded-3xl bg-[rgb(var(--dc-text)/0.06)] shadow-lg">
-        {component.sourceType === 'file' && component.videoFile?.asset?.url ? (
-          <video
-            className="h-full w-full object-cover"
-            controls={showControls}
-            muted={muted}
-            autoPlay={autoPlay}
-            loop={loop}
-            playsInline
+    <section className="w-full space-y-4" aria-label={component.title}>
+      <div className="relative overflow-hidden rounded-2xl bg-[rgb(var(--dc-bg-soft))] shadow-lg">
+        <div className="relative pt-[56.25%]">
+          <iframe
+            src={component.videoUrl}
+            title={component.title}
+            className="absolute inset-0 h-full w-full"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
             aria-describedby={transcriptId}
-            poster={component.poster?.asset?.url}
-          >
-            <source src={component.videoFile.asset.url} />
-            <track
-              kind="captions"
-              src={component.captionsFile?.asset?.url || ''}
-              srcLang="nl"
-              label="Nederlands"
-              default={!!component.captionsFile?.asset?.url}
-            />
-          </video>
-        ) : component.videoUrl ? (
-          <div className="relative pt-[56.25%]">
-            <iframe
-              src={component.videoUrl}
-              title={title}
-              className="absolute inset-0 h-full w-full"
-              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        ) : null}
+          />
+        </div>
       </div>
       {component.transcript ? (
         <details
