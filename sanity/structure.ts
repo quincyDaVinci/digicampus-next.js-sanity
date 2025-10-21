@@ -6,77 +6,42 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
     .items([
-      // Pages section with nested structure
-      S.listItem()
-        .title('Pages')
+      S.documentListItem()
+        .id('homePage')
+        .schemaType('homePage')
+        .icon(HomeIcon)
+        .title('Homepagina'),
+      S.documentTypeListItem('page')
+        .title('Alle pagina\'s')
         .icon(FileTextIcon)
-        .child(
-          S.list()
-            .title('Pages')
-            .items([
-              // Premade pages subsection
-              S.listItem()
-                .title('Premade Pages')
-                .icon(HomeIcon)
-                .child(
-                  S.list()
-                    .title('Premade Pages')
-                    .items([
-                      S.documentListItem()
-                        .id('homePage')
-                        .schemaType('homePage')
-                        .title('Home Page'),
-                      // Add more premade page templates here in the future
-                    ])
-                ),
-              S.divider(),
-              // All other pages
-              S.listItem()
-                .title('All Pages')
-                .icon(FileTextIcon)
-                .child(
-                  S.documentTypeList('page')
-                    .title('All Pages')
-                    .defaultOrdering([{field: 'title', direction: 'asc'}])
-                ),
-            ])
-        ),
-      
-      // Blogs section
-      S.listItem()
-        .title('Blogs')
+        .defaultOrdering([{field: 'title', direction: 'asc'}]),
+
+      S.divider(),
+
+      S.documentTypeListItem('post')
+        .title('Blogposts')
         .icon(BookOpenIcon)
-        .child(
-          S.documentTypeList('post')
-            .title('Blog Posts')
-            .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
-        ),
-      
+        .defaultOrdering([{field: 'publishedAt', direction: 'desc'}]),
+
       S.divider(),
-      
-      // Navigation section
-      S.listItem()
-        .title('Navigation')
+
+      S.documentListItem()
+        .id('navigation')
+        .schemaType('navigation')
         .icon(LayersIcon)
-        .child(
-          S.list()
-            .title('Navigation')
-            .items([
-              S.documentListItem()
-                .id('navigation')
-                .schemaType('navigation')
-                .title('Header Navigation'),
-              // Add footer navigation or other nav items here if needed
-            ])
-        ),
-      
+        .title('Header navigatie'),
+      S.documentListItem()
+        .id('footerNavigation')
+        .schemaType('footerNavigation')
+        .icon(LayersIcon)
+        .title('Footer navigatie'),
+
       S.divider(),
-      
-      // Team Members
+
       S.documentTypeListItem('author')
         .title('Team Members')
         .icon(UsersIcon),
-      
+
       S.divider(),
       
       // Tags

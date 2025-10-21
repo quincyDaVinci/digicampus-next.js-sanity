@@ -14,6 +14,7 @@ import {apiVersion, dataset, projectId} from './sanity/env'
 import {schema} from './sanity/schemaTypes'
 import {structure} from './sanity/structure'
 import {customDocumentActions} from './sanity/lib/documentActions'
+import PreviewHeaderEnhancer from './sanity/components/PreviewHeaderEnhancer'
 
 export default defineConfig({
   basePath: '/geheimelocatie',
@@ -31,6 +32,11 @@ export default defineConfig({
         origin: 'http://localhost:3000',
         previewMode: {
           enable: '/api/draft',
+        },
+      },
+      components: {
+        unstable_header: {
+          component: PreviewHeaderEnhancer,
         },
       },
       resolve: {
@@ -67,7 +73,7 @@ export default defineConfig({
             select: {
               title: 'title',
             },
-            resolve: (doc) => ({
+            resolve: () => ({
               locations: [
                 {
                   title: 'Home',

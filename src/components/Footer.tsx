@@ -1,87 +1,205 @@
-import { GlobeIcon, ExternalLinkIcon } from './icons/FeatherIcons'
 import Link from 'next/link'
+import {client} from '@sanity/lib/client'
+import {groq} from 'next-sanity'
+import {ExternalLinkIcon, GlobeIcon, FeatherIconComponent} from './icons/FeatherIcons'
 
-export default function Footer() {
+const footerNavigationQuery = groq`*[_type == "footerNavigation"][0]{
+  intro,
+  menuColumns[]{
+    title,
+    links[]{
+      label,
+      href
+    }
+  },
+  socialLinks[]{
+    label,
+    href,
+    icon,
+    opensInNewTab
+  },
+  legalText
+}`
+
+type FooterLink = {
+  label?: string | null
+  href?: string | null
+}
+
+type FooterMenuColumn = {
+  title?: string | null
+  links?: FooterLink[] | null
+}
+
+type FooterSocialLink = {
+  label?: string | null
+  href?: string | null
+  icon?: string | null
+  opensInNewTab?: boolean | null
+}
+
+type FooterNavigationData = {
+  intro?: {
+    heading?: string | null
+    description?: string | null
+  } | null
+  menuColumns?: FooterMenuColumn[] | null
+  socialLinks?: FooterSocialLink[] | null
+  legalText?: string | null
+}
+
+const fallbackFooter: FooterNavigationData = {
+  intro: {
+    heading: 'About DigiCampus',
+    description:
+      'Empowering education through digital innovation and accessible learning platforms.',
+  },
+  menuColumns: [
+    {
+      title: 'Quick Links',
+      links: [
+        {label: 'About Us', href: '/about'},
+        {label: 'Privacy Policy', href: '/privacy'},
+        {label: 'Accessibility Statement', href: '/accessibility'},
+        {label: 'Contact', href: '/contact'},
+      ],
+    },
+  ],
+  socialLinks: [
+    {
+      label: 'Twitter',
+      href: 'https://twitter.com/digicampus',
+      icon: 'external',
+      opensInNewTab: true,
+    },
+    {
+      label: 'LinkedIn',
+      href: 'https://linkedin.com/company/digicampus',
+      icon: 'globe',
+      opensInNewTab: true,
+    },
+  ],
+  legalText: '© {year} DigiCampus. All rights reserved.',
+}
+
+function resolveLegalText(text?: string | null) {
+  const template = text || fallbackFooter.legalText || ''
+  return template.replace('{year}', String(new Date().getFullYear()))
+}
+
+function isExternalHref(href?: string | null) {
+  if (!href) return false
+  return /^(https?:)?\/\//i.test(href) || href.startsWith('mailto:')
+}
+
+function getSocialIcon(icon?: string | null): FeatherIconComponent {
+  switch (icon) {
+    case 'globe':
+      return GlobeIcon
+    case 'external':
+      return ExternalLinkIcon
+    default:
+      return ExternalLinkIcon
+  }
+}
+
+async function fetchFooterNavigation(): Promise<FooterNavigationData | null> {
+  const hasSanityCredentials = Boolean(
+    process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && process.env.NEXT_PUBLIC_SANITY_DATASET,
+  )
+
+  if (!hasSanityCredentials) {
+    return null
+  }
+
+  try {
+    return await client.fetch<FooterNavigationData | null>(footerNavigationQuery)
+  } catch (error) {
+    console.error('Could not fetch footer navigation data:', error)
+    return null
+  }
+}
+
+export default async function Footer() {
+  const data = await fetchFooterNavigation()
+
+  const intro = data?.intro ?? fallbackFooter.intro
+  const menuColumns = data?.menuColumns?.length
+    ? data.menuColumns
+    : fallbackFooter.menuColumns ?? []
+  const socialLinks = data?.socialLinks?.length
+    ? data.socialLinks
+    : fallbackFooter.socialLinks ?? []
+  const legalText = resolveLegalText(data?.legalText)
+
   return (
-    <footer 
-      className="bg-dc-surface-95 border-t border-dc mt-auto"
-      role="contentinfo"
-    >
+    <footer className="bg-dc-surface-95 border-t border-dc mt-auto" role="contentinfo">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* About Section */}
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div>
-            <h2 className="text-lg font-semibold mb-4">About DigiCampus</h2>
+            <h2 className="mb-4 text-lg font-semibold">{intro?.heading ?? 'Footer'}</h2>
             <p className="text-sm text-dc-text-muted">
-              Empowering education through digital innovation and accessible learning platforms.
+              {intro?.description ?? 'Beheer deze tekst vanuit de Sanity Studio.'}
             </p>
           </div>
 
-          {/* Quick Links */}
-          <nav aria-label="Footer navigation">
-            <h2 className="text-lg font-semibold mb-4">Quick Links</h2>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link 
-                  href="/about" 
-                  className="text-dc-text-muted hover:text-dc-brand transition-colors focus-visible:ring-2 ring-dc-focus rounded inline-block"
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  href="/privacy" 
-                  className="text-dc-text-muted hover:text-dc-brand transition-colors focus-visible:ring-2 ring-dc-focus rounded inline-block"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  href="/accessibility" 
-                  className="text-dc-text-muted hover:text-dc-brand transition-colors focus-visible:ring-2 ring-dc-focus rounded inline-block"
-                >
-                  Accessibility Statement
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  href="/contact" 
-                  className="text-dc-text-muted hover:text-dc-brand transition-colors focus-visible:ring-2 ring-dc-focus rounded inline-block"
-                >
-                  Contact
-                </Link>
-              </li>
-            </ul>
+          <nav aria-label="Footer navigation" className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {menuColumns.map((column, index) => (
+              <div key={column?.title ?? `column-${index}`}>
+                <h2 className="mb-4 text-lg font-semibold">{column?.title ?? `Links ${index + 1}`}</h2>
+                <ul className="space-y-2 text-sm">
+                  {(column?.links ?? []).map((link) => {
+                    if (!link?.label || !link?.href) return null
+                    const external = isExternalHref(link.href)
+                    const className =
+                      'inline-block rounded text-dc-text-muted transition-colors hover:text-dc-brand focus-visible:ring-2 ring-dc-focus'
+
+                    return (
+                      <li key={`${link.label}-${link.href}`}>
+                        {external ? (
+                          <a
+                            href={link.href}
+                            className={className}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {link.label}
+                          </a>
+                        ) : (
+                          <Link href={link.href} className={className}>
+                            {link.label}
+                          </Link>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))}
           </nav>
 
-          {/* Social & Legal */}
           <div>
-            <h2 className="text-lg font-semibold mb-4">Connect</h2>
-            <div className="flex gap-4 mb-4">
-              <a
-                href="https://twitter.com/digicampus"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 hover:bg-dc-surface-90 rounded transition-colors focus-visible:ring-2 ring-dc-focus"
-                aria-label="Follow us on Twitter (opens in new window)"
-              >
-                <ExternalLinkIcon className="w-5 h-5" aria-hidden="true" />
-              </a>
-              <a
-                href="https://linkedin.com/company/digicampus"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 hover:bg-dc-surface-90 rounded transition-colors focus-visible:ring-2 ring-dc-focus"
-                aria-label="Connect on LinkedIn (opens in new window)"
-              >
-                <GlobeIcon className="w-5 h-5" aria-hidden="true" />
-              </a>
+            <h2 className="mb-4 text-lg font-semibold">Connect</h2>
+            <div className="mb-4 flex gap-4">
+              {socialLinks.map((item) => {
+                if (!item?.href) return null
+                const Icon = getSocialIcon(item.icon)
+                const external = isExternalHref(item.href) || item.opensInNewTab
+                return (
+                  <a
+                    key={`${item.label}-${item.href}`}
+                    href={item.href}
+                    target={external ? '_blank' : undefined}
+                    rel={external ? 'noopener noreferrer' : undefined}
+                    className="rounded p-2 transition-colors hover:bg-dc-surface-90 focus-visible:ring-2 ring-dc-focus"
+                    aria-label={`${item.label ?? 'Link'}${external ? ' (opens in new window)' : ''}`}
+                  >
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </a>
+                )
+              })}
             </div>
-            <p className="text-xs text-dc-text-muted">
-              © {new Date().getFullYear()} DigiCampus. All rights reserved.
-            </p>
+            <p className="text-xs text-dc-text-muted">{legalText}</p>
           </div>
         </div>
       </div>

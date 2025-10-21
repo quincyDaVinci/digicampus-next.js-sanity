@@ -6,6 +6,7 @@ export const navigationType = defineType({
   title: 'Navigation',
   type: 'document',
   icon: LayersIcon,
+  hidden: true,
   fields: [
     defineField({
       name: 'title',
@@ -16,23 +17,25 @@ export const navigationType = defineType({
     }),
     defineField({
       name: 'menuItems',
-      title: 'Menu Items',
+      title: '📁 Menu blokken',
+      description: '🧭 Groepeer links per onderwerp. Submenu\'s houden navigatie overzichtelijk.',
       type: 'array',
       of: [
         defineArrayMember({
           type: 'object',
           name: 'menuItem',
-          title: 'Menu Item',
+          title: 'Navigatie-item',
           fields: [
             defineField({
               name: 'label',
-              title: 'Label',
+              title: 'Titel',
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'items',
-              title: 'Sub Items',
+              title: '🔗 Submenu links',
+              description: '➕ Voeg links toe die onder deze categorie vallen.',
               type: 'array',
               of: [
                 defineArrayMember({
@@ -41,13 +44,13 @@ export const navigationType = defineType({
                   fields: [
                     defineField({
                       name: 'label',
-                      title: 'Label',
+                      title: 'Linktekst',
                       type: 'string',
                       validation: (Rule) => Rule.required(),
                     }),
                     defineField({
                       name: 'href',
-                      title: 'Link',
+                      title: 'URL',
                       type: 'string',
                       validation: (Rule) => Rule.required(),
                     }),
@@ -69,8 +72,10 @@ export const navigationType = defineType({
             },
             prepare({title, items}) {
               return {
-                title,
-                subtitle: items ? `${items.length} sub-items` : 'No sub-items',
+                title: title || 'Navigatie-item',
+                subtitle: items?.length
+                  ? `${items.length} sublink${items.length === 1 ? '' : 's'}`
+                  : 'Nog geen sublinks',
               }
             },
           },

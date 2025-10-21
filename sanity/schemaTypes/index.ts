@@ -4,6 +4,7 @@ import {blockContentType} from './blockContentType'
 import {categoryType} from './categoryType'
 import {tagType} from './tagType'
 import {navigationType} from './navigationType'
+import {footerNavigationType} from './footerNavigationType'
 import {postType} from './postType'
 import {authorType} from './authorType'
 import {blogSectionType} from './blogSectionType'
@@ -33,6 +34,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     categoryType,
     tagType,
     navigationType,
+    footerNavigationType,
     postType,
     authorType,
     linkFieldType,

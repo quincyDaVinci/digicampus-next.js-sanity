@@ -45,8 +45,9 @@ export const pageType = defineType({
     }),
     defineField({
       name: 'sections',
-      title: 'Page builder',
-      description: 'Voeg secties toe en sleep ze om de opbouw van de pagina te bepalen.',
+      title: '🧱 Page builder',
+      description:
+        '➕ Voeg secties toe en sleep ze in de juiste volgorde. Iedere sectie heeft duidelijke iconen en uitleg om keuzes eenvoudig te maken.',
       type: 'array',
       group: 'content',
       of: [defineArrayMember({type: 'pageSection'})],
@@ -59,23 +60,31 @@ export const pageType = defineType({
               return 'Voeg minimaal één sectie toe.'
             }
 
-            const countH1 = (item: any): number => {
-              if (!item) return 0
-              if (item._type === 'richTextComponent') {
-                const blocks = Array.isArray(item.content) ? item.content : []
-                return blocks.filter((block: any) => block?.style === 'h1').length
+            const isRecord = (value: unknown): value is Record<string, unknown> =>
+              typeof value === 'object' && value !== null
+
+            const countH1 = (item: unknown): number => {
+              if (!isRecord(item)) return 0
+              if (item._type === 'richTextComponent' && Array.isArray(item.content)) {
+                return item.content.filter(
+                  (block): block is {style?: string} =>
+                    isRecord(block) && typeof block.style === 'string' && block.style === 'h1',
+                ).length
               }
-              if (item._type === 'carouselComponent') {
-                return (item.items ?? []).reduce((sum: number, sub: any) => sum + countH1(sub), 0)
+              if (item._type === 'carouselComponent' && Array.isArray(item.items)) {
+                return item.items.reduce((sum: number, subItem) => sum + countH1(subItem), 0)
               }
               return 0
             }
 
-            const totalH1 = sections.reduce((sectionCount: number, section: any) => {
-              const columns = Array.isArray(section?.columns) ? section.columns : []
-              const columnCount = columns.reduce((columnSum: number, column: any) => {
-                const components = Array.isArray(column?.components) ? column.components : []
-                return columnSum + components.reduce((componentSum: number, component: any) => componentSum + countH1(component), 0)
+            const totalH1 = sections.reduce((sectionCount: number, section) => {
+              if (!isRecord(section)) return sectionCount
+              const columns = Array.isArray(section.columns) ? section.columns : []
+              const columnCount = columns.reduce((columnSum: number, column) => {
+                if (!isRecord(column)) return columnSum
+                const components = Array.isArray(column.components) ? column.components : []
+                const componentTotal = components.reduce((componentSum: number, component) => componentSum + countH1(component), 0)
+                return columnSum + componentTotal
               }, 0)
               return sectionCount + columnCount
             }, 0)
