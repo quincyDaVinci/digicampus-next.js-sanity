@@ -133,8 +133,8 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
 
                 <div id={`menu-${menus.indexOf(m)}`} role="menu" aria-label={m.label} className={["absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl transition-opacity duration-150 motion-reduce:transition-none", openIndex === menus.indexOf(m) ? "opacity-100" : "opacity-0 pointer-events-none"].join(" ")} style={{ backgroundColor: 'rgb(var(--dc-surface) / 0.98)', border: '1px solid rgb(var(--dc-border) / 0.1)', color: 'rgb(var(--dc-text))' }}>
                   <ul className="py-2">
-                      {m.items.map(it => (
-                      <li key={it.href}><Link href={it.href} role="menuitem" onClick={() => setOpenIndex(null)} className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm" style={{ color: 'rgb(var(--dc-text))' }}>{it.label}</Link></li>
+                      {m.items.map((it, idx) => (
+                      <li key={`${m.label}-${idx}`}><Link href={it.href} role="menuitem" onClick={() => setOpenIndex(null)} className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm" style={{ color: 'rgb(var(--dc-text))' }}>{it.label}</Link></li>
                     ))}
                   </ul>
                 </div>
@@ -197,8 +197,8 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
                   <details className="group">
                     <summary className="cursor-pointer list-none rounded-lg px-3 py-2 dc-tooltip" aria-label={m.label} title={m.label} style={{ color: 'rgb(var(--dc-text))' }}>{m.label}</summary>
                     <ul className="mt-1 ml-2 space-y-1">
-                      {m.items.map(it => (
-                        <li key={it.href}><Link href={it.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-fluid-sm" style={{ color: 'rgb(var(--dc-text))' }}>{it.label}</Link></li>
+                      {m.items.map((it, idx) => (
+                        <li key={`${m.label}-mobile-${idx}`}><Link href={it.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-fluid-sm" style={{ color: 'rgb(var(--dc-text))' }}>{it.label}</Link></li>
                       ))}
                     </ul>
                   </details>
