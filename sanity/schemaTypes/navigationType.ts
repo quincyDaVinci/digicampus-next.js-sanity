@@ -1,22 +1,26 @@
-import { LayersIcon } from '../lib/featherIcons'
+import {LayersIcon} from '../lib/featherIcons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
 export const navigationType = defineType({
   name: 'navigation',
-  title: 'Navigation',
+  title: 'Header menu',
   type: 'document',
   icon: LayersIcon,
+  hidden: true,
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: '📌 Interne naam',
       type: 'string',
       initialValue: 'Header Navigation',
       readOnly: true,
+      description: 'Alleen voor intern gebruik zodat duidelijk is welk menu dit is.',
     }),
     defineField({
       name: 'menuItems',
-      title: 'Menu Items',
+      title: '🧭 Hoofdmenu',
+      description:
+        'Voeg hoofditems toe voor de bovenste navigatie. Gebruik sub-items om dropdowns te maken.',
       type: 'array',
       of: [
         defineArrayMember({
@@ -26,13 +30,15 @@ export const navigationType = defineType({
           fields: [
             defineField({
               name: 'label',
-              title: 'Label',
+              title: '🏷️ Titel',
               type: 'string',
               validation: (Rule) => Rule.required(),
+              description: 'Tekst die in het menu zichtbaar is.',
             }),
             defineField({
               name: 'items',
-              title: 'Sub Items',
+              title: '🔽 Dropdown links (optioneel)',
+              description: 'Voeg sublinks toe wanneer dit menu-item een dropdown moet tonen.',
               type: 'array',
               of: [
                 defineArrayMember({
@@ -41,15 +47,17 @@ export const navigationType = defineType({
                   fields: [
                     defineField({
                       name: 'label',
-                      title: 'Label',
+                      title: '🏷️ Titel',
                       type: 'string',
                       validation: (Rule) => Rule.required(),
+                      description: 'Tekst van de submenu-link.',
                     }),
                     defineField({
                       name: 'href',
-                      title: 'Link',
+                      title: '🔗 Link',
                       type: 'string',
                       validation: (Rule) => Rule.required(),
+                      description: 'Relatieve URL, bijvoorbeeld /over-ons.',
                     }),
                   ],
                   preview: {

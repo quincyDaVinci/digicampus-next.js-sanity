@@ -1,9 +1,19 @@
 import {BookOpenIcon, FileTextIcon, HomeIcon, LayersIcon, UsersIcon, TagIcon} from './lib/featherIcons'
 import type {StructureResolver} from 'sanity/structure'
+import {PreviewPaneWithSearch} from './components/PreviewPaneWithSearch'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
-export const structure: StructureResolver = (S) =>
-  S.list()
+export const structure: StructureResolver = (S) => {
+  const documentWithPreview = (schemaType: string) => (documentId: string) =>
+    S.document()
+      .documentId(documentId)
+      .schemaType(schemaType)
+      .views([
+        S.view.form().title('Bewerken'),
+        S.view.component(PreviewPaneWithSearch).title('Preview'),
+      ])
+
+  return S.list()
     .title('Content')
     .items([
       // Pages section with nested structure
@@ -25,7 +35,8 @@ export const structure: StructureResolver = (S) =>
                       S.documentListItem()
                         .id('homePage')
                         .schemaType('homePage')
-                        .title('Home Page'),
+                        .title('Home Page')
+                        .child(documentWithPreview('homePage')('homePage')),
                       // Add more premade page templates here in the future
                     ])
                 ),
@@ -38,6 +49,7 @@ export const structure: StructureResolver = (S) =>
                   S.documentTypeList('page')
                     .title('All Pages')
                     .defaultOrdering([{field: 'title', direction: 'asc'}])
+                    .child((documentId) => documentWithPreview('page')(documentId)),
                 ),
             ])
         ),
@@ -65,8 +77,13 @@ export const structure: StructureResolver = (S) =>
               S.documentListItem()
                 .id('navigation')
                 .schemaType('navigation')
-                .title('Header Navigation'),
-              // Add footer navigation or other nav items here if needed
+                .title('Header Navigation')
+                .child(documentWithPreview('navigation')('navigation')),
+              S.documentListItem()
+                .id('footerNavigation')
+                .schemaType('footerNavigation')
+                .title('Footer Navigation')
+                .child(documentWithPreview('footerNavigation')('footerNavigation')),
             ])
         ),
       
@@ -89,3 +106,4 @@ export const structure: StructureResolver = (S) =>
         .title('Categories')
         .icon(TagIcon),
     ])
+}

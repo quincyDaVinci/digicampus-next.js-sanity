@@ -67,7 +67,7 @@ export default defineConfig({
             select: {
               title: 'title',
             },
-            resolve: (doc) => ({
+            resolve: () => ({
               locations: [
                 {
                   title: 'Home',
