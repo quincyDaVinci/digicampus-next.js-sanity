@@ -7,128 +7,34 @@ import {PageRenderer} from '@/components/pageBuilder'
 import {PagePreview} from './PagePreview'
 import type {PageDocument} from '@/types/pageBuilder'
 
-const blogCardFields = `
-  _id,
-  title,
-  "slug": slug.current,
-  publishedAt,
-  "summary": coalesce(pt::text(body[0]), ""),
-  mainImage{
-    asset->{..., metadata{dimensions, lqip}},
-    alt
-  },
-  author->{name}
-`
-
-const blogCardSelection = `
-  ...,
-  "resolvedPost": select(
-    selectionMode == 'manual' => post->{${blogCardFields}},
-    selectionMode == 'automatic' && automaticSort == 'author' && defined(author._ref) => *[_type == 'post' && author._ref == ^.author._ref] | order(publishedAt desc)[0..0]{${blogCardFields}},
-    selectionMode == 'automatic' && automaticSort == 'oldest' => *[_type == 'post'] | order(publishedAt asc)[0..0]{${blogCardFields}},
-    selectionMode == 'automatic' && automaticSort == 'popular' => *[_type == 'post'] | order(coalesce(popularity, 0) desc, publishedAt desc)[0..0]{${blogCardFields}},
-    selectionMode == 'automatic' && automaticSort == 'date' => *[_type == 'post'] | order(publishedAt desc)[0..0]{${blogCardFields}},
-    selectionMode == 'automatic' => *[_type == 'post'] | order(publishedAt desc)[0..0]{${blogCardFields}}
-  )
-`
-
 const pageQuery = groq`*[_type == "page" && slug.current == $slug][0]{
   _id,
   title,
   description,
   slug,
-  sections[]{
+  blocks[]{
     _key,
-    title,
-    layout,
-    background{
-      ...,
+    _type,
+    ...,
+    _type == "imageComponent" => {
       image{
         asset->{..., metadata{dimensions, lqip}, url},
-        alt,
-        caption
-      }
+        alt
+      },
+      caption
     },
-    columns[]{
-      _key,
-      width,
-      horizontalAlignment,
-      verticalAlignment,
-      componentSpacing,
-      placement,
-      components[]{
-        ...,
-        _type == "imageComponent" => {
-          ...,
-          image{
-            asset->{..., metadata{dimensions, lqip}, url},
-            alt,
-            caption
-          },
-          background{
-            ...,
-            image{
-              asset->{..., metadata{dimensions, lqip}, url},
-              alt,
-              caption
-            }
-          }
-        },
-        _type == "videoComponent" => {
-          ...,
-          videoFile{asset->{url}},
-          captionsFile{asset->{url}},
-          poster{
-            asset->{..., metadata{dimensions, lqip}, url},
-            alt
-          }
-        },
-        _type == "buttonComponent" => {
-          ...,
-          link{label, href}
-        },
-        _type == "blogCardComponent" => {
-          ${blogCardSelection}
-        },
-        _type == "carouselComponent" => {
-          ...,
-          items[]{
-            ...,
-            _type == "imageComponent" => {
-              ...,
-              image{
-                asset->{..., metadata{dimensions, lqip}, url},
-                alt,
-                caption
-              },
-              background{
-                ...,
-                image{
-                  asset->{..., metadata{dimensions, lqip}, url},
-                  alt,
-                  caption
-                }
-              }
-            },
-            _type == "videoComponent" => {
-              ...,
-              videoFile{asset->{url}},
-              captionsFile{asset->{url}},
-              poster{
-                asset->{..., metadata{dimensions, lqip}, url},
-                alt
-              }
-            },
-            _type == "buttonComponent" => {
-              ...,
-              link{label, href}
-            },
-            _type == "blogCardComponent" => {
-              ${blogCardSelection}
-            }
-          }
-        }
-      }
+    _type == "videoComponent" => {
+      title,
+      videoUrl,
+      poster{
+        asset->{..., metadata{dimensions, lqip}, url},
+        alt
+      },
+      transcript
+    },
+    _type == "buttonComponent" => {
+      label,
+      link{label, href}
     }
   }
 }`
@@ -174,7 +80,7 @@ export async function generateMetadata({params}: PageParams) {
 
 export default async function Page({params}: PageParams) {
   const draft = await draftMode()
-  
+
   if (!hasSanityCredentials) {
     notFound()
   }

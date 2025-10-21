@@ -5,37 +5,36 @@ interface VideoBlockProps {
 }
 
 export default function VideoBlock({component}: VideoBlockProps) {
-  const showControls = component.showControls ?? true
-  const muted = component.muted ?? true
-  const autoPlay = component.autoPlay ?? false
-  const loop = component.loop ?? false
   const title = component.title || 'Video'
   const transcriptId = component.transcript ? `${component._key}-transcript` : undefined
+  const posterUrl = component.poster?.asset?.url
+  const captionsDataUrl = component.transcript
+    ? `data:text/vtt;charset=utf-8,${encodeURIComponent(`WEBVTT\n\n00:00.000 --> 01:00.000\n${component.transcript}`)}`
+    : undefined
+
+  const isDirectVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(component.videoUrl)
+  const hasTranscript = Boolean(component.transcript)
 
   return (
     <section className="w-full space-y-4" aria-label={title}>
-      <div className="relative w-full overflow-hidden rounded-3xl bg-[rgb(var(--dc-text)/0.06)] shadow-lg">
-        {component.sourceType === 'file' && component.videoFile?.asset?.url ? (
-          <video
-            className="h-full w-full object-cover"
-            controls={showControls}
-            muted={muted}
-            autoPlay={autoPlay}
-            loop={loop}
-            playsInline
-            aria-describedby={transcriptId}
-            poster={component.poster?.asset?.url}
-          >
-            <source src={component.videoFile.asset.url} />
-            <track
-              kind="captions"
-              src={component.captionsFile?.asset?.url || ''}
-              srcLang="nl"
-              label="Nederlands"
-              default={!!component.captionsFile?.asset?.url}
-            />
-          </video>
-        ) : component.videoUrl ? (
+      <div className="relative w-full overflow-hidden rounded-2xl bg-[rgb(var(--dc-text)/0.06)] shadow-lg">
+        {isDirectVideo ? (
+          hasTranscript ? (
+            <video
+              className="h-full w-full object-cover"
+              controls
+              poster={posterUrl}
+              aria-describedby={transcriptId}
+            >
+              <source src={component.videoUrl} />
+              <track kind="captions" src={captionsDataUrl!} srcLang="nl" label="Transcript" default />
+            </video>
+          ) : (
+            <div className="p-6 text-sm text-[rgb(var(--dc-text))]">
+              Voeg een transcript toe om deze video af te spelen.
+            </div>
+          )
+        ) : (
           <div className="relative pt-[56.25%]">
             <iframe
               src={component.videoUrl}
@@ -45,7 +44,7 @@ export default function VideoBlock({component}: VideoBlockProps) {
               allowFullScreen
             />
           </div>
-        ) : null}
+        )}
       </div>
       {component.transcript ? (
         <details

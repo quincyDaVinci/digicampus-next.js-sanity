@@ -45,40 +45,36 @@ export const pageType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'sections',
-      title: 'Page builder',
-      description: 'Voeg secties toe en sleep ze om de opbouw van de pagina te bepalen.',
+      name: 'blocks',
+      title: 'Pagina-inhoud',
+      description: 'Voeg eenvoudige bouwblokken toe en orden ze om de pagina op te bouwen.',
       type: 'array',
       group: 'content',
-      of: [defineArrayMember({type: 'pageSection'})],
+      of: [
+        defineArrayMember({type: 'richTextComponent', title: 'Tekstblok'}),
+        defineArrayMember({type: 'imageComponent', title: 'Afbeelding'}),
+        defineArrayMember({type: 'videoComponent', title: 'Video'}),
+        defineArrayMember({type: 'buttonComponent', title: 'Knop'}),
+      ],
       validation: (rule) =>
         rule
           .min(1)
-          .error('Een pagina heeft minstens één sectie nodig.')
-          .custom((sections) => {
-            if (!Array.isArray(sections)) {
-              return 'Voeg minimaal één sectie toe.'
+          .error('Een pagina heeft minstens één blok nodig.')
+          .custom((blocks) => {
+            if (!Array.isArray(blocks)) {
+              return 'Voeg minimaal één blok toe.'
             }
 
-            const countH1 = (item: any): number => {
-              if (!item) return 0
-              if (item._type === 'richTextComponent') {
-                const blocks = Array.isArray(item.content) ? item.content : []
-                return blocks.filter((block: any) => block?.style === 'h1').length
+            const totalH1 = blocks.reduce((count: number, block: any) => {
+              if (block?._type !== 'richTextComponent') {
+                return count
               }
-              if (item._type === 'carouselComponent') {
-                return (item.items ?? []).reduce((sum: number, sub: any) => sum + countH1(sub), 0)
-              }
-              return 0
-            }
 
-            const totalH1 = sections.reduce((sectionCount: number, section: any) => {
-              const columns = Array.isArray(section?.columns) ? section.columns : []
-              const columnCount = columns.reduce((columnSum: number, column: any) => {
-                const components = Array.isArray(column?.components) ? column.components : []
-                return columnSum + components.reduce((componentSum: number, component: any) => componentSum + countH1(component), 0)
-              }, 0)
-              return sectionCount + columnCount
+              const items = Array.isArray(block.content) ? block.content : []
+              return (
+                count +
+                items.filter((item: any) => item?._type === 'block' && item?.style === 'h1').length
+              )
             }, 0)
 
             if (totalH1 > 1) {

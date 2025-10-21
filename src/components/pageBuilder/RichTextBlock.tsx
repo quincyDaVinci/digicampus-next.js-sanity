@@ -3,12 +3,6 @@ import type {PortableTextReactComponents} from 'next-sanity'
 
 import type {RichTextComponent} from '@/types/pageBuilder'
 
-const maxWidthMap: Record<NonNullable<RichTextComponent['maxWidth']>, string> = {
-  narrow: 'max-w-2xl',
-  default: 'max-w-3xl',
-  wide: 'max-w-5xl',
-}
-
 const portableTextComponents: PortableTextReactComponents = {
   block: {
     normal: ({children}) => <p className="text-fluid-md leading-relaxed text-[rgb(var(--dc-text))]">{children}</p>,
@@ -62,24 +56,8 @@ interface RichTextBlockProps {
 }
 
 export default function RichTextBlock({component}: RichTextBlockProps) {
-  const align = component.textAlign ?? 'left'
-  const maxWidthClass = component.maxWidth ? maxWidthMap[component.maxWidth] : maxWidthMap.default
-
   return (
-    <div
-      className={[
-        'w-full',
-        maxWidthClass,
-        'space-y-4',
-        'text-[rgb(var(--dc-text))]',
-        align === 'center' ? 'mx-auto text-center' : '',
-        align === 'right' ? 'ml-auto text-right' : '',
-        align === 'justify' ? 'mx-auto text-justify' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      aria-label={component.ariaLabel}
-    >
+    <div className="w-full space-y-4 text-[rgb(var(--dc-text))]">
       <PortableText value={component.content} components={portableTextComponents} />
     </div>
   )

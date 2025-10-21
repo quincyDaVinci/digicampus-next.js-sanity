@@ -68,41 +68,6 @@ export const richTextComponentType = defineType({
       ],
       validation: (rule) => rule.required().min(1).error('Voeg tekst toe.'),
     }),
-    defineField({
-      name: 'textAlign',
-      title: 'Uitlijning',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Links', value: 'left'},
-          {title: 'Gecentreerd', value: 'center'},
-          {title: 'Rechts', value: 'right'},
-          {title: 'Uitgevuld', value: 'justify'},
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'left',
-    }),
-    defineField({
-      name: 'maxWidth',
-      title: 'Maximale breedte',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Smalle kolom', value: 'narrow'},
-          {title: 'Standaard', value: 'default'},
-          {title: 'Breed', value: 'wide'},
-        ],
-      },
-      initialValue: 'default',
-    }),
-    defineField({
-      name: 'ariaLabel',
-      title: 'Aria label (optioneel)',
-      type: 'string',
-      description:
-        'Handig wanneer de tekst als call-to-action of belangrijke melding fungeert. Beschrijf kort de bedoeling.',
-    }),
   ],
   preview: {
     select: {
