@@ -37,8 +37,7 @@ export const structure: StructureResolver = (S) =>
                 .icon(FileTextIcon)
                 .child(
                   S.documentTypeList('page')
-                    .title('All Pages')
-                    .defaultOrdering([{field: 'title', direction: 'asc'}])
+                     .title('All Pages'),
                 ),
             ])
         ),
@@ -49,8 +48,7 @@ export const structure: StructureResolver = (S) =>
         .icon(BookOpenIcon)
         .child(
           S.documentTypeList('post')
-            .title('Blog Posts')
-            .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
+             .title('Blog Posts'),
         ),
       
       S.divider(),

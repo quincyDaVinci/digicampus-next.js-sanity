@@ -1,5 +1,6 @@
-export const previewOrigin =
-  process.env.NEXT_PUBLIC_PREVIEW_ORIGIN || 'http://localhost:3000'
+export const previewOrigin = typeof window !== 'undefined'
+  ? window.location.origin
+  : (process.env.NEXT_PUBLIC_PREVIEW_ORIGIN || 'http://localhost:3001')
 
 type SlugValue = {current?: string} | string | null | undefined
 

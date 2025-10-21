@@ -1,6 +1,5 @@
 import {LaunchIcon} from '@sanity/icons'
 import type {DocumentActionComponent, DocumentActionProps, DocumentActionsContext} from 'sanity'
-import {usePresentationNavigate} from 'sanity/presentation'
 import {previewOrigin, resolvePreviewPath} from './previewConfig'
 
 type DocumentWithSlug = {
@@ -8,10 +7,9 @@ type DocumentWithSlug = {
 }
 
 const PreviewAction: DocumentActionComponent = (props) => {
-  const navigate = usePresentationNavigate()
-  const {draft, published, schemaType, onComplete} = props
+  const {draft, published, onComplete, type} = props as DocumentActionProps & {type: string}
   const latest = (draft ?? published) as DocumentWithSlug | undefined
-  const path = resolvePreviewPath({_type: schemaType, slug: latest?.slug})
+  const path = resolvePreviewPath({_type: type, slug: latest?.slug})
 
   return {
     label: 'Open preview',
@@ -20,8 +18,10 @@ const PreviewAction: DocumentActionComponent = (props) => {
     disabled: !path,
     onHandle: () => {
       if (path) {
-        navigate?.({params: {preview: path}})
-        window.open(`${previewOrigin}${path}`, '_blank', 'noopener')
+        // Open preview in a new tab. Avoid usePresentationNavigate as actions may render outside its context.
+        if (typeof window !== 'undefined') {
+          window.open(`${previewOrigin}${path}`, '_blank', 'noopener')
+        }
       }
       onComplete?.()
     },
