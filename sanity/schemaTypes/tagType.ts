@@ -1,9 +1,9 @@
 import { TagIcon } from '../lib/featherIcons'
 import {defineField, defineType} from 'sanity'
 
-export const categoryType = defineType({
-  name: 'category',
-  title: 'Category',
+export const tagType = defineType({
+  name: 'tag',
+  title: 'Tag',
   type: 'document',
   icon: TagIcon,
   fields: [

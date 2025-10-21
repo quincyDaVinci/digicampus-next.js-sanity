@@ -39,8 +39,17 @@ export const postType = defineType({
     }),
     defineField({
       name: 'categories',
+      title: 'Categories',
       type: 'array',
       of: [defineArrayMember({type: 'reference', to: {type: 'category'}})],
+      validation: (Rule) => Rule.max(3).warning('Max 3 categories aanbevolen'),
+    }),
+    defineField({
+      name: 'tags',
+      title: 'Tags',
+      type: 'array',
+      of: [defineArrayMember({type: 'reference', to: {type: 'tag'}})],
+      validation: (Rule) => Rule.max(10).warning('Max 10 tags aanbevolen'),
     }),
     defineField({
       name: 'publishedAt',

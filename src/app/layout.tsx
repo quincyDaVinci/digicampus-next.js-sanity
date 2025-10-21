@@ -1,10 +1,13 @@
 import './globals.css'
 import { LanguageProvider } from '@/lib/language'
 import Header from '@/components/Header'
+import { draftMode } from 'next/headers'
+import { VisualEditing } from '@/components/VisualEditing'
 
 export const metadata = { title: 'Digicampus' }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const draft = await draftMode()
   
   return (
     <html>
@@ -14,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           <main id="main">{children}</main>
         </LanguageProvider>
+        {draft.isEnabled && <VisualEditing />}
       </body>
     </html>
   )

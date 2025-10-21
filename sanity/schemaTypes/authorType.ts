@@ -10,6 +10,7 @@ export const authorType = defineType({
     defineField({
       name: 'name',
       type: 'string',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
@@ -17,6 +18,7 @@ export const authorType = defineType({
       options: {
         source: 'name',
       },
+      hidden: true, // Hide slug field - not needed for authors
     }),
     defineField({
       name: 'image',

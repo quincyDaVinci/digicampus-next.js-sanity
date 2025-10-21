@@ -1,8 +1,10 @@
 import {groq} from 'next-sanity'
 import {notFound} from 'next/navigation'
+import {draftMode} from 'next/headers'
 
 import {client} from '@sanity/lib/client'
 import {PageRenderer} from '@/components/pageBuilder'
+import {PagePreview} from './PagePreview'
 import type {PageDocument} from '@/types/pageBuilder'
 
 const blogCardFields = `
@@ -171,6 +173,8 @@ export async function generateMetadata({params}: PageParams) {
 }
 
 export default async function Page({params}: PageParams) {
+  const draft = await draftMode()
+  
   if (!hasSanityCredentials) {
     notFound()
   }
@@ -179,6 +183,10 @@ export default async function Page({params}: PageParams) {
 
   if (!page) {
     notFound()
+  }
+
+  if (draft.isEnabled) {
+    return <PagePreview initial={{data: page, sourceMap: undefined}} query={pageQuery} params={{slug: params.slug}} />
   }
 
   return <PageRenderer page={page} />
