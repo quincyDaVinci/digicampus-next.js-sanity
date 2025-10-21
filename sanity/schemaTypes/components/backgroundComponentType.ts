@@ -1,20 +1,21 @@
 import {defineField, defineType} from 'sanity'
+import {ChoiceCardInput, DesignTokenSwatchInput} from '../../components/inputs'
 
 const designTokenOptions = [
-  {title: 'Surface (var(--dc-surface))', value: 'surface'},
-  {title: 'Soft background (var(--dc-bg-soft))', value: 'bg-soft'},
-  {title: 'Page background (var(--dc-bg))', value: 'bg'},
-  {title: 'Brand (var(--dc-brand))', value: 'brand'},
-  {title: 'Primary (var(--dc-primary))', value: 'primary'},
-  {title: 'Navy (var(--dc-navy))', value: 'navy'},
-  {title: 'Text (var(--dc-text))', value: 'text'},
+  {title: '☁️ Surface', value: 'surface', subtitle: 'Zachte neutrale achtergrond'},
+  {title: '🌤️ Soft', value: 'bg-soft', subtitle: 'Lichte accentkleur'},
+  {title: '📄 Pagina', value: 'bg', subtitle: 'Standaard achtergrondkleur'},
+  {title: '✨ Brand', value: 'brand', subtitle: 'Gebruik de merkaccentkleur'},
+  {title: '🔥 Primary', value: 'primary', subtitle: 'Voor opvallende CTA secties'},
+  {title: '🌊 Navy', value: 'navy', subtitle: 'Donker contrast met lichte tekst'},
+  {title: '🖊️ Tekstkleur', value: 'text', subtitle: 'Zeer donker – gebruik spaarzaam'},
 ]
 
 const textureOptions = [
-  {title: 'Geen patroon', value: 'none'},
-  {title: 'Zachte stippen', value: 'dots'},
-  {title: 'Rasterlijnen', value: 'grid'},
-  {title: 'Diagonaal', value: 'diagonal'},
+  {title: '🚫 Geen patroon', value: 'none'},
+  {title: '• Zachte stippen', value: 'dots'},
+  {title: '# Rasterlijnen', value: 'grid'},
+  {title: '╱ Diagonaal', value: 'diagonal'},
 ]
 
 export const backgroundComponentType = defineType({
@@ -24,37 +25,40 @@ export const backgroundComponentType = defineType({
   fields: [
     defineField({
       name: 'mode',
-      title: 'Type achtergrond',
+      title: '🎨 Type achtergrond',
       type: 'string',
       initialValue: 'color',
       options: {
         list: [
-          {title: 'Effen kleur', value: 'color'},
-          {title: 'Kleurverloop', value: 'gradient'},
-          {title: 'Afbeelding', value: 'image'},
-          {title: 'Textuur', value: 'texture'},
+          {title: '🎨 Effen kleur', value: 'color'},
+          {title: '🌈 Kleurverloop', value: 'gradient'},
+          {title: '🖼️ Afbeelding', value: 'image'},
+          {title: '🧩 Textuur', value: 'texture'},
         ],
-        layout: 'radio',
       },
       validation: (rule) => rule.required(),
+      components: {input: ChoiceCardInput},
     }),
     defineField({
       name: 'colorToken',
-      title: 'Primaire kleur (design token)',
+      title: 'Basiskleur',
       type: 'string',
       options: {list: designTokenOptions},
+      description: 'Kies een vooraf gedefinieerde kleur die past bij het design systeem.',
       hidden: ({parent}) => !parent || !['color', 'gradient', 'texture'].includes(parent.mode ?? ''),
+      components: {input: DesignTokenSwatchInput},
     }),
     defineField({
       name: 'secondaryColorToken',
-      title: 'Secundaire kleur (voor gradient)',
+      title: 'Tweede kleur (gradient)',
       type: 'string',
       options: {list: designTokenOptions},
       hidden: ({parent}) => parent?.mode !== 'gradient',
+      components: {input: DesignTokenSwatchInput},
     }),
     defineField({
       name: 'customColor',
-      title: 'Alternatieve hex kleur',
+      title: 'Eigen hexkleur',
       description:
         'Gebruik dit alleen als geen design token voldoet. Let op voldoende contrast volgens WCAG (minimaal 4.5:1 voor tekst).',
       type: 'string',
@@ -71,6 +75,7 @@ export const backgroundComponentType = defineType({
       name: 'image',
       title: 'Achtergrondafbeelding',
       type: 'image',
+      description: 'Gebruik een beeld dat de boodschap ondersteunt. Zorg voor voldoende contrast met tekst.',
       options: {hotspot: true},
       fields: [
         defineField({
@@ -91,10 +96,11 @@ export const backgroundComponentType = defineType({
     }),
     defineField({
       name: 'imageTint',
-      title: 'Kleurwaas over afbeelding',
+      title: 'Kleurwaas',
       type: 'string',
       options: {list: designTokenOptions},
       hidden: ({parent}) => parent?.mode !== 'image',
+      components: {input: DesignTokenSwatchInput},
     }),
     defineField({
       name: 'imageTintOpacity',
@@ -106,16 +112,19 @@ export const backgroundComponentType = defineType({
     }),
     defineField({
       name: 'texture',
-      title: 'Textuur patroon',
+      title: 'Textuurpatroon',
       type: 'string',
       options: {list: textureOptions},
       hidden: ({parent}) => parent?.mode !== 'texture',
+      components: {input: ChoiceCardInput},
     }),
     defineField({
       name: 'overlay',
-      title: 'Extra overlay kleur',
+      title: 'Overlay kleur',
       type: 'string',
       options: {list: designTokenOptions},
+      description: 'Voeg een transparante kleurlaag toe voor extra contrast.',
+      components: {input: DesignTokenSwatchInput},
     }),
     defineField({
       name: 'overlayOpacity',

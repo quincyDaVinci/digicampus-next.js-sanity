@@ -1,5 +1,5 @@
-import { LayersIcon } from '../lib/featherIcons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {LayersIcon} from '../lib/featherIcons'
 
 export const navigationType = defineType({
   name: 'navigation',
@@ -9,31 +9,33 @@ export const navigationType = defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Titel',
       type: 'string',
       initialValue: 'Header Navigation',
       readOnly: true,
     }),
     defineField({
       name: 'menuItems',
-      title: 'Menu Items',
+      title: '📋 Hoofdmenu',
       type: 'array',
+      description: 'Voeg hoofditems toe voor het menu in de header. Elk item kan een rij sublinks bevatten.',
       of: [
         defineArrayMember({
           type: 'object',
           name: 'menuItem',
-          title: 'Menu Item',
+          title: '🔹 Menu-item',
           fields: [
             defineField({
               name: 'label',
-              title: 'Label',
+              title: 'Naam in het menu',
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'items',
-              title: 'Sub Items',
+              title: '⬇️ Sublinks',
               type: 'array',
+              description: 'Optioneel: voeg extra links toe die zichtbaar worden in het dropdownmenu.',
               of: [
                 defineArrayMember({
                   type: 'object',
@@ -41,13 +43,13 @@ export const navigationType = defineType({
                   fields: [
                     defineField({
                       name: 'label',
-                      title: 'Label',
+                      title: 'Linktekst',
                       type: 'string',
                       validation: (Rule) => Rule.required(),
                     }),
                     defineField({
                       name: 'href',
-                      title: 'Link',
+                      title: 'Bestemming (URL of slug)',
                       type: 'string',
                       validation: (Rule) => Rule.required(),
                     }),
@@ -70,7 +72,9 @@ export const navigationType = defineType({
             prepare({title, items}) {
               return {
                 title,
-                subtitle: items ? `${items.length} sub-items` : 'No sub-items',
+                subtitle: items?.length
+                  ? `${items.length} sublink${items.length === 1 ? '' : 's'}`
+                  : 'Nog geen sublinks',
               }
             },
           },

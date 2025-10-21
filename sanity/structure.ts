@@ -1,5 +1,6 @@
 import {BookOpenIcon, FileTextIcon, HomeIcon, LayersIcon, UsersIcon, TagIcon} from './lib/featherIcons'
-import type {StructureResolver} from 'sanity/structure'
+import type {DefaultDocumentNodeResolver, StructureResolver} from 'sanity/structure'
+import PagePreviewPane from './components/PagePreviewPane'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
@@ -66,7 +67,10 @@ export const structure: StructureResolver = (S) =>
                 .id('navigation')
                 .schemaType('navigation')
                 .title('Header Navigation'),
-              // Add footer navigation or other nav items here if needed
+              S.documentListItem()
+                .id('footerNavigation')
+                .schemaType('footerNavigation')
+                .title('Footer Navigation'),
             ])
         ),
       
@@ -89,3 +93,14 @@ export const structure: StructureResolver = (S) =>
         .title('Categories')
         .icon(TagIcon),
     ])
+
+export const defaultDocumentNode: DefaultDocumentNodeResolver = (S, {schemaType}) => {
+  if (['page', 'homePage', 'post'].includes(schemaType)) {
+    return S.document().views([
+      S.view.form().title('Bewerken'),
+      S.view.component(PagePreviewPane).title('Preview'),
+    ])
+  }
+
+  return null
+}

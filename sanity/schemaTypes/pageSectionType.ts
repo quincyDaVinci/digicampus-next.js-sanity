@@ -1,4 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {ChoiceCardInput} from '../components/inputs'
 
 export const pageSectionType = defineType({
   name: 'pageSection',
@@ -13,97 +14,57 @@ export const pageSectionType = defineType({
     }),
     defineField({
       name: 'layout',
-      title: 'Lay-out instellingen',
+      title: '⚙️ Lay-out & ritme',
       type: 'object',
-      options: {
-        collapsible: true,
-        collapsed: false,
-      },
+      options: {collapsible: false},
       fields: [
         defineField({
           name: 'contentWidth',
-          title: 'Breedte inhoud',
+          title: '📐 Breedte inhoud',
           type: 'string',
+          description: 'Bepaalt hoe breed de inhoudkolom wordt weergegeven.',
           options: {
             list: [
-              {title: 'Smalle kolom', value: 'narrow'},
-              {title: 'Standaard', value: 'default'},
-              {title: 'Breed', value: 'wide'},
-              {title: 'Volledige breedte', value: 'full'},
+              {title: '🎯 Smalle focus', value: 'narrow'},
+              {title: '📄 Standaard', value: 'default'},
+              {title: '🖥️ Breed', value: 'wide'},
+              {title: '🌍 Volledige breedte', value: 'full'},
             ],
-            layout: 'radio',
           },
           initialValue: 'default',
+          components: {input: ChoiceCardInput},
         }),
         defineField({
           name: 'paddingY',
-          title: 'Verticale ruimte',
+          title: '↕️ Verticale ruimte',
           type: 'string',
+          description: 'Voeg extra ademruimte boven en onder de sectie toe.',
           options: {
             list: [
-              {title: 'Geen', value: 'none'},
-              {title: 'Klein', value: 'sm'},
-              {title: 'Normaal', value: 'md'},
-              {title: 'Groot', value: 'lg'},
-              {title: 'Extra groot', value: 'xl'},
+              {title: '🚫 Geen', value: 'none'},
+              {title: '🌱 Compact', value: 'sm'},
+              {title: '🌤️ Comfortabel', value: 'md'},
+              {title: '🌳 Ruim', value: 'lg'},
+              {title: '🌄 Extra ruim', value: 'xl'},
             ],
           },
           initialValue: 'lg',
-        }),
-        defineField({
-          name: 'paddingX',
-          title: 'Horizontale ruimte',
-          type: 'string',
-          options: {
-            list: [
-              {title: 'Geen', value: 'none'},
-              {title: 'Compact', value: 'sm'},
-              {title: 'Normaal', value: 'md'},
-              {title: 'Ruim', value: 'lg'},
-            ],
-          },
-          initialValue: 'md',
-        }),
-        defineField({
-          name: 'componentSpacing',
-          title: 'Ruimte tussen componenten',
-          type: 'string',
-          options: {
-            list: [
-              {title: 'Compact', value: 'tight'},
-              {title: 'Normaal', value: 'normal'},
-              {title: 'Ruim', value: 'relaxed'},
-            ],
-          },
-          initialValue: 'normal',
+          components: {input: ChoiceCardInput},
         }),
         defineField({
           name: 'horizontalAlignment',
-          title: 'Horizontale uitlijning',
+          title: '🎯 Uitlijning',
           type: 'string',
+          description: 'Kies waar de inhoud binnen de sectie uitgelijnd wordt.',
           options: {
             list: [
-              {title: 'Links', value: 'left'},
-              {title: 'Midden', value: 'center'},
-              {title: 'Rechts', value: 'right'},
+              {title: '⬅️ Links', value: 'left'},
+              {title: '↔️ Midden', value: 'center'},
+              {title: '➡️ Rechts', value: 'right'},
             ],
-            layout: 'radio',
           },
           initialValue: 'left',
-        }),
-        defineField({
-          name: 'verticalAlignment',
-          title: 'Verticale uitlijning',
-          type: 'string',
-          options: {
-            list: [
-              {title: 'Boven', value: 'top'},
-              {title: 'Midden', value: 'center'},
-              {title: 'Onder', value: 'bottom'},
-            ],
-            layout: 'radio',
-          },
-          initialValue: 'top',
+          components: {input: ChoiceCardInput},
         }),
       ],
     }),
@@ -111,12 +72,13 @@ export const pageSectionType = defineType({
       name: 'background',
       title: 'Achtergrond',
       type: 'backgroundComponent',
-      description: 'Kies optioneel een aangepaste achtergrond voor deze sectie.',
+      description: 'Kies een achtergrondstijl zodat redacteuren direct zien welke sfeer de sectie krijgt.',
     }),
     defineField({
       name: 'columns',
       title: 'Kolommen',
       type: 'array',
+      description: 'Voeg een of meerdere kolommen toe en sleep ze om de volgorde te bepalen.',
       of: [defineArrayMember({type: 'pageColumn'})],
       validation: (rule) => rule.min(1).error('Voeg ten minste één kolom toe aan de sectie.'),
     }),

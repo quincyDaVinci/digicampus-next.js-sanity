@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {FileTextIcon} from '../lib/featherIcons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 

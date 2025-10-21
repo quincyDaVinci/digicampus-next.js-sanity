@@ -33,12 +33,12 @@ function createIcon(children: React.ReactNode) {
     if (process.env.NODE_ENV !== 'production') {
       // Warn if conflicting props that harm accessibility
       if (title && computedAriaHidden) {
-        // eslint-disable-next-line no-console
-        console.warn('[FeatherIcon] Received `title` along with `ariaHidden=true`. This hides the icon from assistive tech despite having a title. Prefer omitting `ariaHidden` or removing `title`.')
+        console.warn(
+          '[FeatherIcon] Received `title` along with `ariaHidden=true`. This hides the icon from assistive tech despite having a title. Prefer omitting `ariaHidden` or removing `title`.')
       }
       if (!title && computedRole === 'img') {
-        // eslint-disable-next-line no-console
-        console.warn('[FeatherIcon] Role set to `img` without a `title`. Provide a `title` or omit role to allow the component to set `presentation` + `aria-hidden`.')
+        console.warn(
+          '[FeatherIcon] Role set to `img` without a `title`. Provide a `title` or omit role to allow the component to set `presentation` + `aria-hidden`.')
       }
     }
 
