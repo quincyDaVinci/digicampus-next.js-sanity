@@ -1,4 +1,4 @@
-import { type SchemaTypeDefinition } from 'sanity'
+import {type SchemaTypeDefinition} from 'sanity'
 
 import {blockContentType} from './blockContentType'
 import {categoryType} from './categoryType'
@@ -13,22 +13,17 @@ import {ctaBannerType} from './ctaBannerType'
 import {heroSectionType} from './heroSectionType'
 import {homePageType} from './homePageType'
 import {linkFieldType} from './linkFieldType'
-import {pageColumnType} from './pageColumnType'
-import {pageSectionType} from './pageSectionType'
 import {pageType} from './pageType'
 import {partnerLogoType, partnersSectionType} from './partnersSectionType'
 import {projectCardType, projectsSectionType} from './projectCardType'
 import {textImageSectionType} from './textImageSectionType'
 import {videoSectionType} from './videoSectionType'
-import {backgroundComponentType} from './components/backgroundComponentType'
-import {imageComponentType} from './components/imageComponentType'
-import {richTextComponentType} from './components/richTextComponentType'
-import {videoComponentType} from './components/videoComponentType'
-import {buttonComponentType} from './components/buttonComponentType'
-import {blogCardComponentType} from './components/blogCardComponentType'
-import {carouselComponentType} from './components/carouselComponentType'
+import {textBlockType} from './components/textBlockType'
+import {imageBlockType} from './components/imageBlockType'
+import {videoBlockType} from './components/videoBlockType'
+import {buttonBlockType} from './components/buttonBlockType'
 
-export const schema: { types: SchemaTypeDefinition[] } = {
+export const schema: {types: SchemaTypeDefinition[]} = {
   types: [
     blockContentType,
     categoryType,
@@ -38,8 +33,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     postType,
     authorType,
     linkFieldType,
-    pageColumnType,
-    pageSectionType,
     pageType,
     heroSectionType,
     videoSectionType,
@@ -52,12 +45,9 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     partnersSectionType,
     hybridComponentType,
     homePageType,
-    backgroundComponentType,
-    imageComponentType,
-    richTextComponentType,
-    videoComponentType,
-    buttonComponentType,
-    blogCardComponentType,
-    carouselComponentType,
+    textBlockType,
+    imageBlockType,
+    videoBlockType,
+    buttonBlockType,
   ],
 }

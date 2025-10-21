@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity'
+import {defineField, defineType} from 'sanity'
 
 export const linkFieldType = defineType({
   name: 'linkField',
@@ -15,7 +15,7 @@ export const linkFieldType = defineType({
       name: 'href',
       title: 'URL',
       type: 'url',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().uri({allowRelative: true}),
     }),
   ],
   preview: {

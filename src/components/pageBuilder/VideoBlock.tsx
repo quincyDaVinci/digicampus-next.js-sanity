@@ -1,61 +1,64 @@
-import type {VideoComponent} from '@/types/pageBuilder'
+import type {VideoBlock as VideoBlockType} from '@/types/pageBuilder'
 
-interface VideoBlockProps {
-  component: VideoComponent
+function getEmbedUrl(url: string): string {
+  try {
+    const parsed = new URL(url)
+    const host = parsed.hostname.replace('www.', '')
+
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      if (parsed.pathname.startsWith('/embed/')) {
+        return url
+      }
+      const videoId = parsed.searchParams.get('v')
+      if (videoId) {
+        return `https://www.youtube.com/embed/${videoId}`
+      }
+    }
+
+    if (host === 'youtu.be') {
+      const cleanPath = parsed.pathname.replace(/^\/+/, '')
+      return `https://www.youtube.com/embed/${cleanPath}`
+    }
+
+    if (host === 'vimeo.com') {
+      const segments = parsed.pathname.split('/').filter(Boolean)
+      const id = segments.pop()
+      if (id) {
+        return `https://player.vimeo.com/video/${id}`
+      }
+    }
+
+    return url
+  } catch (error) {
+    console.warn('Kon video URL niet converteren:', error)
+    return url
+  }
 }
 
-export default function VideoBlock({component}: VideoBlockProps) {
-  const showControls = component.showControls ?? true
-  const muted = component.muted ?? true
-  const autoPlay = component.autoPlay ?? false
-  const loop = component.loop ?? false
-  const title = component.title || 'Video'
-  const transcriptId = component.transcript ? `${component._key}-transcript` : undefined
+interface VideoBlockProps {
+  block: VideoBlockType
+}
+
+export default function VideoBlock({block}: VideoBlockProps) {
+  const embedUrl = getEmbedUrl(block.videoUrl)
+  const title = block.title || 'Video'
 
   return (
-    <section className="w-full space-y-4" aria-label={title}>
+    <figure className="flex flex-col gap-3">
       <div className="relative w-full overflow-hidden rounded-3xl bg-[rgb(var(--dc-text)/0.06)] shadow-lg">
-        {component.sourceType === 'file' && component.videoFile?.asset?.url ? (
-          <video
-            className="h-full w-full object-cover"
-            controls={showControls}
-            muted={muted}
-            autoPlay={autoPlay}
-            loop={loop}
-            playsInline
-            aria-describedby={transcriptId}
-            poster={component.poster?.asset?.url}
-          >
-            <source src={component.videoFile.asset.url} />
-            <track
-              kind="captions"
-              src={component.captionsFile?.asset?.url || ''}
-              srcLang="nl"
-              label="Nederlands"
-              default={!!component.captionsFile?.asset?.url}
-            />
-          </video>
-        ) : component.videoUrl ? (
-          <div className="relative pt-[56.25%]">
-            <iframe
-              src={component.videoUrl}
-              title={title}
-              className="absolute inset-0 h-full w-full"
-              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        ) : null}
+        <div className="relative pt-[56.25%]">
+          <iframe
+            src={embedUrl}
+            title={title}
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="absolute inset-0 h-full w-full"
+          />
+        </div>
       </div>
-      {component.transcript ? (
-        <details
-          id={transcriptId}
-          className="rounded-2xl border border-[rgb(var(--dc-border)/0.35)] bg-[rgb(var(--dc-surface))] p-4 text-sm leading-relaxed text-[rgb(var(--dc-text))]"
-        >
-          <summary className="cursor-pointer font-semibold text-[rgb(var(--dc-brand))]">Transcript</summary>
-          <p className="mt-2 whitespace-pre-wrap">{component.transcript}</p>
-        </details>
+      {block.caption ? (
+        <figcaption className="text-sm text-[rgb(var(--dc-text)/0.7)]">{block.caption}</figcaption>
       ) : null}
-    </section>
+    </figure>
   )
 }

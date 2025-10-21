@@ -1,9 +1,11 @@
+import {TextIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-export const richTextComponentType = defineType({
-  name: 'richTextComponent',
-  title: 'Rijke tekst',
+export const textBlockType = defineType({
+  name: 'textBlock',
+  title: 'Tekst',
   type: 'object',
+  icon: TextIcon,
   fields: [
     defineField({
       name: 'content',
@@ -14,10 +16,9 @@ export const richTextComponentType = defineType({
           type: 'block',
           styles: [
             {title: 'Paragraaf', value: 'normal'},
-            {title: 'H1 (max. één per pagina)', value: 'h1'},
+            {title: 'H1 (maximaal één per pagina)', value: 'h1'},
             {title: 'H2', value: 'h2'},
             {title: 'H3', value: 'h3'},
-            {title: 'H4', value: 'h4'},
             {title: 'Citaat', value: 'blockquote'},
           ],
           lists: [
@@ -68,51 +69,16 @@ export const richTextComponentType = defineType({
       ],
       validation: (rule) => rule.required().min(1).error('Voeg tekst toe.'),
     }),
-    defineField({
-      name: 'textAlign',
-      title: 'Uitlijning',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Links', value: 'left'},
-          {title: 'Gecentreerd', value: 'center'},
-          {title: 'Rechts', value: 'right'},
-          {title: 'Uitgevuld', value: 'justify'},
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'left',
-    }),
-    defineField({
-      name: 'maxWidth',
-      title: 'Maximale breedte',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Smalle kolom', value: 'narrow'},
-          {title: 'Standaard', value: 'default'},
-          {title: 'Breed', value: 'wide'},
-        ],
-      },
-      initialValue: 'default',
-    }),
-    defineField({
-      name: 'ariaLabel',
-      title: 'Aria label (optioneel)',
-      type: 'string',
-      description:
-        'Handig wanneer de tekst als call-to-action of belangrijke melding fungeert. Beschrijf kort de bedoeling.',
-    }),
   ],
   preview: {
     select: {
       firstBlock: 'content.0',
     },
     prepare({firstBlock}) {
-      const title = firstBlock?.children?.[0]?.text || 'Rijke tekst'
+      const title = firstBlock?.children?.[0]?.text || 'Tekstblok'
       return {
         title,
-        subtitle: 'Tekstblok',
+        subtitle: 'Tekst',
       }
     },
   },
