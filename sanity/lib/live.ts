@@ -1,13 +1,21 @@
-// Querying with "sanityFetch" will keep content automatically updated
-// Before using it, import and render "<SanityLive />" in your layout, see
-// https://github.com/sanity-io/next-sanity#live-content-api for more information.
-import { defineLive } from "next-sanity";
+// Lightweight Live API shim for next-sanity v11+
+// If you later upgrade to a version that exposes `defineLive`, you can swap this implementation.
 import { previewClient } from './client'
+import type { QueryParams } from '@sanity/client'
+import type {ReactElement} from 'react'
 
-const token = process.env.SANITY_API_READ_TOKEN
+/**
+ * Server/client-safe fetch that returns draft-aware data using the preview client.
+ * Stega encoding is already enabled in the preview client; adjust in client.ts if needed.
+ */
+export async function sanityFetch<T>(query: string, params?: QueryParams): Promise<T> {
+  return previewClient.fetch<T>(query, params ?? {})
+}
 
-export const { sanityFetch, SanityLive } = defineLive({
-  client: previewClient,
-  serverToken: token,
-  browserToken: token,
-});
+/**
+ * Placeholder component to enable future Live features.
+ * Currently renders nothing; safe to include in layouts.
+ */
+export function SanityLive(): ReactElement | null {
+  return null
+}

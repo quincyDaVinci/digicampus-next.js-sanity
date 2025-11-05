@@ -23,9 +23,10 @@ export interface HeroSectionProps extends BaseSection {
     icon?: string
   }>
   media?: {
-    type?: string
-    image?: unknown
-    video?: unknown
+    mediaType?: 'image' | 'video' | 'gallery'
+    image?: import('@sanity/image-url/lib/types/types').SanityImageSource
+    videoUrl?: string
+    gallery?: import('@sanity/image-url/lib/types/types').SanityImageSource[]
   }
 }
 

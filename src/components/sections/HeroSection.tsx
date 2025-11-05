@@ -1,18 +1,32 @@
 "use client";
 
 import type { HeroSectionProps } from "@/types/sections";
+import { urlFor } from "@sanity/lib/image";
 
 /**
  * Hero Section Router
  * Routes to different hero variants based on the variant prop
  */
 export default function HeroSection(props: HeroSectionProps) {
-  const { heading, subheading, badgeText, buttons = [] } = props;
+  const { heading, subheading, badgeText, buttons = [], media } = props;
+
+  // Build background image URL with hotspot/crop applied (also rasterize vectors)
+  const bgUrl = media?.image
+    ? urlFor(media.image).width(2400).height(1200).fit('crop').url()
+    : null;
 
   // For now, render a simple hero section
   // TODO: Implement variants from sane-kit (buttonBanner, badgeBanner, gridGallery)
   return (
-    <div className="w-full py-20 lg:py-40">
+    <div
+      className="w-full py-20 lg:py-40"
+      style={bgUrl ? {
+        backgroundImage: `url(${bgUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      } : undefined}
+    >
       <div className="container mx-auto">
         <div className="flex gap-8 items-center justify-center flex-col text-center">
           {badgeText && (
