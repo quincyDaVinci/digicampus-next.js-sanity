@@ -7,28 +7,28 @@ import {HomeIcon} from '../../lib/featherIcons'
  */
 export default defineType({
   name: 'homePage',
-  title: 'Home Page',
+  title: 'Startpagina',
   type: 'document',
   icon: HomeIcon,
   groups: [
-    {name: 'content', title: 'Content', default: true},
-    {name: 'metadata', title: 'SEO & Metadata'},
+    {name: 'content', title: 'Inhoud', default: true},
+    {name: 'metadata', title: 'SEO & metadata'},
   ],
   fields: [
     defineField({
       name: 'title',
-      title: 'Page Title',
+      title: 'Paginatitel',
       type: 'string',
-      description: 'The main title of the homepage',
+      description: 'De hoofd­titel van de startpagina',
       group: 'content',
       validation: (Rule) => Rule.required().max(100),
-      initialValue: 'Home',
+      initialValue: 'Startpagina',
     }),
     defineField({
       name: 'modules',
-      title: 'Page Sections',
+      title: 'Paginasecties',
       type: 'array',
-      description: 'Build your homepage by adding sections',
+      description: 'Stel de startpagina samen door secties toe te voegen',
       of: [
         {type: 'heroSection'},
         {type: 'featureSection'},
@@ -44,12 +44,12 @@ export default defineType({
         {type: 'compareFeaturesSection'},
       ],
       group: 'content',
-      validation: (Rule) => Rule.min(1).error('Add at least one section to the homepage'),
+      validation: (Rule) => Rule.min(1).error('Voeg minimaal één sectie toe aan de startpagina'),
     }),
     defineField({
       name: 'metadata',
       type: 'metadata',
-      description: 'SEO settings and URL configuration',
+      description: 'SEO-instellingen en URL-configuratie',
       group: 'metadata',
     }),
   ],
@@ -58,8 +58,8 @@ export default defineType({
       title: 'title',
     },
     prepare: ({title}) => ({
-      title: title || 'Home Page',
-      subtitle: 'Homepage (Singleton)',
+      title: title || 'Startpagina',
+      subtitle: 'Startpagina (singleton)',
       media: HomeIcon,
     }),
   },

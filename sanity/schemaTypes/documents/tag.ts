@@ -13,7 +13,7 @@ export default defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Titel',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
@@ -29,7 +29,7 @@ export default defineType({
     }),
     defineField({
       name: 'description',
-      title: 'Description',
+      title: 'Beschrijving',
       type: 'text',
       rows: 3,
     }),

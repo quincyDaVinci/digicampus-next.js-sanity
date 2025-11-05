@@ -7,25 +7,25 @@ import {ImageIcon} from '../../lib/featherIcons'
  */
 export default defineType({
   name: 'heroSection',
-  title: 'Hero Section',
+  title: 'Hero-sectie',
   type: 'object',
   icon: ImageIcon,
   groups: [
-    {name: 'content', title: 'Content', default: true},
-    {name: 'appearance', title: 'Appearance'},
+    {name: 'content', title: 'Inhoud', default: true},
+    {name: 'appearance', title: 'Weergave'},
     {name: 'media', title: 'Media'},
   ],
   fields: [
     defineField({
       name: 'variant',
-      title: 'Layout Variant',
+      title: 'Lay-outvariant',
       type: 'string',
       group: 'appearance',
       options: {
         list: [
-          {title: 'Button Banner', value: 'buttonBanner'},
-          {title: 'Badge Banner', value: 'badgeBanner'},
-          {title: 'Grid Gallery', value: 'gridGallery'},
+          {title: 'Banner met knop', value: 'buttonBanner'},
+          {title: 'Banner met badge', value: 'badgeBanner'},
+          {title: 'Rastergalerij', value: 'gridGallery'},
         ],
         layout: 'radio',
       },
@@ -33,14 +33,14 @@ export default defineType({
     }),
     defineField({
       name: 'heading',
-      title: 'Heading',
+      title: 'Kop',
       type: 'string',
       validation: (Rule) => Rule.required().max(100),
       group: 'content',
     }),
     defineField({
       name: 'subheading',
-      title: 'Subheading',
+      title: 'Subkop',
       type: 'text',
       rows: 3,
       validation: (Rule) => Rule.max(250),
@@ -48,7 +48,7 @@ export default defineType({
     }),
     defineField({
       name: 'badgeText',
-      title: 'Badge Text',
+      title: 'Badge-tekst',
       type: 'string',
       description: 'Small text badge (for badgeBanner variant)',
       validation: (Rule) => Rule.max(40),
@@ -56,7 +56,7 @@ export default defineType({
     }),
     defineField({
       name: 'bannerButton',
-      title: 'Banner Button',
+      title: 'Bannerknop',
       type: 'object',
       description: 'Special button displayed in banner (buttonBanner variant)',
       hidden: ({parent}) => parent?.variant !== 'buttonBanner',
@@ -76,7 +76,7 @@ export default defineType({
     }),
     defineField({
       name: 'buttons',
-      title: 'Action Buttons',
+      title: 'Actieknoppen',
       type: 'array',
       of: [
         {
@@ -87,13 +87,13 @@ export default defineType({
             {
               name: 'variant',
               type: 'string',
-              title: 'Style',
+              title: 'Stijl',
               options: {
                 list: [
-                  {title: 'Default', value: 'default'},
-                  {title: 'Secondary', value: 'secondary'},
-                  {title: 'Outline', value: 'outline'},
-                  {title: 'Ghost', value: 'ghost'},
+                  {title: 'Standaard', value: 'default'},
+                  {title: 'Secundair', value: 'secondary'},
+                  {title: 'Omlijnd', value: 'outline'},
+                  {title: 'Transparant', value: 'ghost'},
                 ],
               },
               initialValue: 'default',
@@ -101,12 +101,12 @@ export default defineType({
             {
               name: 'icon',
               type: 'string',
-              title: 'Icon',
+              title: 'Pictogram',
               options: {
                 list: [
-                  {title: 'None', value: 'none'},
-                  {title: 'Arrow Right', value: 'arrowRight'},
-                  {title: 'Phone', value: 'phone'},
+                  {title: 'Geen', value: 'none'},
+                  {title: 'Pijl rechts', value: 'arrowRight'},
+                  {title: 'Telefoon', value: 'phone'},
                 ],
               },
             },
@@ -117,7 +117,7 @@ export default defineType({
               url: 'url',
             },
             prepare: ({label, url}) => ({
-              title: label || 'Button',
+              title: label || 'Knop',
               subtitle: url,
             }),
           },
@@ -127,46 +127,46 @@ export default defineType({
     }),
     defineField({
       name: 'media',
-      title: 'Hero Media',
+      title: 'Hero-media',
       type: 'object',
       group: 'media',
       fields: [
         {
           name: 'mediaType',
-          title: 'Media Type',
+          title: 'Mediatype',
           type: 'string',
           options: {
             list: [
-              {title: 'Image', value: 'image'},
+              {title: 'Afbeelding', value: 'image'},
               {title: 'Video', value: 'video'},
-              {title: 'Gallery', value: 'gallery'},
+              {title: 'Galerij', value: 'gallery'},
             ],
           },
           initialValue: 'image',
         },
         {
           name: 'image',
-          title: 'Image',
+          title: 'Afbeelding',
           type: 'image',
           options: {hotspot: true},
           fields: [
             {
               name: 'alt',
               type: 'string',
-              title: 'Alternative Text',
+              title: 'Alternatieve tekst',
             },
           ],
           hidden: ({parent}) => parent?.mediaType !== 'image',
         },
         {
           name: 'videoUrl',
-          title: 'Video URL',
+          title: 'Video-URL',
           type: 'url',
           hidden: ({parent}) => parent?.mediaType !== 'video',
         },
         {
           name: 'gallery',
-          title: 'Gallery Images',
+          title: 'Galerijafbeeldingen',
           type: 'array',
           of: [
             {
@@ -176,7 +176,7 @@ export default defineType({
                 {
                   name: 'alt',
                   type: 'string',
-                  title: 'Alternative Text',
+                  title: 'Alternatieve tekst',
                 },
               ],
             },
@@ -187,7 +187,7 @@ export default defineType({
     }),
     defineField({
       name: 'attributes',
-      title: 'Section Attributes',
+      title: 'Sectie-attributen',
       type: 'module-attributes',
       group: 'appearance',
     }),
@@ -199,7 +199,7 @@ export default defineType({
       media: 'media.image',
     },
     prepare: ({title, variant, media}) => ({
-      title: title || 'Hero Section',
+      title: title || 'Hero-sectie',
       subtitle: `Variant: ${variant || 'buttonBanner'}`,
       media,
     }),

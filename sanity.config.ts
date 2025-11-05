@@ -43,7 +43,7 @@ export default defineConfig({
             resolve: (doc) => ({
               locations: [
                 {
-                  title: doc?.title || 'Untitled',
+                  title: doc?.title || 'Naamloos',
                   href: `/${doc?.slug}`,
                 },
               ],
@@ -57,7 +57,7 @@ export default defineConfig({
             resolve: (doc) => ({
               locations: [
                 {
-                  title: doc?.title || 'Untitled',
+                  title: doc?.title || 'Naamloos',
                   href: `/blog/${doc?.slug}`,
                 },
               ],
@@ -70,7 +70,7 @@ export default defineConfig({
             resolve: (doc) => ({
               locations: [
                 {
-                  title: 'Home',
+                  title: 'Startpagina',
                   href: '/',
                 },
               ],

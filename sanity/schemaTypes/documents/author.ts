@@ -3,13 +3,13 @@ import {defineField, defineType} from 'sanity'
 
 export default defineType({
   name: 'author',
-  title: 'Author',
+  title: 'Auteur',
   type: 'document',
   icon: UserIcon,
   fields: [
     defineField({
       name: 'name',
-      title: 'Name',
+      title: 'Naam',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
@@ -24,7 +24,7 @@ export default defineType({
     }),
     defineField({
       name: 'image',
-      title: 'Image',
+      title: 'Afbeelding',
       type: 'image',
       options: {
         hotspot: true,
@@ -33,13 +33,13 @@ export default defineType({
         {
           name: 'alt',
           type: 'string',
-          title: 'Alternative Text',
+          title: 'Alternatieve tekst',
         },
       ],
     }),
     defineField({
       name: 'bio',
-      title: 'Bio',
+      title: 'Biografie',
       type: 'array',
       of: [{type: 'block'}],
     }),

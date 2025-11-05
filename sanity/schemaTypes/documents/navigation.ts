@@ -7,25 +7,25 @@ import {LayersIcon} from '../../lib/featherIcons'
  */
 export default defineType({
   name: 'navigation',
-  title: 'Navigation Menu',
+  title: 'Navigatiemenu',
   type: 'document',
   icon: LayersIcon,
   fields: [
     defineField({
       name: 'title',
-      title: 'Menu Title',
+      title: 'Menutitel',
       type: 'string',
-      description: 'Internal name for this menu (e.g., "Main Menu", "Footer Links")',
+      description: 'Interne naam voor dit menu (bijv. “Hoofdmenu”, “Footer-links”)',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'items',
-      title: 'Navigation Items',
+      title: 'Navigatie-items',
       type: 'array',
-      description: 'Add links and dropdown menus',
+      description: 'Voeg links en dropdownmenu’s toe',
       of: [
         {type: 'link'},
-        {type: 'link.list'}, // Dropdown menus
+        {type: 'link.list'}, // Dropdownmenu’s
       ],
     }),
   ],
@@ -35,7 +35,7 @@ export default defineType({
       count: 'items.length',
     },
     prepare: ({title, count}) => ({
-      title: title || 'Navigation Menu',
+      title: title || 'Navigatiemenu',
       subtitle: `${count || 0} items`,
       media: LayersIcon,
     }),

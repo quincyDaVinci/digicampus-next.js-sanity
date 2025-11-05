@@ -3,13 +3,13 @@ import {defineField, defineType} from 'sanity'
 
 export default defineType({
   name: 'blogPost',
-  title: 'Blog Post',
+  title: 'Blogbericht',
   type: 'document',
   icon: BookOpenIcon,
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Titel',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
@@ -25,13 +25,13 @@ export default defineType({
     }),
     defineField({
       name: 'author',
-      title: 'Author',
+      title: 'Auteur',
       type: 'reference',
       to: [{type: 'author'}],
     }),
     defineField({
       name: 'mainImage',
-      title: 'Main Image',
+      title: 'Hoofdafbeelding',
       type: 'image',
       options: {
         hotspot: true,
@@ -40,30 +40,30 @@ export default defineType({
         {
           name: 'alt',
           type: 'string',
-          title: 'Alternative Text',
+          title: 'Alternatieve tekst',
         },
       ],
     }),
     defineField({
       name: 'categories',
-      title: 'Categories',
+      title: 'Categorieën',
       type: 'array',
       of: [{type: 'reference', to: {type: 'blogCategory'}}],
     }),
     defineField({
       name: 'publishedAt',
-      title: 'Published At',
+      title: 'Gepubliceerd op',
       type: 'datetime',
     }),
     defineField({
       name: 'excerpt',
-      title: 'Excerpt',
+      title: 'Samenvatting',
       type: 'text',
       rows: 4,
     }),
     defineField({
       name: 'body',
-      title: 'Body',
+      title: 'Inhoud',
       type: 'array',
       of: [{type: 'block'}],
     }),
@@ -76,7 +76,7 @@ export default defineType({
     },
     prepare(selection) {
       const {author} = selection
-      return {...selection, subtitle: author && `by ${author}`}
+      return {...selection, subtitle: author && `door ${author}`}
     },
   },
 })

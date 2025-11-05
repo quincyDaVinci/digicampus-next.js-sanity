@@ -6,24 +6,24 @@ import {defineField, defineType} from 'sanity'
  */
 export default defineType({
   name: 'cta',
-  title: 'Call-to-Action',
+  title: 'Call-to-action',
   type: 'object',
   fields: [
     defineField({
       name: 'link',
       type: 'link',
-      description: 'Button link and label',
+      description: 'Knoplink en label',
     }),
     defineField({
       name: 'style',
-      title: 'Button Style',
+      title: 'Knopstijl',
       type: 'string',
       options: {
         list: [
-          {title: 'Primary (Filled)', value: 'action'},
-          {title: 'Primary Outline', value: 'action-outline'},
-          {title: 'Ghost (Transparent)', value: 'ghost'},
-          {title: 'Link (Text only)', value: 'link'},
+          {title: 'Primair (gevuld)', value: 'action'},
+          {title: 'Primair omlijnd', value: 'action-outline'},
+          {title: 'Transparant', value: 'ghost'},
+          {title: 'Tekstlink', value: 'link'},
         ],
       },
       initialValue: 'action',
@@ -35,8 +35,8 @@ export default defineType({
       style: 'style',
     },
     prepare: ({label, style}) => ({
-      title: label || 'Button',
-      subtitle: style || 'Default style',
+      title: label || 'Knop',
+      subtitle: style || 'Standaardstijl',
     }),
   },
 })

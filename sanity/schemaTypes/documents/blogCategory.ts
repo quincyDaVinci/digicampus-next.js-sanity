@@ -3,13 +3,13 @@ import {defineField, defineType} from 'sanity'
 
 export default defineType({
   name: 'blogCategory',
-  title: 'Blog Category',
+  title: 'Blogcategorie',
   type: 'document',
   icon: TagIcon,
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Titel',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
@@ -25,7 +25,7 @@ export default defineType({
     }),
     defineField({
       name: 'description',
-      title: 'Description',
+      title: 'Beschrijving',
       type: 'text',
     }),
   ],

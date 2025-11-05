@@ -15,16 +15,16 @@ export default defineType({
       name: 'label',
       title: 'Label',
       type: 'string',
-      description: 'Text displayed for the link',
+      description: 'Tekst die voor de link getoond wordt',
     }),
     defineField({
       name: 'type',
-      title: 'Link Type',
+      title: 'Linktype',
       type: 'string',
       options: {
         list: [
-          {title: 'Internal Page', value: 'internal'},
-          {title: 'External URL', value: 'external'},
+          {title: 'Interne pagina', value: 'internal'},
+          {title: 'Externe URL', value: 'external'},
         ],
         layout: 'radio',
       },
@@ -33,14 +33,14 @@ export default defineType({
     }),
     defineField({
       name: 'internal',
-      title: 'Internal Page',
+      title: 'Interne pagina',
       type: 'reference',
       to: [{type: 'page'}, {type: 'homePage'}, {type: 'blogPost'}],
       hidden: ({parent}) => parent?.type !== 'internal',
     }),
     defineField({
       name: 'external',
-      title: 'External URL',
+      title: 'Externe URL',
       type: 'url',
       validation: (Rule) =>
         Rule.uri({
@@ -51,10 +51,10 @@ export default defineType({
     }),
     defineField({
       name: 'params',
-      title: 'URL Parameters',
+      title: 'URL-parameters',
       type: 'string',
-      placeholder: 'e.g. #section-id or ?utm_source=campaign',
-      description: 'Add hash links or query parameters',
+      placeholder: 'bijv. #sectie-id of ?utm_source=campagne',
+      description: 'Voeg hash-links of queryparameters toe',
       hidden: ({parent}) => parent?.type !== 'internal',
     }),
   ],
@@ -73,8 +73,8 @@ export default defineType({
           ? `/${internalSlug || ''}${params || ''}`
           : external
       return {
-        title: label || internalTitle || 'Untitled link',
-        subtitle: href || 'No URL set',
+        title: label || internalTitle || 'Naamloze link',
+        subtitle: href || 'Geen URL ingesteld',
       }
     },
   },

@@ -4,11 +4,11 @@ import type {StructureResolver} from 'sanity/structure'
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title('Content')
+    .title('Inhoud')
     .items([
-      // Site Settings (Singleton)
+      // Website-instellingen (Singleton)
       S.listItem()
-        .title('Site Settings')
+        .title('Website-instellingen')
         .icon(SettingsIcon)
         .child(
           S.document()
@@ -18,17 +18,17 @@ export const structure: StructureResolver = (S) =>
       
       S.divider(),
       
-      // Pages section with nested structure
+      // Pagina's met geneste structuur
       S.listItem()
-        .title('Pages')
+        .title('Pagina’s')
         .icon(FileTextIcon)
         .child(
           S.list()
-            .title('Pages')
+            .title('Pagina’s')
             .items([
               // Home Page (Singleton)
               S.listItem()
-                .title('Home Page')
+                .title('Homepagina')
                 .icon(HomeIcon)
                 .child(
                   S.document()
@@ -38,11 +38,11 @@ export const structure: StructureResolver = (S) =>
               S.divider(),
               // All other pages
               S.listItem()
-                .title('All Pages')
+                .title('Alle pagina’s')
                 .icon(FileTextIcon)
                 .child(
                   S.documentTypeList('page')
-                    .title('All Pages')
+                    .title('Alle pagina’s')
                     .defaultOrdering([{field: 'title', direction: 'asc'}])
                 ),
             ])
@@ -50,7 +50,7 @@ export const structure: StructureResolver = (S) =>
       
       S.divider(),
       
-      // Blog section
+      // Blogsectie
       S.listItem()
         .title('Blog')
         .icon(BookOpenIcon)
@@ -59,28 +59,28 @@ export const structure: StructureResolver = (S) =>
             .title('Blog')
             .items([
               S.listItem()
-                .title('Posts')
+                .title('Blogs')
                 .icon(BookOpenIcon)
                 .child(
                   S.documentTypeList('blogPost')
-                    .title('Blog Posts')
+                    .title('Blogberichten')
                     .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
                 ),
               S.listItem()
-                .title('Categories')
+                .title('Categorieën')
                 .icon(TagIcon)
                 .child(
                   S.documentTypeList('blogCategory')
-                    .title('Blog Categories')
+                    .title('Blogcategorieën')
                 ),
             ])
         ),
       
       S.divider(),
       
-      // Navigation (Singleton)
+      // Navigatie (Singleton)
       S.listItem()
-        .title('Navigation')
+        .title('Navigatie')
         .icon(LayersIcon)
         .child(
           S.document()
@@ -92,9 +92,9 @@ export const structure: StructureResolver = (S) =>
 
       // Legacy content cleanup helpers were temporary and have been removed
       
-      // Authors/Team Members
+      // Auteurs / Teamleden
       S.documentTypeListItem('author')
-        .title('Authors')
+        .title('Teamleden')
         .icon(UsersIcon),
       
       S.divider(),

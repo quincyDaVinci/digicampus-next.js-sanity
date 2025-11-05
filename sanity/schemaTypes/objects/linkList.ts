@@ -7,22 +7,22 @@ import {LayersIcon} from '../../lib/featherIcons'
  */
 export default defineType({
   name: 'link.list',
-  title: 'Link with Dropdown',
+  title: 'Link met dropdown',
   type: 'object',
   icon: LayersIcon,
   fields: [
     defineField({
       name: 'link',
-      title: 'Parent Link',
+      title: 'Bovenliggende link',
       type: 'link',
-      description: 'Main navigation item',
+      description: 'Hoofdnavigatie-item',
     }),
     defineField({
       name: 'links',
-      title: 'Dropdown Links',
+      title: 'Dropdown-links',
       type: 'array',
       of: [{type: 'link'}],
-      description: 'Links shown in dropdown menu',
+      description: 'Links die in het dropdownmenu worden getoond',
     }),
   ],
   preview: {
@@ -31,8 +31,8 @@ export default defineType({
       count: 'links.length',
     },
     prepare: ({label, count}) => ({
-      title: label || 'Dropdown menu',
-      subtitle: `${count || 0} sub-items`,
+      title: label || 'Dropdownmenu',
+      subtitle: `${count || 0} subitems`,
       media: LayersIcon,
     }),
   },

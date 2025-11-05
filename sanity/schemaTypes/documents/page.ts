@@ -7,27 +7,27 @@ import {FileTextIcon} from '../../lib/featherIcons'
  */
 export default defineType({
   name: 'page',
-  title: 'Page',
+  title: 'Pagina',
   type: 'document',
   icon: FileTextIcon,
   groups: [
-    {name: 'content', title: 'Content', default: true},
-    {name: 'metadata', title: 'SEO & Metadata'},
+    {name: 'content', title: 'Inhoud', default: true},
+    {name: 'metadata', title: 'SEO & metadata'},
   ],
   fields: [
     defineField({
       name: 'title',
-      title: 'Page Title',
+      title: 'Paginatitel',
       type: 'string',
-      description: 'The main title of the page',
+      description: 'De hoofd­titel van de pagina',
       group: 'content',
       validation: (Rule) => Rule.required().max(100),
     }),
     defineField({
       name: 'modules',
-      title: 'Page Sections',
+      title: 'Paginasecties',
       type: 'array',
-      description: 'Build your page by adding sections',
+      description: 'Stel de pagina samen door secties toe te voegen',
       of: [
         {type: 'heroSection'},
         {type: 'featureSection'},
@@ -43,12 +43,12 @@ export default defineType({
         {type: 'compareFeaturesSection'},
       ],
       group: 'content',
-      validation: (Rule) => Rule.min(1).error('Add at least one section to the page'),
+      validation: (Rule) => Rule.min(1).error('Voeg minimaal één sectie toe aan de pagina'),
     }),
     defineField({
       name: 'metadata',
       type: 'metadata',
-      description: 'SEO settings and URL configuration',
+      description: 'SEO-instellingen en URL-configuratie',
       group: 'metadata',
     }),
   ],
@@ -59,8 +59,8 @@ export default defineType({
       noIndex: 'metadata.noIndex',
     },
     prepare: ({title, slug, noIndex}) => ({
-      title: title || 'Untitled Page',
-      subtitle: slug ? `/${slug}` : 'No slug set',
+      title: title || 'Naamloze pagina',
+      subtitle: slug ? `/${slug}` : 'Geen slug ingesteld',
       media: noIndex ? '🔒' : FileTextIcon,
     }),
   },

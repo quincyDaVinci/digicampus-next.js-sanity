@@ -6,23 +6,23 @@ import {defineField, defineType} from 'sanity'
  */
 export default defineType({
   name: 'module-attributes',
-  title: 'Module Attributes',
+  title: 'Module-attributen',
   type: 'object',
   fields: [
     defineField({
       name: 'uid',
-      title: 'Unique Identifier',
+      title: 'Unieke identificatie',
       type: 'string',
-      description: 'Used for anchor/jump links (HTML id attribute)',
-      placeholder: 'e.g. contact-section',
+      description: 'Gebruikt voor anker-/jumplinks (HTML id-attribuut)',
+      placeholder: 'bijv. contact-sectie',
       validation: (Rule) =>
-        Rule.regex(/^[a-zA-Z0-9-]+$/).error('Only letters, numbers, and hyphens allowed'),
+        Rule.regex(/^[a-zA-Z0-9-]+$/).error('Alleen letters, cijfers en koppeltekens toegestaan'),
     }),
     defineField({
       name: 'hidden',
-      title: 'Hide Section',
+      title: 'Sectie verbergen',
       type: 'boolean',
-      description: 'Temporarily hide this section from the page',
+      description: 'Verberg deze sectie tijdelijk op de pagina',
       initialValue: false,
     }),
   ],
