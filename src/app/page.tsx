@@ -47,22 +47,10 @@ export default async function Page() {
     return (
       <main id="main" className="flex flex-col gap-8 p-6 min-h-[60vh] items-center justify-center">
         <div className="max-w-2xl text-center">
-          <h1 className="text-fluid-3xl font-semibold mb-4">Welkom 👋</h1>
-          <p className="text-fluid-base text-[rgb(var(--dc-text)/0.85)] mb-6">
-            Je hebt succesvol SanityPress + Sane-Kit geïntegreerd!
+          <h1 className="text-4xl font-bold mb-4">Welcome to Your New Next.js & Sanity App!</h1>
+          <p className="text-lg mb-6 text-muted-foreground">
+            It looks like you haven&apos;t set up your home page content yet. To get started, head over to the Sanity Studio and create your home page by adding modules and content.
           </p>
-          <div className="rounded-2xl border border-dc bg-dc-surface-98 p-6 text-left">
-            <h2 className="font-semibold mb-3">Volgende stappen:</h2>
-            <ol className="text-sm text-[rgb(var(--dc-text)/0.7)] space-y-2 list-decimal list-inside">
-              <li>Ga naar <Link href="/geheimelocatie" className="underline text-[rgb(var(--dc-primary))]">Sanity Studio</Link></li>
-              <li>Bewerk de <strong>Home Page</strong> onder Pages</li>
-              <li>Voeg modules toe (Hero, Features, CTA, etc.)</li>
-              <li>Publiceer en zie je content hier verschijnen!</li>
-            </ol>
-            <p className="text-xs text-[rgb(var(--dc-text)/0.5)] mt-4">
-              Zie <code>QUICK_START.md</code> voor meer details
-            </p>
-          </div>
         </div>
       </main>
     )

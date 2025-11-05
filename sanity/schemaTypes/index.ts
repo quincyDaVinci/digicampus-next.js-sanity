@@ -42,7 +42,7 @@ export const schema: SchemaPluginOptions = {
     blogCategory,
     navigation,
     author,
-    tag,
+  tag,
 
     // Objects
     metadata,
@@ -66,8 +66,6 @@ export const schema: SchemaPluginOptions = {
     compareFeaturesSection,
     compareFeature,
   ],
-  templates: (templates) =>
-    templates.filter(({schemaType}) => !singletonTypes.includes(schemaType)),
 }
 
 // Document types that should only have one instance

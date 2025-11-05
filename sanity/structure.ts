@@ -89,6 +89,8 @@ export const structure: StructureResolver = (S) =>
         ),
       
       S.divider(),
+
+      // Legacy content cleanup helpers were temporary and have been removed
       
       // Authors/Team Members
       S.documentTypeListItem('author')
