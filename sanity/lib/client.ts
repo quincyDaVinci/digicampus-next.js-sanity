@@ -7,4 +7,23 @@ export const client = createClient({
   dataset,
   apiVersion,
   useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+  perspective: 'published',
+  stega: {
+    enabled: false,
+    studioUrl: '/geheimelocatie',
+  },
+})
+
+// Client for preview/draft mode with live updates
+export const previewClient = createClient({
+  projectId,
+  dataset,
+  apiVersion,
+  useCdn: false,
+  perspective: 'previewDrafts',
+  token: process.env.SANITY_API_READ_TOKEN,
+  stega: {
+    enabled: true,
+    studioUrl: '/geheimelocatie',
+  },
 })

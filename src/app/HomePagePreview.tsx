@@ -8,21 +8,19 @@ type PageData = {
   modules?: Array<{_key: string; _type: string; [key: string]: unknown}>
 }
 
-type PagePreviewProps = {
+type HomePagePreviewProps = {
   initial: QueryResponseInitial<PageData | null>
   query: string
-  params: {slug: string}
 }
 
-export function PagePreview({initial, query, params}: PagePreviewProps) {
-  const {data, loading, error} = useQuery<PageData | null>(query, params, {initial})
+export function HomePagePreview({initial, query}: HomePagePreviewProps) {
+  const {data, loading, error} = useQuery<PageData | null>(query, {}, {initial})
   
-  // Listen for navigation events from Sanity Studio to refresh smoothly
+  // Listen for navigation events from Sanity Studio
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      // Listen for navigation or update events from Studio
       if (event.data?.type === 'navigation' || event.data?.type === 'sanity/visual-editing/navigate') {
-        // The useQuery hook will automatically refetch
+        // useQuery will automatically refetch
       }
     }
     
@@ -39,13 +37,13 @@ export function PagePreview({initial, query, params}: PagePreviewProps) {
     return <div className="p-6 text-red-600">Error loading preview</div>
   }
   
-  if (!data) {
-    return <div className="p-6">Page not found in preview</div>
+  if (!data || !data.modules?.length) {
+    return <div className="p-6">No content yet. Add modules to the home page in Sanity Studio.</div>
   }
   
   return (
     <main id="main">
-      {data.modules?.map((module) => (
+      {data.modules.map((module) => (
         <RenderSection key={module._key} section={module} />
       ))}
     </main>

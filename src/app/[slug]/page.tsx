@@ -2,7 +2,7 @@ import {groq} from 'next-sanity'
 import {notFound} from 'next/navigation'
 import {draftMode} from 'next/headers'
 
-import {client} from '@sanity/lib/client'
+import {client, previewClient} from '@sanity/lib/client'
 import RenderSection from '@/components/sections/RenderSection'
 import {PagePreview} from './PagePreview'
 
@@ -68,7 +68,9 @@ export default async function Page({params}: PageParams) {
     notFound()
   }
 
-  const page = await client.fetch<{_id: string; title: string; description?: string; modules?: Array<{_key: string; _type: string}>} | null>(pageQuery, {slug})
+  // Use previewClient in draft mode to see unpublished changes
+  const activeClient = draft.isEnabled ? previewClient : client
+  const page = await activeClient.fetch<{_id: string; title: string; description?: string; modules?: Array<{_key: string; _type: string}>} | null>(pageQuery, {slug})
 
   if (!page) {
     notFound()

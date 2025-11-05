@@ -1,6 +1,8 @@
 import { client } from '@sanity/lib/client'
+import { draftMode } from 'next/headers'
 import RenderSection from '@/components/sections/RenderSection'
 import Link from 'next/link'
+import { HomePagePreview } from './HomePagePreview'
 
 // Query for the home page (singleton)
 const homePageQuery = `*[_type == "homePage" && _id == "homePage"][0]{
@@ -28,10 +30,17 @@ async function getHomePage() {
 }
 
 export default async function Page() {
+  const draft = await draftMode()
   const page = await getHomePage()
 
   console.log('Page exists:', !!page)
   console.log('Modules length:', page?.modules?.length)
+  console.log('Draft enabled:', draft.isEnabled)
+
+  // If in draft mode, use the live preview component
+  if (draft.isEnabled && page) {
+    return <HomePagePreview initial={{data: page, sourceMap: undefined}} query={homePageQuery} />
+  }
 
   // If no home page exists yet, show a welcome message
   if (!page || !page.modules?.length) {
