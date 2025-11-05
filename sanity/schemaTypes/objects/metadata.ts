@@ -33,7 +33,17 @@ export default defineType({
         source: (doc: any) => doc.title || doc.metadata?.title,
         maxLength: 96,
       },
-      validation: (Rule) => Rule.required().error('Slug is vereist voor pagina-URL’s'),
+      validation: (Rule) => Rule.custom((slug, context) => {
+        // Homepage doesn't need a slug (always renders at /)
+        if (context.document?._type === 'homePage') {
+          return true
+        }
+        // For regular pages, slug is required
+        if (!slug?.current) {
+          return "Slug is vereist voor pagina-URL's"
+        }
+        return true
+      }),
     }),
     defineField({
       name: 'image',
