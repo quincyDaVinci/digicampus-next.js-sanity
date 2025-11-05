@@ -1,61 +1,74 @@
-import { type SchemaTypeDefinition } from 'sanity'
+import type {SchemaPluginOptions} from 'sanity'
 
-import {blockContentType} from './blockContentType'
-import {categoryType} from './categoryType'
-import {tagType} from './tagType'
-import {navigationType} from './navigationType'
-import {postType} from './postType'
-import {authorType} from './authorType'
-import {blogSectionType} from './blogSectionType'
-import {hybridComponentType} from './hybridComponentType'
-import {ctaBannerType} from './ctaBannerType'
-import {heroSectionType} from './heroSectionType'
-import {homePageType} from './homePageType'
-import {linkFieldType} from './linkFieldType'
-import {pageColumnType} from './pageColumnType'
-import {pageSectionType} from './pageSectionType'
-import {pageType} from './pageType'
-import {partnerLogoType, partnersSectionType} from './partnersSectionType'
-import {projectCardType, projectsSectionType} from './projectCardType'
-import {textImageSectionType} from './textImageSectionType'
-import {videoSectionType} from './videoSectionType'
-import {backgroundComponentType} from './components/backgroundComponentType'
-import {imageComponentType} from './components/imageComponentType'
-import {richTextComponentType} from './components/richTextComponentType'
-import {videoComponentType} from './components/videoComponentType'
-import {buttonComponentType} from './components/buttonComponentType'
-import {blogCardComponentType} from './components/blogCardComponentType'
-import {carouselComponentType} from './components/carouselComponentType'
+// Documents
+import site from './documents/site'
+import page from './documents/page'
+import homePage from './documents/homePage'
+import blogPost from './documents/blogPost'
+import blogCategory from './documents/blogCategory'
+import navigation from './documents/navigation'
+import author from './documents/author'
+import tag from './documents/tag'
 
-export const schema: { types: SchemaTypeDefinition[] } = {
+// Objects
+import metadata from './objects/metadata'
+import link from './objects/link'
+import linkList from './objects/linkList'
+import cta from './objects/cta'
+import moduleAttributes from './objects/moduleAttributes'
+
+// Modules (Sections from sane-kit)
+import heroSection from './modules/heroSection'
+import featureSection from './modules/featureSection'
+import blogSection from './modules/blogSection'
+import statsSection from './modules/statsSection'
+import testimonialsSection from './modules/testimonialsSection'
+import pricingSection from './modules/pricingSection'
+import casesSection from './modules/casesSection'
+import ctaSection from './modules/ctaSection'
+import faqSection from './modules/faqSection'
+import contactSection from './modules/contactSection'
+import newsletterSection from './modules/newsletterSection'
+import compareFeaturesSection from './modules/compareFeaturesSection'
+import compareFeature from './modules/compareFeature'
+
+export const schema: SchemaPluginOptions = {
   types: [
-    blockContentType,
-    categoryType,
-    tagType,
-    navigationType,
-    postType,
-    authorType,
-    linkFieldType,
-    pageColumnType,
-    pageSectionType,
-    pageType,
-    heroSectionType,
-    videoSectionType,
-    textImageSectionType,
-    ctaBannerType,
-    blogSectionType,
-    projectCardType,
-    projectsSectionType,
-    partnerLogoType,
-    partnersSectionType,
-    hybridComponentType,
-    homePageType,
-    backgroundComponentType,
-    imageComponentType,
-    richTextComponentType,
-    videoComponentType,
-    buttonComponentType,
-    blogCardComponentType,
-    carouselComponentType,
+    // Documents
+    site,
+    page,
+    homePage,
+    blogPost,
+    blogCategory,
+    navigation,
+    author,
+    tag,
+
+    // Objects
+    metadata,
+    link,
+    linkList,
+    cta,
+    moduleAttributes,
+
+    // Modules (Sections)
+    heroSection,
+    featureSection,
+    blogSection,
+    statsSection,
+    testimonialsSection,
+    pricingSection,
+    casesSection,
+    ctaSection,
+    faqSection,
+    contactSection,
+    newsletterSection,
+    compareFeaturesSection,
+    compareFeature,
   ],
+  templates: (templates) =>
+    templates.filter(({schemaType}) => !singletonTypes.includes(schemaType)),
 }
+
+// Document types that should only have one instance
+const singletonTypes = ['site', 'homePage', 'navigation']

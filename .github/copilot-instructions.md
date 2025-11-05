@@ -10,11 +10,20 @@ Project snapshot and quick-start
 High-level architecture (why/how)
 
 - Frontend: `src/app/` holds the Next.js App Router pages and layout. Key files:
-  - `src/app/layout.tsx`, `src/app/page.tsx` — app shell and landing page.
+  - `src/app/layout.tsx`, `src/app/page.tsx` — app shell and landing page (now uses modular sections from Sanity).
+  - `src/app/[slug]/page.tsx` — dynamic pages using the new modular section system.
   - `src/app/globals.css` — global CSS and the design tokens (see "Design tokens" below).
   - `src/components/` — reusable UI; `Header.tsx` is a good example of site conventions (client component, dark toggle, responsive menu).
+- `src/components/sections/` — Modular section components (Hero, Features, CTA, FAQ, etc.) that render content from Sanity.
+  - `RenderSection.tsx` — Main router that handles all section types.
+  - Individual section files (HeroSection.tsx, FeatureSection.tsx, etc.) — Each handles its own variants.
 - `src/components/ui/HybridComponents.tsx` exposes the hybrid design system primitives (section, card, button, badge) that blend DaisyUI visuals with NL Design System semantics. Prefer these over ad-hoc markup for new UI.
-- CMS: `sanity/` contains Sanity Studio config and schemas used by the site. `sanity/lib/client.ts` and `sanity.config.ts` are integration points.
+- `src/components/pageBuilder/` — Legacy page builder components (still functional for backward compatibility).
+- CMS: `sanity/` contains Sanity Studio config and schemas used by the site:
+  - `sanity/schemaTypes/documents/` — Main content types (page, site, homePage, blogPost, author, etc.)
+  - `sanity/schemaTypes/objects/` — Reusable field groups (metadata, link, cta, moduleAttributes)
+  - `sanity/schemaTypes/modules/` — Page building blocks / sections (hero, feature, blog, stats, etc.)
+  - `sanity/lib/client.ts` and `sanity.config.ts` are integration points.
 - API: Minimal Next API routes live under `src/app/api/` (e.g. `src/app/api/env/route.ts`).
 - Public assets: `public/assets/images/` (logo SVGs, etc.).
 
@@ -65,10 +74,16 @@ Files to read for more context
 
 - `src/app/globals.css` — tokens, utilities, accessibility helpers
 - `src/components/Header.tsx` — practical examples for dark-mode, responsive nav, and token usage
-- `src/components/sections/HybridComponentGallery.tsx` — renders Sanity-driven hybrid components; useful reference when wiring new modular sections.
-- `sanity/schemaTypes/hybridComponentType.ts` — schema for the hybrid building blocks surfaced in Studio.
+- `src/components/sections/RenderSection.tsx` — main section router, handles both new modular sections and legacy pageBuilder
+- `src/components/sections/*Section.tsx` — individual section implementations
+- `sanity/schemaTypes/index.ts` — registry of all Sanity schemas
+- `sanity/schemaTypes/documents/` — document type schemas (page, site, homePage, etc.)
+- `sanity/schemaTypes/modules/` — section/module schemas (hero, feature, blog, etc.)
+- `sanity/structure.ts` — Sanity Studio organization and structure
 - `sanity/` folder — CMS schemas and client setup
 - `package.json` — scripts and dependencies
+- `INTEGRATION_COMPLETE.md` — full documentation of the SanityPress + Sane-Kit integration
+- `QUICK_START.md` — quick start guide for creating content
 
 If you modify behavior that affects other parts of the app
 

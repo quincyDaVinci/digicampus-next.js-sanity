@@ -244,6 +244,22 @@ export const ExternalLinkIcon = createIcon(
   </>
 )
 
+export const SettingsIcon = createIcon(
+  <>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.4 4.4l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.4-4.4l4.2-4.2" />
+  </>
+)
+
+export const PackageIcon = createIcon(
+  <>
+    <path d="M16.5 9.4l-9-5.19" />
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+    <line x1="12" y1="22.08" x2="12" y2="12" />
+  </>
+)
+
 export type FeatherSymbol =
   | 'sun'
   | 'moon'
@@ -269,6 +285,8 @@ export type FeatherSymbol =
   | 'globe'
   | 'download'
   | 'external'
+  | 'settings'
+  | 'package'
 
 export const featherIconMap: Record<FeatherSymbol, FeatherIconComponent> = {
   sun: SunIcon,
@@ -295,6 +313,8 @@ export const featherIconMap: Record<FeatherSymbol, FeatherIconComponent> = {
   globe: GlobeIcon,
   download: DownloadIcon,
   external: ExternalLinkIcon,
+  settings: SettingsIcon,
+  package: PackageIcon,
 }
 
 export function getFeatherIcon(symbol?: FeatherSymbol) {

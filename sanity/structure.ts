@@ -1,4 +1,4 @@
-import {BookOpenIcon, FileTextIcon, HomeIcon, LayersIcon, UsersIcon, TagIcon} from './lib/featherIcons'
+import {BookOpenIcon, FileTextIcon, HomeIcon, LayersIcon, UsersIcon, TagIcon, SettingsIcon, PackageIcon} from './lib/featherIcons'
 import type {StructureResolver} from 'sanity/structure'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
@@ -6,6 +6,18 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title('Content')
     .items([
+      // Site Settings (Singleton)
+      S.listItem()
+        .title('Site Settings')
+        .icon(SettingsIcon)
+        .child(
+          S.document()
+            .schemaType('site')
+            .documentId('site')
+        ),
+      
+      S.divider(),
+      
       // Pages section with nested structure
       S.listItem()
         .title('Pages')
@@ -14,20 +26,14 @@ export const structure: StructureResolver = (S) =>
           S.list()
             .title('Pages')
             .items([
-              // Premade pages subsection
+              // Home Page (Singleton)
               S.listItem()
-                .title('Premade Pages')
+                .title('Home Page')
                 .icon(HomeIcon)
                 .child(
-                  S.list()
-                    .title('Premade Pages')
-                    .items([
-                      S.documentListItem()
-                        .id('homePage')
-                        .schemaType('homePage')
-                        .title('Home Page'),
-                      // Add more premade page templates here in the future
-                    ])
+                  S.document()
+                    .schemaType('homePage')
+                    .documentId('homePage')
                 ),
               S.divider(),
               // All other pages
@@ -42,39 +48,51 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
       
-      // Blogs section
-      S.listItem()
-        .title('Blogs')
-        .icon(BookOpenIcon)
-        .child(
-          S.documentTypeList('post')
-            .title('Blog Posts')
-            .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
-        ),
-      
       S.divider(),
       
-      // Navigation section
+      // Blog section
       S.listItem()
-        .title('Navigation')
-        .icon(LayersIcon)
+        .title('Blog')
+        .icon(BookOpenIcon)
         .child(
           S.list()
-            .title('Navigation')
+            .title('Blog')
             .items([
-              S.documentListItem()
-                .id('navigation')
-                .schemaType('navigation')
-                .title('Header Navigation'),
-              // Add footer navigation or other nav items here if needed
+              S.listItem()
+                .title('Posts')
+                .icon(BookOpenIcon)
+                .child(
+                  S.documentTypeList('blogPost')
+                    .title('Blog Posts')
+                    .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
+                ),
+              S.listItem()
+                .title('Categories')
+                .icon(TagIcon)
+                .child(
+                  S.documentTypeList('blogCategory')
+                    .title('Blog Categories')
+                ),
             ])
         ),
       
       S.divider(),
       
-      // Team Members
+      // Navigation (Singleton)
+      S.listItem()
+        .title('Navigation')
+        .icon(LayersIcon)
+        .child(
+          S.document()
+            .schemaType('navigation')
+            .documentId('navigation')
+        ),
+      
+      S.divider(),
+      
+      // Authors/Team Members
       S.documentTypeListItem('author')
-        .title('Team Members')
+        .title('Authors')
         .icon(UsersIcon),
       
       S.divider(),
@@ -82,10 +100,5 @@ export const structure: StructureResolver = (S) =>
       // Tags
       S.documentTypeListItem('tag')
         .title('Tags')
-        .icon(TagIcon),
-      
-      // Categories
-      S.documentTypeListItem('category')
-        .title('Categories')
         .icon(TagIcon),
     ])

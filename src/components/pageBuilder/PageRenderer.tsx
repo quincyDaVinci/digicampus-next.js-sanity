@@ -43,28 +43,29 @@ function renderComponent(component: PageComponent, depth = 0): ReactNode {
 
   switch (component._type) {
     case 'richTextComponent':
-      return <RichTextBlock component={component} />
+      return <RichTextBlock component={component as Extract<PageComponent, {_type: 'richTextComponent'}>} />
     case 'imageComponent':
-      return <ImageBlock component={component} />
+      return <ImageBlock component={component as Extract<PageComponent, {_type: 'imageComponent'}>} />
     case 'videoComponent':
-      return <VideoBlock component={component} />
+      return <VideoBlock component={component as Extract<PageComponent, {_type: 'videoComponent'}>} />
     case 'buttonComponent':
-      return <ButtonBlock component={component} />
+      return <ButtonBlock component={component as Extract<PageComponent, {_type: 'buttonComponent'}>} />
     case 'blogCardComponent':
-      return <BlogCard component={component} />
+      return <BlogCard component={component as Extract<PageComponent, {_type: 'blogCardComponent'}>} />
     case 'carouselComponent': {
-      if (!component.items?.length) return null
-      const renderedItems = component.items
+      const carouselComp = component as Extract<PageComponent, {_type: 'carouselComponent'}>
+      if (!carouselComp.items?.length) return null
+      const renderedItems = carouselComp.items
         .map((item) => renderComponent(item as PageComponent, depth + 1))
         .filter(Boolean) as ReactNode[]
       if (!renderedItems.length) return null
       return (
         <Carousel
-          ariaLabel={component.ariaLabel}
-          autoPlay={component.autoPlay}
-          interval={component.interval}
-          showIndicators={component.showIndicators}
-          spacing={component.spacing}
+          ariaLabel={carouselComp.ariaLabel}
+          autoPlay={carouselComp.autoPlay}
+          interval={carouselComp.interval}
+          showIndicators={carouselComp.showIndicators}
+          spacing={carouselComp.spacing}
         >
           {renderedItems}
         </Carousel>

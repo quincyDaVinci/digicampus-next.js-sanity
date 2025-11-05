@@ -6,6 +6,8 @@ export {
   HomeIcon,
   ImageIcon,
   LayersIcon,
+  PackageIcon,
+  SettingsIcon,
   ShieldIcon,
   TagIcon,
   UserIcon,

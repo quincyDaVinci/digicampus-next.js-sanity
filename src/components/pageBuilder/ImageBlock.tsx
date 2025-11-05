@@ -33,12 +33,19 @@ export default function ImageBlock({component}: ImageBlockProps) {
   const imageUrl = imageBuilder.width(1600).url()
   const {width = 1600, height = 900} = component.image.asset.metadata?.dimensions ?? {width: 1600, height: 900}
   const rounded = component.rounded ?? true
-  const Wrapper = component.link ? Link : component.allowZoom ? 'a' : 'div'
-  const wrapperProps = component.link
+  
+  // Determine wrapper type and props properly
+  const hasLink = Boolean(component.link?.href)
+  const hasZoom = Boolean(component.allowZoom)
+  
+  const WrapperElement = hasLink ? Link : hasZoom ? 'a' : 'div'
+  const wrapperProps = hasLink && component.link
     ? {href: component.link.href, 'aria-label': component.link.label}
-    : component.allowZoom
-      ? {href: imageUrl, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${component.image.alt || 'Afbeelding'} openen in nieuw venster`}
+    : hasZoom
+      ? {href: imageUrl, target: '_blank' as const, rel: 'noopener noreferrer', 'aria-label': `${component.image.alt || 'Afbeelding'} openen in nieuw venster`}
       : {}
+
+  const WrapperComponent = WrapperElement as React.ElementType
 
   return (
     <figure
@@ -55,8 +62,8 @@ export default function ImageBlock({component}: ImageBlockProps) {
       style={{color: 'rgb(var(--dc-text))'}}
     >
       {component.background ? <BackgroundLayer background={component.background} /> : null}
-      <Wrapper
-        {...(wrapperProps as Record<string, unknown>)}
+      <WrapperComponent
+        {...wrapperProps}
         className={[
           'relative block w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]',
         ].join(' ')}
@@ -75,12 +82,12 @@ export default function ImageBlock({component}: ImageBlockProps) {
             width={width}
             height={height}
             className="h-auto w-full object-cover"
-            sizes="(max-width: 768px) 100vw, 70vw"
-          />
-        </span>
-      </Wrapper>
+          sizes="(max-width: 768px) 100vw, 70vw"
+        />
+      </span>
+      </WrapperComponent>
       {component.image.caption ? (
-        <figcaption className="text-sm text-[rgb(var(--dc-text)/0.7)]">{component.image.caption}</figcaption>
+        <figcaption className="relative text-center text-sm text-[rgb(var(--dc-text)/0.7)]">{component.image.caption}</figcaption>
       ) : null}
     </figure>
   )

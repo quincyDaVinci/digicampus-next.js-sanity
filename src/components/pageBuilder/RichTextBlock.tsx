@@ -9,7 +9,7 @@ const maxWidthMap: Record<NonNullable<RichTextComponent['maxWidth']>, string> = 
   wide: 'max-w-5xl',
 }
 
-const portableTextComponents: PortableTextReactComponents = {
+const portableTextComponents: Partial<PortableTextReactComponents> = {
   block: {
     normal: ({children}) => <p className="text-fluid-md leading-relaxed text-[rgb(var(--dc-text))]">{children}</p>,
     h1: ({children}) => (
