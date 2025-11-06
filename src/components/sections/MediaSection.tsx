@@ -272,15 +272,13 @@ export default function MediaSection(props: MediaSectionProps) {
                     tabIndex={0}
                   >
                     <source src={video.videoUrl} type="video/mp4" />
-                    {video.captionsUrl && (
-                      <track
-                        kind="captions"
-                        src={video.captionsUrl}
-                        srcLang="nl"
-                        label="Nederlands"
-                        default
-                      />
-                    )}
+                    <track
+                      kind="captions"
+                      src={video.captionsUrl || ""}
+                      srcLang="nl"
+                      label="Nederlands"
+                      default
+                    />
                     Your browser does not support the video tag.
                   </video>
                 </div>
