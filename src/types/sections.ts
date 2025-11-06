@@ -144,6 +144,38 @@ export interface CompareFeaturesSectionProps extends BaseSection {
   badgeText?: string
 }
 
+export interface MediaSectionProps extends BaseSection {
+  _type: 'mediaSection'
+  variant?: 'fullWidth' | 'contained' | 'splitScreen' | 'card'
+  heading?: string
+  description?: string
+  mediaType?: 'image' | 'video'
+  image?: {
+    asset?: import('@sanity/image-url/lib/types/types').SanityImageSource
+    alt?: string
+    caption?: string
+  }
+  video?: {
+    videoUrl?: string
+    posterImage?: {
+      asset?: import('@sanity/image-url/lib/types/types').SanityImageSource
+      alt?: string
+    }
+    videoTitle?: string
+    transcript?: string
+    captionsUrl?: string
+    autoplay?: boolean
+    loop?: boolean
+    controls?: boolean
+  }
+  aspectRatio?: string
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  rounded?: boolean
+  shadow?: boolean
+  ariaLabel?: string
+  ariaDescribedBy?: string
+}
+
 export type SectionProps =
   | HeroSectionProps
   | FeatureSectionProps
@@ -157,3 +189,4 @@ export type SectionProps =
   | ContactSectionProps
   | NewsletterSectionProps
   | CompareFeaturesSectionProps
+  | MediaSectionProps

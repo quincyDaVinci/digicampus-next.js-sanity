@@ -31,6 +31,7 @@ import contactSection from './modules/contactSection'
 import newsletterSection from './modules/newsletterSection'
 import compareFeaturesSection from './modules/compareFeaturesSection'
 import compareFeature from './modules/compareFeature'
+import mediaSection from './modules/mediaSection'
 
 export const schema: SchemaPluginOptions = {
   types: [
@@ -65,6 +66,7 @@ export const schema: SchemaPluginOptions = {
     newsletterSection,
     compareFeaturesSection,
     compareFeature,
+    mediaSection,
   ],
 }
 

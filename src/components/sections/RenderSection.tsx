@@ -15,6 +15,7 @@ import FAQSection from "./FAQSection";
 import ContactSection from "./ContactSection";
 import NewsletterSection from "./NewsletterSection";
 import CompareFeaturesSection from "./CompareFeaturesSection";
+import MediaSection from "./MediaSection";
 
 // Import existing pageBuilder component renderers
 import RichTextBlock from "../pageBuilder/RichTextBlock";
@@ -64,6 +65,8 @@ export default function RenderSection({ section }: RenderSectionProps) {
       return <NewsletterSection {...(section as Extract<SectionProps, {_type: 'newsletterSection'}>)} />;
     case "compareFeaturesSection":
       return <CompareFeaturesSection {...(section as Extract<SectionProps, {_type: 'compareFeaturesSection'}>)} />;
+    case "mediaSection":
+      return <MediaSection {...(section as Extract<SectionProps, {_type: 'mediaSection'}>)} />;
 
     // Existing pageBuilder component types
     case "richTextComponent":

@@ -41,6 +41,7 @@ export default defineType({
         {type: 'contactSection'},
         {type: 'newsletterSection'},
         {type: 'compareFeaturesSection'},
+        {type: 'mediaSection'},
       ],
       group: 'content',
       validation: (Rule) => Rule.min(1).error('Voeg minimaal één sectie toe aan de pagina'),
