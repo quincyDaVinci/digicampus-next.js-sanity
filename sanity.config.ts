@@ -15,6 +15,20 @@ import {schema} from './sanity/schemaTypes'
 import {structure} from './sanity/structure'
 import {customDocumentActions} from './sanity/lib/documentActions'
 
+// Determine the preview URL based on environment
+const getPreviewUrl = () => {
+  // In production (Vercel), use VERCEL_URL or custom domain
+  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+  }
+  // Check for custom domain
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL
+  }
+  // Fallback to localhost for development
+  return 'http://localhost:3000'
+}
+
 export default defineConfig({
   basePath: '/geheimelocatie',
   projectId,
@@ -28,7 +42,7 @@ export default defineConfig({
     structureTool({structure}),
     presentationTool({
       previewUrl: {
-        origin: 'http://localhost:3000',
+        origin: getPreviewUrl(),
         previewMode: {
           enable: '/api/draft',
         },
