@@ -5,11 +5,18 @@ import {previewClient} from '@sanity/lib/client'
 import {useEffect} from 'react'
 
 export function VisualEditing() {
+  // Get the current origin for studio URL
+  const studioOrigin = typeof window !== 'undefined' 
+    ? window.location.origin 
+    : process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_VERCEL_URL 
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` 
+      : 'http://localhost:3000'
+  
   // This hook enables live queries with the preview client
   // It listens to document mutations and automatically refetches queries
   useLiveMode({
     client: previewClient,
-    allowStudioOrigin: 'http://localhost:3000',
+    allowStudioOrigin: studioOrigin,
   })
   
   useEffect(() => {
