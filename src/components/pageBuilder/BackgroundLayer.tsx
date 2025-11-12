@@ -50,9 +50,9 @@ export default function BackgroundLayer({background, className}: BackgroundLayer
   }
 
   if (background.mode === 'texture') {
-    const base = tokenToCss(background.colorToken) ?? 'rgb(var(--dc-bg-soft))'
+    const base = tokenToCss(background.colorToken) ?? 'hsl(var(--dc-bg-soft))'
     backgroundColor = base
-    const patternColor = tokenToCss('brand', 0.1) ?? 'rgba(0,0,0,0.05)'
+    const patternColor = tokenToCss('brand', 0.1) ?? 'hsl(var(--dc-text)/0.05)'
     switch (background.texture) {
       case 'dots':
         layers.push(
@@ -83,7 +83,7 @@ export default function BackgroundLayer({background, className}: BackgroundLayer
   }
 
   if (!layers.length && !backgroundColor) {
-    backgroundColor = 'rgb(var(--dc-bg-soft))'
+    backgroundColor = 'hsl(var(--dc-bg-soft))'
   }
 
   const style: CSSProperties = {
@@ -106,3 +106,4 @@ export default function BackgroundLayer({background, className}: BackgroundLayer
     />
   )
 }
+

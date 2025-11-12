@@ -49,3 +49,4 @@ export function HomePagePreview({initial, query}: HomePagePreviewProps) {
     </main>
   )
 }
+

@@ -109,17 +109,17 @@ import Image from 'next/image'
 ## 📐 Design Tokens
 
 ```tsx
-// Use RGB tokens with alpha
+// Use HSL tokens with alpha
 <div style={{ 
-  backgroundColor: 'rgb(var(--dc-primary))',
-  color: 'rgb(var(--dc-on-primary))'
+  backgroundColor: 'hsl(var(--dc-primary))',
+  color: 'hsl(var(--dc-on-primary))'
 }}>
   Primary button
 </div>
 
 // With transparency
 <div style={{ 
-  backgroundColor: 'rgb(var(--dc-primary) / 0.9)'
+  backgroundColor: 'hsl(var(--dc-primary) / 0.9)'
 }}>
   Transparent overlay
 </div>

@@ -31,3 +31,4 @@ export default function FAQSection(props: FAQSectionProps) {
     </div>
   );
 }
+

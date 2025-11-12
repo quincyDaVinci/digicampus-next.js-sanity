@@ -176,3 +176,4 @@ export interface PageDocument {
   description?: string
   sections: PageSection[]
 }
+

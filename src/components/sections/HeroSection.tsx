@@ -52,9 +52,9 @@ export default function HeroSection(props: HeroSectionProps) {
                   href={button.url || "#"}
                   className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium"
                   style={{ 
-                    backgroundColor: button.variant === "outline" ? "transparent" : "rgb(var(--dc-primary))",
-                    color: button.variant === "outline" ? "rgb(var(--dc-primary))" : "white",
-                    border: button.variant === "outline" ? "1px solid rgb(var(--dc-primary))" : "none"
+                    backgroundColor: button.variant === "outline" ? "transparent" : "hsl(var(--dc-primary))",
+                    color: button.variant === "outline" ? "hsl(var(--dc-primary))" : "white",
+                    border: button.variant === "outline" ? "1px solid hsl(var(--dc-primary))" : "none"
                   }}
                 >
                   {button.label}
@@ -67,3 +67,4 @@ export default function HeroSection(props: HeroSectionProps) {
     </div>
   );
 }
+

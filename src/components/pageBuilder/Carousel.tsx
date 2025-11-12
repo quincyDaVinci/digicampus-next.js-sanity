@@ -73,7 +73,7 @@ export default function Carousel({
           <button
             type="button"
             onClick={() => goTo(current - 1)}
-            className="rounded-full border border-[rgb(var(--dc-border)/0.5)] px-4 py-2 text-sm font-medium text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.2)]"
+            className="rounded-full border border-[hsl(var(--dc-border)/0.5)] px-4 py-2 text-sm font-medium text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.2)]"
             aria-label="Vorige slide"
           >
             Vorige
@@ -85,8 +85,8 @@ export default function Carousel({
                   key={index}
                   className={`h-2 w-8 rounded-full transition ${
                     index === current
-                      ? 'bg-[rgb(var(--dc-brand))]'
-                      : 'bg-[rgb(var(--dc-border)/0.4)]'
+                      ? 'bg-[hsl(var(--dc-brand))]'
+                      : 'bg-[hsl(var(--dc-border)/0.4)]'
                   }`}
                 />
               ))}
@@ -95,7 +95,7 @@ export default function Carousel({
           <button
             type="button"
             onClick={() => goTo(current + 1)}
-            className="rounded-full border border-[rgb(var(--dc-border)/0.5)] px-4 py-2 text-sm font-medium text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.2)]"
+            className="rounded-full border border-[hsl(var(--dc-border)/0.5)] px-4 py-2 text-sm font-medium text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.2)]"
             aria-label="Volgende slide"
           >
             Volgende
@@ -105,3 +105,4 @@ export default function Carousel({
     </section>
   )
 }
+

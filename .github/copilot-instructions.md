@@ -29,9 +29,9 @@ High-level architecture (why/how)
 
 Project-specific conventions to follow
 
-- Design tokens are defined as RGB triples in `src/app/globals.css` so components can use alpha values:
-  - Use `rgb(var(--dc-<name>) / <alpha>)` for inline styles and element style props.
-  - Example: `style={{ backgroundColor: 'rgb(var(--dc-primary))' }}` or `backgroundColor: 'rgb(var(--dc-primary) / 0.95)'`.
+- Design tokens are defined as HSL triples in `src/app/globals.css` so components can use alpha values:
+  - Use `hsl(var(--dc-<name>) / <alpha>)` for inline styles and element style props.
+  - Example: `style={{ backgroundColor: 'hsl(var(--dc-primary))' }}` or `backgroundColor: 'hsl(var(--dc-primary) / 0.95)'`.
 - Helpful CSS helper classes were added in `src/app/globals.css` (search for `bg-dc-surface-98`, `border-dc`, `ring-dc-focus`, `divider-dc`). Use those in markup to keep styles consistent.
 - Dark mode: toggled by adding `.dark` class to `<body>`. The app persists the preference to `localStorage` key `dc_dark` (see `src/components/Header.tsx`). Keep that behavior when editing dark-mode logic.
 - Accessibility patterns visible in the codebase:
@@ -61,13 +61,13 @@ Developer workflow notes
 
 Where to make token/color updates
 
-- Add or update tokens in `src/app/globals.css`. Tokens are named `--dc-<name>` and kept as RGB triples (example: `--dc-primary: 0 97 93;`).
+- Add or update tokens in `src/app/globals.css`. Tokens are named `--dc-<name>` and kept as HSL triples (example: `--dc-primary: 176 100% 24%;`).
 - Keep or add backward-compatible aliases (e.g. `--color-brand`) if consumers still use `bg-[--color-brand]` in Tailwind.
 
 What the AI agent should do first when editing UI styles
 
 1. Update tokens in `src/app/globals.css` if adding or adjusting colors.
-2. Prefer helper classes (`bg-dc-surface-98`, `border-dc`, `ring-dc-focus`) or inline style with `rgb(var(--dc-...)/alpha)` in React components.
+2. Prefer helper classes (`bg-dc-surface-98`, `border-dc`, `ring-dc-focus`) or inline style with `hsl(var(--dc-...)/alpha)` in React components.
 3. Run `npm run lint` and `npm run build` locally to catch TS/ESLint errors.
 
 Files to read for more context

@@ -14,7 +14,7 @@ export default function VideoBlock({component}: VideoBlockProps) {
 
   return (
     <section className="w-full space-y-4" aria-label={title}>
-      <div className="relative w-full overflow-hidden rounded-3xl bg-[rgb(var(--dc-text)/0.06)] shadow-lg">
+      <div className="relative w-full overflow-hidden rounded-3xl bg-[hsl(var(--dc-text)/0.06)] shadow-lg">
         {component.sourceType === 'file' && component.videoFile?.asset?.url ? (
           <video
             className="h-full w-full object-cover"
@@ -50,12 +50,13 @@ export default function VideoBlock({component}: VideoBlockProps) {
       {component.transcript ? (
         <details
           id={transcriptId}
-          className="rounded-2xl border border-[rgb(var(--dc-border)/0.35)] bg-[rgb(var(--dc-surface))] p-4 text-sm leading-relaxed text-[rgb(var(--dc-text))]"
+          className="rounded-2xl border border-[hsl(var(--dc-border)/0.35)] bg-[hsl(var(--dc-surface))] p-4 text-sm leading-relaxed text-[hsl(var(--dc-text))]"
         >
-          <summary className="cursor-pointer font-semibold text-[rgb(var(--dc-brand))]">Transcript</summary>
+          <summary className="cursor-pointer font-semibold text-[hsl(var(--dc-brand))]">Transcript</summary>
           <p className="mt-2 whitespace-pre-wrap">{component.transcript}</p>
         </details>
       ) : null}
     </section>
   )
 }
+

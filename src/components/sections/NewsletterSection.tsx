@@ -25,7 +25,7 @@ export default function NewsletterSection(props: NewsletterSectionProps) {
             <button
               type="submit"
               className="rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap"
-              style={{ backgroundColor: "rgb(var(--dc-primary))", color: "white" }}
+              style={{ backgroundColor: "hsl(var(--dc-primary))", color: "white" }}
             >
               {buttonText || "Subscribe"}
             </button>
@@ -35,3 +35,4 @@ export default function NewsletterSection(props: NewsletterSectionProps) {
     </div>
   );
 }
+

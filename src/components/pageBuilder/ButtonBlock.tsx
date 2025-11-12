@@ -20,7 +20,7 @@ const iconMap: Record<NonNullable<ButtonComponent['icon']>, ReactNode> = {
 }
 
 function computeVariantStyles(component: ButtonComponent): {className: string; style?: CSSProperties} {
-  const baseClass = 'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]'
+  const baseClass = 'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.25)]'
   const fullWidthClass = component.fullWidth ? 'w-full' : ''
 
   switch (component.variant) {
@@ -28,9 +28,9 @@ function computeVariantStyles(component: ButtonComponent): {className: string; s
       return {
         className: `${baseClass} ${fullWidthClass}`.trim(),
         style: {
-          backgroundColor: 'rgb(var(--dc-primary))',
-          color: 'rgb(var(--dc-on-primary))',
-          border: '2px solid rgb(var(--dc-primary)/0.85)',
+          backgroundColor: 'hsl(var(--dc-primary))',
+          color: 'hsl(var(--dc-on-primary))',
+          border: '2px solid hsl(var(--dc-primary)/0.85)',
         },
       }
     case 'outline':
@@ -38,28 +38,28 @@ function computeVariantStyles(component: ButtonComponent): {className: string; s
         className: `${baseClass} ${fullWidthClass}`.trim(),
         style: {
           backgroundColor: 'transparent',
-          color: 'rgb(var(--dc-primary))',
-          border: '2px solid rgb(var(--dc-primary)/0.6)',
+          color: 'hsl(var(--dc-primary))',
+          border: '2px solid hsl(var(--dc-primary)/0.6)',
         },
       }
     case 'ghost':
       return {
         className: `${baseClass} ${fullWidthClass}`.trim(),
         style: {
-          backgroundColor: 'rgb(var(--dc-primary)/0.08)',
-          color: 'rgb(var(--dc-primary))',
+          backgroundColor: 'hsl(var(--dc-primary)/0.08)',
+          color: 'hsl(var(--dc-primary))',
           border: '2px solid transparent',
         },
       }
     case 'custom': {
-      const bg = tokenToCss(component.customColorToken) ?? 'rgb(var(--dc-brand))'
-      const text = tokenToCss(component.customTextColorToken) ?? 'rgb(var(--dc-on-primary))'
+      const bg = tokenToCss(component.customColorToken) ?? 'hsl(var(--dc-brand))'
+      const text = tokenToCss(component.customTextColorToken) ?? 'hsl(var(--dc-on-primary))'
       return {
         className: `${baseClass} ${fullWidthClass}`.trim(),
         style: {
           backgroundColor: bg,
           color: text,
-          border: '2px solid rgb(var(--dc-border)/0.35)',
+          border: '2px solid hsl(var(--dc-border)/0.35)',
         },
       }
     }
@@ -68,10 +68,10 @@ function computeVariantStyles(component: ButtonComponent): {className: string; s
       return {
         className: `${baseClass} ${fullWidthClass}`.trim(),
         style: {
-          backgroundColor: 'rgb(var(--dc-brand))',
-          color: 'rgb(var(--dc-on-primary))',
-          border: '2px solid rgb(var(--dc-brand)/0.75)',
-          boxShadow: '0 20px 32px rgb(var(--dc-brand)/0.25)',
+          backgroundColor: 'hsl(var(--dc-brand))',
+          color: 'hsl(var(--dc-on-primary))',
+          border: '2px solid hsl(var(--dc-brand)/0.75)',
+          boxShadow: '0 20px 32px hsl(var(--dc-brand)/0.25)',
         },
       }
   }
@@ -120,3 +120,4 @@ export default function ButtonBlock({component}: ButtonBlockProps) {
     </a>
   )
 }
+

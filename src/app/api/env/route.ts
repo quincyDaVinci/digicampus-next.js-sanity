@@ -4,3 +4,4 @@ export async function GET() {
     ds: process.env.NEXT_PUBLIC_SANITY_DATASET
   }), { headers: { 'content-type': 'application/json' }});
 }
+

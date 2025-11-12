@@ -14,5 +14,6 @@ export function tokenToCss(token?: DesignTokenValue, alpha = 1) {
   if (!token) return undefined
   const cssVar = TOKEN_TO_VAR[token]
   const alphaSuffix = alpha < 1 ? ` / ${alpha}` : ''
-  return `rgb(var(${cssVar})${alphaSuffix})`
+  return `hsl(var(${cssVar})${alphaSuffix})`
 }
+

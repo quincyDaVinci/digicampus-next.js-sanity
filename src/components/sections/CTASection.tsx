@@ -23,7 +23,7 @@ export default function CTASection(props: CTASectionProps) {
                   key={button._key}
                   href={button.url || "#"}
                   className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium"
-                  style={{ backgroundColor: "rgb(var(--dc-primary))", color: "white" }}
+                  style={{ backgroundColor: "hsl(var(--dc-primary))", color: "white" }}
                 >
                   {button.label}
                 </a>
@@ -35,3 +35,4 @@ export default function CTASection(props: CTASectionProps) {
     </div>
   );
 }
+

@@ -59,13 +59,13 @@ export default function ImageBlock({component}: ImageBlockProps) {
       ]
         .filter(Boolean)
         .join(' ')}
-      style={{color: 'rgb(var(--dc-text))'}}
+      style={{color: 'hsl(var(--dc-text))'}}
     >
       {component.background ? <BackgroundLayer background={component.background} /> : null}
       <WrapperComponent
         {...wrapperProps}
         className={[
-          'relative block w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]',
+          'relative block w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.25)]',
         ].join(' ')}
       >
         <span
@@ -73,7 +73,7 @@ export default function ImageBlock({component}: ImageBlockProps) {
           style={{
             borderRadius: rounded ? '1.5rem' : '0.75rem',
             overflow: 'hidden',
-            boxShadow: '0 20px 40px rgb(var(--dc-text)/0.12)',
+            boxShadow: '0 20px 40px hsl(var(--dc-text)/0.12)',
           }}
         >
           <Image
@@ -87,8 +87,9 @@ export default function ImageBlock({component}: ImageBlockProps) {
       </span>
       </WrapperComponent>
       {component.image.caption ? (
-        <figcaption className="relative text-center text-sm text-[rgb(var(--dc-text)/0.7)]">{component.image.caption}</figcaption>
+        <figcaption className="relative text-center text-sm text-[hsl(var(--dc-text)/0.7)]">{component.image.caption}</figcaption>
       ) : null}
     </figure>
   )
 }
+

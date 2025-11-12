@@ -70,12 +70,12 @@ npm run test:a11y
 
 ```tsx
 // Inline styles with alpha values
-<div style={{ backgroundColor: 'rgb(var(--dc-primary))' }}>
-  <p style={{ color: 'rgb(var(--dc-on-primary))' }}>Text</p>
+<div style={{ backgroundColor: 'hsl(var(--dc-primary))' }}>
+  <p style={{ color: 'hsl(var(--dc-on-primary))' }}>Text</p>
 </div>
 
 // With alpha transparency
-<div style={{ backgroundColor: 'rgb(var(--dc-primary) / 0.95)' }}>
+<div style={{ backgroundColor: 'hsl(var(--dc-primary) / 0.95)' }}>
   Content
 </div>
 ```

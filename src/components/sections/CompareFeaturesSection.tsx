@@ -24,3 +24,4 @@ export default function CompareFeaturesSection(props: CompareFeaturesSectionProp
     </div>
   );
 }
+

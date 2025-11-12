@@ -18,3 +18,4 @@ export async function GET(request: NextRequest) {
   // Default to home if no slug provided
   redirect('/')
 }
+

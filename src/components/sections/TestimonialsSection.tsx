@@ -25,3 +25,4 @@ export default function TestimonialsSection(props: TestimonialsSectionProps) {
     </div>
   );
 }
+

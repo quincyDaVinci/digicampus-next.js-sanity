@@ -102,9 +102,9 @@ function SectionContainer({section, children}: {section: PageSection; children: 
   return (
     <section className={`relative ${paddingY}`}>
       {section.background ? <BackgroundLayer background={section.background} /> : null}
-      <div className={containerClasses} style={{color: 'rgb(var(--dc-text))'}}>
+      <div className={containerClasses} style={{color: 'hsl(var(--dc-text))'}}>
         {section.title ? (
-          <h2 className="mb-8 text-fluid-lg font-semibold text-[rgb(var(--dc-navy))]">
+          <h2 className="mb-8 text-fluid-lg font-semibold text-[hsl(var(--dc-navy))]">
             {section.title}
           </h2>
         ) : null}
@@ -116,7 +116,7 @@ function SectionContainer({section, children}: {section: PageSection; children: 
 
 export default function PageRenderer({page}: {page: PageDocument}) {
   if (!page.sections?.length) {
-    return <p className="px-6 py-12 text-[rgb(var(--dc-text))]">Deze pagina heeft nog geen inhoud.</p>
+    return <p className="px-6 py-12 text-[hsl(var(--dc-text))]">Deze pagina heeft nog geen inhoud.</p>
   }
 
   return (
@@ -178,3 +178,4 @@ export default function PageRenderer({page}: {page: PageDocument}) {
     </div>
   )
 }
+

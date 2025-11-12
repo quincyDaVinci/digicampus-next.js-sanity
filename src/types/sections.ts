@@ -190,3 +190,4 @@ export type SectionProps =
   | NewsletterSectionProps
   | CompareFeaturesSectionProps
   | MediaSectionProps
+

@@ -291,8 +291,8 @@ export default function MediaSection(props: MediaSectionProps) {
                     onClick={() => setShowTranscript(!showTranscript)}
                     className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-md"
                     style={{
-                      backgroundColor: "rgb(var(--dc-surface-90))",
-                      color: "rgb(var(--dc-on-surface))",
+                      backgroundColor: "hsl(var(--dc-surface-90))",
+                      color: "hsl(var(--dc-on-surface))",
                     }}
                     aria-expanded={showTranscript}
                     aria-controls={transcriptId}
@@ -319,8 +319,8 @@ export default function MediaSection(props: MediaSectionProps) {
                       id={transcriptId}
                       className="p-4 rounded-md text-sm"
                       style={{
-                        backgroundColor: "rgb(var(--dc-surface-95))",
-                        color: "rgb(var(--dc-on-surface))",
+                        backgroundColor: "hsl(var(--dc-surface-95))",
+                        color: "hsl(var(--dc-on-surface))",
                       }}
                       role="region"
                       aria-label="Video transcript"
@@ -350,3 +350,4 @@ export default function MediaSection(props: MediaSectionProps) {
     </section>
   );
 }
+

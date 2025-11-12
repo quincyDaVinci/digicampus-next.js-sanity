@@ -37,3 +37,4 @@ export function buildImageUrl(source?: SanityImageSource, opts?: BuildImageOptio
   if (opts?.quality) chain = chain.quality(opts.quality)
   return chain.url()
 }
+

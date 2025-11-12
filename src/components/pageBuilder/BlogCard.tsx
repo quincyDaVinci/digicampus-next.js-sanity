@@ -13,19 +13,19 @@ interface BlogCardProps {
 
 const toneStyles: Record<NonNullable<BlogCardComponent['tone']>, {background: string; border: string; color: string}> = {
   surface: {
-    background: 'rgb(var(--dc-surface))',
-    border: 'rgb(var(--dc-border)/0.2)',
-    color: 'rgb(var(--dc-text))',
+    background: 'hsl(var(--dc-surface))',
+    border: 'hsl(var(--dc-border)/0.2)',
+    color: 'hsl(var(--dc-text))',
   },
   accent: {
-    background: 'rgb(var(--dc-brand)/0.08)',
-    border: 'rgb(var(--dc-brand)/0.3)',
-    color: 'rgb(var(--dc-text))',
+    background: 'hsl(var(--dc-brand)/0.08)',
+    border: 'hsl(var(--dc-brand)/0.3)',
+    color: 'hsl(var(--dc-text))',
   },
   contrast: {
-    background: 'linear-gradient(135deg, rgb(var(--dc-primary)) 0%, rgb(var(--dc-brand)) 100%)',
-    border: 'rgb(var(--dc-on-primary)/0.2)',
-    color: 'rgb(var(--dc-on-primary))',
+    background: 'linear-gradient(135deg, hsl(var(--dc-primary)) 0%, hsl(var(--dc-brand)) 100%)',
+    border: 'hsl(var(--dc-on-primary)/0.2)',
+    color: 'hsl(var(--dc-on-primary))',
   },
 }
 
@@ -40,7 +40,7 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
 
   const CardContent = (
     <article
-      className="flex h-full flex-col gap-4 rounded-3xl p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-within:ring-4 focus-within:ring-[rgb(var(--dc-focus)/0.2)]"
+      className="flex h-full flex-col gap-4 rounded-3xl p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-within:ring-4 focus-within:ring-[hsl(var(--dc-focus)/0.2)]"
       style={{
         background: style.background,
         border: `1px solid ${style.border}`,
@@ -99,7 +99,7 @@ export default function BlogCard({component}: BlogCardProps) {
 
   if (posts.length === 0) {
     return (
-      <div className="rounded-3xl border border-dashed border-[rgb(var(--dc-border)/0.4)] p-6 text-sm text-[rgb(var(--dc-text)/0.7)]">
+      <div className="rounded-3xl border border-dashed border-[hsl(var(--dc-border)/0.4)] p-6 text-sm text-[hsl(var(--dc-text)/0.7)]">
         Geen blog gevonden voor de gekozen criteria.
       </div>
     )
@@ -113,3 +113,4 @@ export default function BlogCard({component}: BlogCardProps) {
     </div>
   )
 }
+

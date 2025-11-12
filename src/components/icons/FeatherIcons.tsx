@@ -320,3 +320,4 @@ export const featherIconMap: Record<FeatherSymbol, FeatherIconComponent> = {
 export function getFeatherIcon(symbol?: FeatherSymbol) {
   return symbol ? featherIconMap[symbol] : undefined
 }
+

@@ -74,7 +74,7 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
   return (
     <header ref={navRef} role="banner"
       className={["sticky top-0 z-50 transition-all duration-300 motion-reduce:transition-none", scrolled ? "backdrop-blur shadow-lg" : "bg-transparent"].join(" ")}
-      style={scrolled ? { backgroundColor: 'rgb(var(--dc-bg) / 0.3)' } : undefined}
+      style={scrolled ? { backgroundColor: 'hsl(var(--dc-bg) / 0.3)' } : undefined}
     >
       {/* polite live region for language changes (screen-reader only) */}
       <div aria-live="polite" className="sr-only" role="status">{liveMessage}</div>
@@ -102,21 +102,21 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
               aria-pressed={dark}
               aria-label={dark ? "Schakel lichtmodus in" : "Schakel donker modus in"}
               onClick={() => setDark(d => !d)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgb(var(--dc-border)/0.2)] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.25)]"
             >
               {dark ? <MoonIcon aria-hidden focusable="false" /> : <SunIcon aria-hidden focusable="false" />}
             </button>
 
             <div role="group" aria-label="Taal switch" className="flex items-center gap-0">
-              <button type="button" onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} aria-label="Schakel naar Nederlands" className={["px-3 py-1 focus-visible:outline-none transition-colors text-fluid-sm", language === "nl" ? "font-bold" : ""].join(" ")} style={language === "nl" ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'rgb(var(--dc-text) / 0.8)' }}>NL {language === "nl" && <span className="sr-only">(actief)</span>}</button>
+              <button type="button" onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} aria-label="Schakel naar Nederlands" className={["px-3 py-1 focus-visible:outline-none transition-colors text-fluid-sm", language === "nl" ? "font-bold" : ""].join(" ")} style={language === "nl" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'hsl(var(--dc-text) / 0.8)' }}>NL {language === "nl" && <span className="sr-only">(actief)</span>}</button>
               <span aria-hidden className="w-px h-5 mx-2 divider-dc" />
-              <button type="button" onClick={() => changeLanguage("en")} aria-pressed={language === "en"} aria-label="Switch to English" className={["px-3 py-1 focus-visible:outline-none transition-colors text-fluid-sm", language === "en" ? "font-bold" : ""].join(" ")} style={language === "en" ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'rgb(var(--dc-text) / 0.8)' }}>EN {language === "en" && <span className="sr-only">(active)</span>}</button>
+              <button type="button" onClick={() => changeLanguage("en")} aria-pressed={language === "en"} aria-label="Switch to English" className={["px-3 py-1 focus-visible:outline-none transition-colors text-fluid-sm", language === "en" ? "font-bold" : ""].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'hsl(var(--dc-text) / 0.8)' }}>EN {language === "en" && <span className="sr-only">(active)</span>}</button>
             </div>
 
               <form role="search" className="relative min-w-0">
               <label htmlFor="q" className="sr-only">Zoeken</label>
-              <input id="q" name="q" type="search" placeholder="Search" className="w-28 sm:w-44 rounded-full outline-none px-4 py-2 pr-9 min-w-0 text-fluid-sm" style={{ backgroundColor: 'rgb(var(--dc-text) / 0.06)', color: 'rgb(var(--dc-text))', border: '1px solid rgb(var(--dc-border) / 0.2)' }} onFocus={(e)=> { e.currentTarget.style.boxShadow = `0 0 0 4px rgb(var(--dc-focus) / 0.12)`; }} onBlur={(e)=> { e.currentTarget.style.boxShadow = ''; }} />
-              <span aria-hidden className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--dc-text)/0.75)]">
+              <input id="q" name="q" type="search" placeholder="Search" className="w-28 sm:w-44 rounded-full outline-none px-4 py-2 pr-9 min-w-0 text-fluid-sm" style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', color: 'hsl(var(--dc-text))', border: '1px solid hsl(var(--dc-border) / 0.2)' }} onFocus={(e)=> { e.currentTarget.style.boxShadow = `0 0 0 4px hsl(var(--dc-focus) / 0.12)`; }} onBlur={(e)=> { e.currentTarget.style.boxShadow = ''; }} />
+              <span aria-hidden className="absolute right-3 top-1/2 -translate-y-1/2 text-[hsl(var(--dc-text)/0.75)]">
                 <SearchIcon aria-hidden focusable="false" />
               </span>
             </form>
@@ -131,10 +131,10 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
                   <ChevronDownIcon aria-hidden focusable="false" className="h-4 w-4" />
                 </button>
 
-                <div id={`menu-${menus.indexOf(m)}`} role="menu" aria-label={m.label} className={["absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl transition-opacity duration-150 motion-reduce:transition-none", openIndex === menus.indexOf(m) ? "opacity-100" : "opacity-0 pointer-events-none"].join(" ")} style={{ backgroundColor: 'rgb(var(--dc-surface) / 0.98)', border: '1px solid rgb(var(--dc-border) / 0.1)', color: 'rgb(var(--dc-text))' }}>
+                <div id={`menu-${menus.indexOf(m)}`} role="menu" aria-label={m.label} className={["absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl transition-opacity duration-150 motion-reduce:transition-none", openIndex === menus.indexOf(m) ? "opacity-100" : "opacity-0 pointer-events-none"].join(" ")} style={{ backgroundColor: 'hsl(var(--dc-surface) / 0.98)', border: '1px solid hsl(var(--dc-border) / 0.1)', color: 'hsl(var(--dc-text))' }}>
                   <ul className="py-2">
                       {m.items.map((it, idx) => (
-                      <li key={`${m.label}-${idx}`}><Link href={it.href} role="menuitem" onClick={() => setOpenIndex(null)} className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm" style={{ color: 'rgb(var(--dc-text))' }}>{it.label}</Link></li>
+                      <li key={`${m.label}-${idx}`}><Link href={it.href} role="menuitem" onClick={() => setOpenIndex(null)} className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm" style={{ color: 'hsl(var(--dc-text))' }}>{it.label}</Link></li>
                     ))}
                   </ul>
                 </div>
@@ -146,8 +146,8 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
           <div className="col-start-2 row-start-2 flex items-end justify-end">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
-              style={{ backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))', border: '1px solid rgb(var(--dc-border)/0.2)' }}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.25)]"
+              style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
             >
               <span>Contact</span>
               <ArrowRightIcon aria-hidden focusable="false" />
@@ -161,7 +161,7 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
             onClick={() => setMobileOpen(v => !v)}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgb(var(--dc-border)/0.2)] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.25)]"
             aria-label={mobileOpen ? "Sluit menu" : "Open menu"}
           >
             {mobileOpen ? <CloseIcon aria-hidden focusable="false" /> : <MenuIcon aria-hidden focusable="false" />}
@@ -177,28 +177,28 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
               onClick={() => setDark(d => !d)}
               aria-pressed={dark}
               aria-label={dark ? "Schakel lichtmodus in" : "Schakel donker modus in"}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[rgb(var(--dc-border)/0.2)] text-[rgb(var(--dc-text))] transition hover:bg-[rgb(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.25)]"
             >
               {dark ? <MoonIcon aria-hidden focusable="false" /> : <SunIcon aria-hidden focusable="false" />}
             </button>
             <div className="flex items-center gap-1">
-              <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none text-fluid-sm", language === "nl" ? "" : ""].join(" ")} style={language === "nl" ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' } : { border: '1px solid rgb(var(--dc-border)/0.18)', color: 'rgb(var(--dc-text))' }}>NL</button>
-              <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none text-fluid-sm", language === "en" ? "" : ""].join(" ")} style={language === "en" ? { backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))' } : { border: '1px solid rgb(var(--dc-border)/0.18)', color: 'rgb(var(--dc-text))' }}>EN</button>
+              <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none text-fluid-sm", language === "nl" ? "" : ""].join(" ")} style={language === "nl" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>NL</button>
+              <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none text-fluid-sm", language === "en" ? "" : ""].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>EN</button>
             </div>
           </div>
         </div>
 
         {/* Mobile panel */}
         <div id="mobile-menu" className={["md:hidden transition-all duration-300 overflow-hidden motion-reduce:transition-none", mobileOpen ? "max-h-[80vh] mt-3" : "max-h-0"].join(" ")}>
-          <div className="rounded-2xl p-3 backdrop-blur" style={{ border: '1px solid rgb(var(--dc-border)/0.1)', backgroundColor: 'rgb(var(--dc-surface)/0.9)', color: 'rgb(var(--dc-text))' }}>
+          <div className="rounded-2xl p-3 backdrop-blur" style={{ border: '1px solid hsl(var(--dc-border)/0.1)', backgroundColor: 'hsl(var(--dc-surface)/0.9)', color: 'hsl(var(--dc-text))' }}>
             <ul className="space-y-2">
               {menus.map(m => (
                 <li key={m.label}>
                   <details className="group">
-                    <summary className="cursor-pointer list-none rounded-lg px-3 py-2 dc-tooltip" aria-label={m.label} title={m.label} style={{ color: 'rgb(var(--dc-text))' }}>{m.label}</summary>
+                    <summary className="cursor-pointer list-none rounded-lg px-3 py-2 dc-tooltip" aria-label={m.label} title={m.label} style={{ color: 'hsl(var(--dc-text))' }}>{m.label}</summary>
                     <ul className="mt-1 ml-2 space-y-1">
                       {m.items.map((it, idx) => (
-                        <li key={`${m.label}-mobile-${idx}`}><Link href={it.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-fluid-sm" style={{ color: 'rgb(var(--dc-text))' }}>{it.label}</Link></li>
+                        <li key={`${m.label}-mobile-${idx}`}><Link href={it.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-fluid-sm" style={{ color: 'hsl(var(--dc-text))' }}>{it.label}</Link></li>
                       ))}
                     </ul>
                   </details>
@@ -211,8 +211,8 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
               <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 text-fluid-sm", language === "en" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90"].join(" ")}>EN</button>
               <Link
                 href="/contact"
-                className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgb(var(--dc-focus)/0.25)]"
-                style={{ backgroundColor: 'rgb(var(--dc-brand))', color: 'rgb(var(--dc-on-primary))', border: '1px solid rgb(var(--dc-border)/0.2)' }}
+                className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.25)]"
+                style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
               >
                 <span>Contact</span>
                 <ArrowRightIcon aria-hidden focusable="false" />
@@ -229,3 +229,4 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
     </header>
   )
 }
+
