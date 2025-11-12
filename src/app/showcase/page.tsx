@@ -101,36 +101,6 @@ export default function ShowcasePage() {
       ],
     },
 
-    // Stats Section
-    {
-      _type: "statsSection",
-      _key: "stats-1",
-      heading: "Trusted by Developers Worldwide",
-      subheading: "Join thousands of teams building better digital experiences.",
-      stats: [
-        {
-          _key: "stat-1",
-          value: "10k+",
-          label: "Active Users",
-        },
-        {
-          _key: "stat-2",
-          value: "99.9%",
-          label: "Uptime",
-        },
-        {
-          _key: "stat-3",
-          value: "500+",
-          label: "Components",
-        },
-        {
-          _key: "stat-4",
-          value: "24/7",
-          label: "Support",
-        },
-      ],
-    },
-
     // Testimonials Section
     {
       _type: "testimonialsSection",
@@ -264,15 +234,6 @@ export default function ShowcasePage() {
       buttonText: "Subscribe",
     },
 
-    // Compare Features Section
-    {
-      _type: "compareFeaturesSection",
-      _key: "compare-1",
-      badgeText: "Comparison",
-      heading: "Compare Our Plans",
-      subheading: "See which features are included in each plan to find the perfect fit for your needs.",
-    },
-
     // Media Section - Image variant
     {
       _type: "mediaSection",
@@ -285,28 +246,6 @@ export default function ShowcasePage() {
       maxWidth: "lg",
       rounded: true,
       shadow: true,
-    },
-
-    // Cases Section
-    {
-      _type: "casesSection",
-      _key: "cases-1",
-      heading: "Success Stories",
-      subheading: "See how leading companies use our platform to build amazing digital experiences.",
-      cases: [
-        {
-          _key: "case-1",
-          name: "TechCorp Redesign",
-        },
-        {
-          _key: "case-2",
-          name: "E-commerce Platform",
-        },
-        {
-          _key: "case-3",
-          name: "SaaS Dashboard",
-        },
-      ],
     },
 
     // Blog Section

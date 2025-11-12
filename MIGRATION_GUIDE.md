@@ -1,5 +1,10 @@
 # Sanity Studio Migration Guide: SanityPress + Sane-Kit Integration
 
+> **⚠️ OUTDATED DOCUMENT - November 12, 2025**  
+> This migration guide reflects the original integration. Several sections have since been removed.  
+> **Active sections:** Hero, Feature, Blog, Testimonials, Pricing, CTA, FAQ, Contact, Newsletter, Media  
+> **Removed sections:** ~~Stats~~, ~~Cases~~, ~~CompareFeatures~~
+
 ## Overview
 This migration combines the best of both templates:
 - **SanityPress Studio**: Professional admin dashboard with TypeGen, global modules, proper structure
@@ -122,15 +127,14 @@ export default defineType({
         {type: 'heroSection'},
         {type: 'featureSection'},
         {type: 'blogSection'},
-        {type: 'statsSection'},
         {type: 'testimonialsSection'},
         {type: 'pricingSection'},
-        {type: 'casesSection'},
         {type: 'ctaSection'},
         {type: 'faqSection'},
         {type: 'contactSection'},
         {type: 'newsletterSection'},
-        {type: 'compareFeaturesSection'},
+        {type: 'mediaSection'},
+        // REMOVED: statsSection, casesSection, compareFeaturesSection
       ],
       group: 'content',
     }),
@@ -232,19 +236,22 @@ export default defineType({
 
 ### Remaining Module Schemas
 
-Create these following the same pattern as heroSection.ts and featureSection.ts:
+> **🗑️ UPDATE (Nov 12, 2025):** The following sections have been removed:
+> - ~~statsSection.ts~~ - Not needed for current use case
+> - ~~casesSection.ts~~ - Not needed for current use case  
+> - ~~compareFeaturesSection.ts~~ - Not needed for current use case
+> - ~~compareFeature.ts~~ - Not needed for current use case
+
+**Currently Active Sections** (following the same pattern as heroSection.ts and featureSection.ts):
 
 1. **blogSection.ts** - Blog post listing
-2. **statsSection.ts** - Statistics display with 2 variants (grid, withContent)
-3. **testimonialsSection.ts** - Testimonials with 3 variants (carousel, grid, masonry)
-4. **pricingSection.ts** - Pricing plans
-5. **casesSection.ts** - Case studies/logos with 2 variants (logoCarousel, compactSlider)
-6. **ctaSection.ts** - Call-to-action with 4 variants (default, highlight, minimal, full)
-7. **faqSection.ts** - FAQ with 2 variants (sideBySide, centered)
-8. **contactSection.ts** - Contact form
-9. **newsletterSection.ts** - Newsletter signup with 4 variants
-10. **compareFeaturesSection.ts** - Feature comparison table
-11. **compareFeature.ts** - Individual feature for comparison
+2. **testimonialsSection.ts** - Testimonials with carousel
+3. **pricingSection.ts** - Pricing plans
+4. **ctaSection.ts** - Call-to-action with 4 variants (default, highlight, minimal, full)
+5. **faqSection.ts** - FAQ with 2 variants (sideBySide, centered)
+6. **contactSection.ts** - Contact form
+7. **newsletterSection.ts** - Newsletter signup with 4 variants
+8. **mediaSection.ts** - Media display with various layouts
 
 ## Frontend Components
 

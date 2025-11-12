@@ -21,16 +21,12 @@ import moduleAttributes from './objects/moduleAttributes'
 import heroSection from './modules/heroSection'
 import featureSection from './modules/featureSection'
 import blogSection from './modules/blogSection'
-import statsSection from './modules/statsSection'
 import testimonialsSection from './modules/testimonialsSection'
 import pricingSection from './modules/pricingSection'
-import casesSection from './modules/casesSection'
 import ctaSection from './modules/ctaSection'
 import faqSection from './modules/faqSection'
 import contactSection from './modules/contactSection'
 import newsletterSection from './modules/newsletterSection'
-import compareFeaturesSection from './modules/compareFeaturesSection'
-import compareFeature from './modules/compareFeature'
 import mediaSection from './modules/mediaSection'
 
 export const schema: SchemaPluginOptions = {
@@ -56,16 +52,12 @@ export const schema: SchemaPluginOptions = {
     heroSection,
     featureSection,
     blogSection,
-    statsSection,
     testimonialsSection,
     pricingSection,
-    casesSection,
     ctaSection,
     faqSection,
     contactSection,
     newsletterSection,
-    compareFeaturesSection,
-    compareFeature,
     mediaSection,
   ],
 }

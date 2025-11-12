@@ -6,15 +6,12 @@ import React from "react";
 import HeroSection from "./HeroSection";
 import FeatureSection from "./FeatureSection";
 import BlogSection from "./BlogSection";
-import StatsSection from "./StatsSection";
 import TestimonialsSection from "./TestimonialsSection";
 import PricingSection from "./PricingSection";
-import CasesSection from "./CasesSection";
 import CTASection from "./CTASection";
 import FAQSection from "./FAQSection";
 import ContactSection from "./ContactSection";
 import NewsletterSection from "./NewsletterSection";
-import CompareFeaturesSection from "./CompareFeaturesSection";
 import MediaSection from "./MediaSection";
 
 // Import existing pageBuilder component renderers
@@ -47,14 +44,10 @@ export default function RenderSection({ section }: RenderSectionProps) {
       return <FeatureSection {...(section as Extract<SectionProps, {_type: 'featureSection'}>)} />;
     case "blogSection":
       return <BlogSection />;
-    case "statsSection":
-      return <StatsSection {...(section as Extract<SectionProps, {_type: 'statsSection'}>)} />;
     case "testimonialsSection":
       return <TestimonialsSection {...(section as Extract<SectionProps, {_type: 'testimonialsSection'}>)} />;
     case "pricingSection":
       return <PricingSection {...(section as Extract<SectionProps, {_type: 'pricingSection'}>)} />;
-    case "casesSection":
-      return <CasesSection {...(section as Extract<SectionProps, {_type: 'casesSection'}>)} />;
     case "ctaSection":
       return <CTASection {...(section as Extract<SectionProps, {_type: 'ctaSection'}>)} />;
     case "faqSection":
@@ -63,8 +56,6 @@ export default function RenderSection({ section }: RenderSectionProps) {
       return <ContactSection {...(section as Extract<SectionProps, {_type: 'contactSection'}>)} />;
     case "newsletterSection":
       return <NewsletterSection {...(section as Extract<SectionProps, {_type: 'newsletterSection'}>)} />;
-    case "compareFeaturesSection":
-      return <CompareFeaturesSection {...(section as Extract<SectionProps, {_type: 'compareFeaturesSection'}>)} />;
     case "mediaSection":
       return <MediaSection {...(section as Extract<SectionProps, {_type: 'mediaSection'}>)} />;
 

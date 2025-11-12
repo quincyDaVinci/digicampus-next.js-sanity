@@ -1,5 +1,9 @@
 # SanityPress + Sane-Kit Integration Complete
 
+> **⚠️ OUTDATED DOCUMENT - November 12, 2025**  
+> This document reflects the original integration. Several sections have since been removed.  
+> See the "Deprecated Sections" note below for details.
+
 This document summarizes the successful integration of SanityPress studio structure with Sane-Kit frontend components into your DigiCampus project.
 
 ## What Was Integrated
@@ -22,21 +26,25 @@ The Sanity Studio now uses the SanityPress organizational pattern:
 - Taxonomies (Tags & Categories)
 
 ### 2. **Sane-Kit Section Schemas** ✅
-All section types have been ported with their variants:
 
-#### `/sanity/schemaTypes/modules/`
+> **🗑️ DEPRECATED SECTIONS (Removed Nov 12, 2025):**  
+> The following sections were removed from the codebase as they were not needed:
+> - ~~statsSection.ts~~ - Statistics display
+> - ~~casesSection.ts~~ - Case studies/logos  
+> - ~~compareFeaturesSection.ts~~ - Feature comparison tables
+> - ~~compareFeature.ts~~ - Individual feature for comparison
+
+#### Current Active Sections in `/sanity/schemaTypes/modules/`
 - **heroSection.ts** - Variants: buttonBanner, badgeBanner, gridGallery
 - **featureSection.ts** - Variants: default, withImage, leftImage, rightImage, imageCards, masonryGrid, bigMasonryGrid, carouselFeature, slidingComparison
 - **blogSection.ts** - Variants: default, grid
-- **statsSection.ts** - Variants: grid, withContent
 - **testimonialsSection.ts** - Single variant with carousel
 - **pricingSection.ts** - Single variant with multiple plans
-- **casesSection.ts** - Variants: logoCarousel, compactSlider
 - **ctaSection.ts** - Variants: default, highlight, minimal, full
 - **faqSection.ts** - Variants: sideBySide, centered
 - **contactSection.ts** - Default variant with form builder
 - **newsletterSection.ts** - Variants: default, highlight, minimal, full
-- **compareFeaturesSection.ts** - Feature comparison tables
+- **mediaSection.ts** - Media display with various layouts
 
 ### 3. **Reusable Object Schemas** ✅
 Common building blocks following SanityPress patterns:
@@ -65,24 +73,24 @@ Main content types:
 ### 5. **Frontend Section Components** ✅
 React components for rendering sections:
 
-#### `/src/components/sections/`
-Created stub components for all section types:
+#### Current Active Components in `/src/components/sections/`
 - `HeroSection.tsx`
 - `FeatureSection.tsx`
 - `BlogSection.tsx`
-- `StatsSection.tsx`
 - `TestimonialsSection.tsx`
 - `PricingSection.tsx`
-- `CasesSection.tsx`
 - `CTASection.tsx`
 - `FAQSection.tsx`
 - `ContactSection.tsx`
 - `NewsletterSection.tsx`
-- `CompareFeaturesSection.tsx`
+- `MediaSection.tsx`
+
+> **🗑️ Removed Components (Nov 12, 2025):**  
+> ~~StatsSection.tsx~~, ~~CasesSection.tsx~~, ~~CompareFeaturesSection.tsx~~
 
 ### 6. **Unified Section Renderer** ✅
 Created `RenderSection.tsx` that handles:
-- New modular sections from Sane-Kit
+- New modular sections from Sane-Kit (10 active section types)
 - Existing pageBuilder components (backward compatibility)
 - Type-safe rendering with proper prop passing
 
@@ -124,16 +132,14 @@ digicampus/
 │   │   │   ├── heroSection.ts          [NEW]
 │   │   │   ├── featureSection.ts       [NEW]
 │   │   │   ├── blogSection.ts          [NEW]
-│   │   │   ├── statsSection.ts         [NEW]
 │   │   │   ├── testimonialsSection.ts  [NEW]
 │   │   │   ├── pricingSection.ts       [NEW]
-│   │   │   ├── casesSection.ts         [NEW]
 │   │   │   ├── ctaSection.ts           [NEW]
 │   │   │   ├── faqSection.ts           [NEW]
 │   │   │   ├── contactSection.ts       [NEW]
 │   │   │   ├── newsletterSection.ts    [NEW]
-│   │   │   ├── compareFeaturesSection.ts [NEW]
-│   │   │   └── compareFeature.ts       [NEW]
+│   │   │   └── mediaSection.ts         [NEW]
+│   │   │   # REMOVED: statsSection.ts, casesSection.ts, compareFeaturesSection.ts, compareFeature.ts
 │   │   └── index.ts                    [UPDATED]
 │   ├── structure.ts                    [UPDATED]
 │   └── lib/
@@ -145,15 +151,14 @@ digicampus/
 │   │   │   ├── HeroSection.tsx         [NEW]
 │   │   │   ├── FeatureSection.tsx      [NEW]
 │   │   │   ├── BlogSection.tsx         [NEW]
-│   │   │   ├── StatsSection.tsx        [NEW]
 │   │   │   ├── TestimonialsSection.tsx [NEW]
 │   │   │   ├── PricingSection.tsx      [NEW]
-│   │   │   ├── CasesSection.tsx        [NEW]
 │   │   │   ├── CTASection.tsx          [NEW]
 │   │   │   ├── FAQSection.tsx          [NEW]
 │   │   │   ├── ContactSection.tsx      [NEW]
 │   │   │   ├── NewsletterSection.tsx   [NEW]
-│   │   │   └── CompareFeaturesSection.tsx [NEW]
+│   │   │   └── MediaSection.tsx        [NEW]
+│   │   │   # REMOVED: StatsSection.tsx, CasesSection.tsx, CompareFeaturesSection.tsx
 │   │   └── icons/
 │   │       └── FeatherIcons.tsx        [UPDATED]
 ├── package.json                         [UPDATED]

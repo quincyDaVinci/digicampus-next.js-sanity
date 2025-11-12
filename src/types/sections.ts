@@ -52,17 +52,6 @@ export interface BlogSectionProps extends BaseSection {
   variant?: string
 }
 
-export interface StatsSectionProps extends BaseSection {
-  _type: 'statsSection'
-  heading?: string
-  subheading?: string
-  stats?: Array<{
-    _key: string
-    value?: string
-    label?: string
-  }>
-}
-
 export interface TestimonialsSectionProps extends BaseSection {
   _type: 'testimonialsSection'
   heading?: string
@@ -84,16 +73,6 @@ export interface PricingSectionProps extends BaseSection {
     title?: string
     price?: string
     description?: string
-  }>
-}
-
-export interface CasesSectionProps extends BaseSection {
-  _type: 'casesSection'
-  heading?: string
-  subheading?: string
-  cases?: Array<{
-    _key: string
-    name?: string
   }>
 }
 
@@ -137,13 +116,6 @@ export interface NewsletterSectionProps extends BaseSection {
   buttonText?: string
 }
 
-export interface CompareFeaturesSectionProps extends BaseSection {
-  _type: 'compareFeaturesSection'
-  heading?: string
-  subheading?: string
-  badgeText?: string
-}
-
 export interface MediaSectionProps extends BaseSection {
   _type: 'mediaSection'
   variant?: 'fullWidth' | 'contained' | 'splitScreen' | 'card'
@@ -180,14 +152,11 @@ export type SectionProps =
   | HeroSectionProps
   | FeatureSectionProps
   | BlogSectionProps
-  | StatsSectionProps
   | TestimonialsSectionProps
   | PricingSectionProps
-  | CasesSectionProps
   | CTASectionProps
   | FAQSectionProps
   | ContactSectionProps
   | NewsletterSectionProps
-  | CompareFeaturesSectionProps
   | MediaSectionProps
 
