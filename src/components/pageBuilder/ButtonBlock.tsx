@@ -20,7 +20,7 @@ const iconMap: Record<NonNullable<ButtonComponent['icon']>, ReactNode> = {
 }
 
 function computeVariantStyles(component: ButtonComponent): {className: string; style?: CSSProperties} {
-  const baseClass = 'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.25)]'
+  const baseClass = 'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]'
   const fullWidthClass = component.fullWidth ? 'w-full' : ''
 
   switch (component.variant) {

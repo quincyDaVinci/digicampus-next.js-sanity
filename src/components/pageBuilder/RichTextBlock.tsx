@@ -37,7 +37,7 @@ const portableTextComponents: Partial<PortableTextReactComponents> = {
       return (
         <a
           href={href}
-          className="text-[hsl(var(--dc-brand))] underline decoration-2 decoration-[hsl(var(--dc-brand)/0.4)] underline-offset-4 hover:decoration-[hsl(var(--dc-brand))] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.25)]"
+          className="text-[hsl(var(--dc-brand))] underline decoration-2 decoration-[hsl(var(--dc-brand)/0.4)] underline-offset-4 hover:decoration-[hsl(var(--dc-brand))] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
           rel={isExternal ? 'noopener noreferrer' : undefined}
           target={isExternal ? '_blank' : undefined}
         >

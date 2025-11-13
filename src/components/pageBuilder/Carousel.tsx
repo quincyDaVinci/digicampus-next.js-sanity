@@ -73,7 +73,7 @@ export default function Carousel({
           <button
             type="button"
             onClick={() => goTo(current - 1)}
-            className="rounded-full border border-[hsl(var(--dc-border)/0.5)] px-4 py-2 text-sm font-medium text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.2)]"
+            className="rounded-full border border-[hsl(var(--dc-border)/0.5)] px-4 py-2 text-sm font-medium text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
             aria-label="Vorige slide"
           >
             Vorige
@@ -95,7 +95,7 @@ export default function Carousel({
           <button
             type="button"
             onClick={() => goTo(current + 1)}
-            className="rounded-full border border-[hsl(var(--dc-border)/0.5)] px-4 py-2 text-sm font-medium text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.2)]"
+            className="rounded-full border border-[hsl(var(--dc-border)/0.5)] px-4 py-2 text-sm font-medium text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
             aria-label="Volgende slide"
           >
             Volgende

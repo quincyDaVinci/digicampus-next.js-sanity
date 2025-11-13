@@ -21,7 +21,7 @@ export default function FAQSection(props: FAQSectionProps) {
           <div className="max-w-3xl mx-auto w-full space-y-4 mt-8">
             {faqItems.map((item) => (
               <details key={item._key} className="border rounded-lg p-4">
-                <summary className="font-medium cursor-pointer">{item.question}</summary>
+                <summary className="font-medium cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]">{item.question}</summary>
                 <p className="text-muted-foreground mt-2">{item.answer}</p>
               </details>
             ))}

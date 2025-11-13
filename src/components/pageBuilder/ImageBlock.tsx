@@ -65,7 +65,7 @@ export default function ImageBlock({component}: ImageBlockProps) {
       <WrapperComponent
         {...wrapperProps}
         className={[
-          'relative block w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus)/0.25)]',
+          'relative block w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]',
         ].join(' ')}
       >
         <span

@@ -22,7 +22,7 @@ export default function CTASection(props: CTASectionProps) {
                 <a
                   key={button._key}
                   href={button.url || "#"}
-                  className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium"
+                  className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
                   style={{ backgroundColor: "hsl(var(--dc-primary))", color: "white" }}
                 >
                   {button.label}

@@ -40,7 +40,7 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
 
   const CardContent = (
     <article
-      className="flex h-full flex-col gap-4 rounded-3xl p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-within:ring-4 focus-within:ring-[hsl(var(--dc-focus)/0.2)]"
+  className="flex h-full flex-col gap-4 rounded-3xl p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-within:ring-4 focus-within:ring-[hsl(var(--dc-focus))]"
       style={{
         background: style.background,
         border: `1px solid ${style.border}`,
