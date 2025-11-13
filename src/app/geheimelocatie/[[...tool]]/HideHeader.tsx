@@ -10,6 +10,10 @@ export default function HideHeader() {
     const headerElement = document.getElementsByTagName('header')
     const footerElement = document.getElementsByTagName('footer')
     
+    // Store original display values
+    const originalHeaderDisplay = headerElement[0]?.style.display || 'block'
+    const originalFooterDisplay = footerElement[0]?.style.display || 'block'
+    
     if (headerElement[0]) {
       headerElement[0].style.display = 'none'
     }
@@ -24,11 +28,11 @@ export default function HideHeader() {
       const footerElement = document.getElementsByTagName('footer')
       
       if (headerElement[0]) {
-        headerElement[0].style.display = ''
+        headerElement[0].style.display = originalHeaderDisplay
       }
       
       if (footerElement[0]) {
-        footerElement[0].style.display = ''
+        footerElement[0].style.display = originalFooterDisplay
       }
     }
   }, [])

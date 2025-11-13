@@ -22,6 +22,8 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [dark, setDark] = useState(false)
   const navRef = useRef<HTMLElement | null>(null)
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null)
+  const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null)
 
   // Persist dark mode
   useEffect(() => {
@@ -45,15 +47,43 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
 
   // Close menus on outside click / escape
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setOpenIndex(null); setMobileOpen(false) } }
+    const onKey = (e: KeyboardEvent) => { 
+      if (e.key === "Escape") { 
+        if (mobileOpen) {
+          setMobileOpen(false)
+          setLiveMessage(language === 'nl' ? 'Menu gesloten' : 'Menu closed')
+          setTimeout(() => setLiveMessage(''), 2000)
+          // Return focus to menu button
+          mobileMenuButtonRef.current?.focus()
+        }
+        setOpenIndex(null)
+      } 
+    }
     const onClick = (e: MouseEvent) => { if (!navRef.current?.contains(e.target as Node)) setOpenIndex(null) }
     document.addEventListener("keydown", onKey)
     document.addEventListener("mousedown", onClick)
     return () => { document.removeEventListener("keydown", onKey); document.removeEventListener("mousedown", onClick) }
-  }, [])
+  }, [mobileOpen, language])
 
-  // Keep focusable order logical when menu opens
-  useEffect(() => { if (mobileOpen) document.body.style.overflow = "hidden"; else document.body.style.overflow = "" }, [mobileOpen])
+  // Keep focusable order logical when menu opens and trap focus
+  useEffect(() => { 
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden"
+      // Announce menu opened
+      setLiveMessage(language === 'nl' ? 'Menu geopend' : 'Menu opened')
+      setTimeout(() => setLiveMessage(''), 2000)
+      
+      // Focus first interactive element in mobile menu
+      setTimeout(() => {
+        const firstFocusable = mobileMenuRef.current?.querySelector(
+          'a, button, input, [tabindex]:not([tabindex="-1"])'
+        ) as HTMLElement
+        firstFocusable?.focus()
+      }, 100)
+    } else {
+      document.body.style.overflow = ""
+    }
+  }, [mobileOpen, language])
 
   // Language change handler (also updates provider)
   const changeLanguage = (l: "nl" | "en") => {
@@ -78,7 +108,7 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
     >
       {/* polite live region for language changes (screen-reader only) */}
       <div aria-live="polite" className="sr-only" role="status">{liveMessage}</div>
-      <nav aria-label="Hoofd" className={["mx-auto max-w-7xl px-4 sm:px-6", scrolled ? "py-2" : "py-4"].join(" ")}> 
+      <nav aria-label={language === 'nl' ? 'Hoofdnavigatie' : 'Main navigation'} className={["mx-auto max-w-7xl px-4 sm:px-6", scrolled ? "py-2" : "py-4"].join(" ")}> 
         {/* Desktop grid: 2x2 */}
         <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-4 items-start w-full" style={{ minHeight: "8rem" }}>
           {/* Top-left: Logo */}
@@ -101,10 +131,15 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
             <button
               aria-pressed={dark}
               aria-label={dark ? "Schakel lichtmodus in" : "Schakel donker modus in"}
-              onClick={() => setDark(d => !d)}
+              onClick={() => {
+                setDark(d => !d)
+                setLiveMessage(dark ? (language === 'nl' ? 'Lichtmodus actief' : 'Light mode active') : (language === 'nl' ? 'Donkere modus actief' : 'Dark mode active'))
+                setTimeout(() => setLiveMessage(''), 2000)
+              }}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
             >
               {dark ? <MoonIcon aria-hidden focusable="false" /> : <SunIcon aria-hidden focusable="false" />}
+              <span className="sr-only">{dark ? (language === 'nl' ? 'Donkere modus actief' : 'Dark mode active') : (language === 'nl' ? 'Lichtmodus actief' : 'Light mode active')}</span>
             </button>
 
             <div role="group" aria-label="Taal switch" className="flex items-center gap-0">
@@ -126,7 +161,7 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
           <div className="col-start-1 row-start-2 flex items-end gap-4 flex-wrap sm:flex-nowrap">
             {menus.map(m => (
               <div key={m.label} className="relative">
-                <button aria-expanded={openIndex === menus.indexOf(m)} aria-controls={`menu-${menus.indexOf(m)}`} onClick={() => setOpenIndex(openIndex === menus.indexOf(m) ? null : menus.indexOf(m))} className="inline-flex items-center gap-2 rounded-lg px-2 py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] whitespace-nowrap dc-tooltip" aria-label={m.label} title={m.label}>
+                <button aria-expanded={openIndex === menus.indexOf(m)} aria-controls={`menu-${menus.indexOf(m)}`} onClick={() => setOpenIndex(openIndex === menus.indexOf(m) ? null : menus.indexOf(m))} className="inline-flex items-center gap-2 rounded-lg px-2 py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] whitespace-nowrap" aria-label={m.label}>
                   <span className="no-wrap text-fluid-md" aria-hidden>{m.label}</span>
                   <ChevronDownIcon aria-hidden focusable="false" className="h-4 w-4" />
                 </button>
@@ -158,14 +193,14 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
         {/* Mobile top row with hamburger on left and controls on right */}
         <div className="md:hidden flex items-center justify-between">
           <button
+            ref={mobileMenuButtonRef}
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
             onClick={() => setMobileOpen(v => !v)}
             className="flex h-12 w-12 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
-            aria-label={mobileOpen ? "Sluit menu" : "Open menu"}
+            aria-label={mobileOpen ? (language === 'nl' ? 'Sluit menu' : 'Close menu') : (language === 'nl' ? 'Open menu' : 'Open menu')}
           >
             {mobileOpen ? <CloseIcon aria-hidden focusable="false" /> : <MenuIcon aria-hidden focusable="false" />}
-            <span className="sr-only">Menu</span>
           </button>
 
             <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg">
@@ -174,12 +209,17 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setDark(d => !d)}
+              onClick={() => {
+                setDark(d => !d)
+                setLiveMessage(dark ? (language === 'nl' ? 'Lichtmodus actief' : 'Light mode active') : (language === 'nl' ? 'Donkere modus actief' : 'Dark mode active'))
+                setTimeout(() => setLiveMessage(''), 2000)
+              }}
               aria-pressed={dark}
-              aria-label={dark ? "Schakel lichtmodus in" : "Schakel donker modus in"}
+              aria-label={dark ? (language === 'nl' ? 'Schakel lichtmodus in' : 'Switch to light mode') : (language === 'nl' ? 'Schakel donker modus in' : 'Switch to dark mode')}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
             >
               {dark ? <MoonIcon aria-hidden focusable="false" /> : <SunIcon aria-hidden focusable="false" />}
+              <span className="sr-only">{dark ? (language === 'nl' ? 'Donkere modus actief' : 'Dark mode active') : (language === 'nl' ? 'Lichtmodus actief' : 'Light mode active')}</span>
             </button>
             <div className="flex items-center gap-1">
               <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm", language === "nl" ? "" : ""].join(" ")} style={language === "nl" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>NL</button>
@@ -189,13 +229,19 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
         </div>
 
         {/* Mobile panel */}
-        <div id="mobile-menu" className={["md:hidden transition-all duration-300 overflow-hidden motion-reduce:transition-none", mobileOpen ? "max-h-[80vh] mt-3" : "max-h-0"].join(" ")}>
+        <div 
+          ref={mobileMenuRef}
+          id="mobile-menu" 
+          role="navigation"
+          aria-label={language === 'nl' ? 'Mobiel menu' : 'Mobile menu'}
+          className={["md:hidden transition-all duration-300 overflow-hidden motion-reduce:transition-none", mobileOpen ? "max-h-[80vh] mt-3" : "max-h-0"].join(" ")}
+        >
           <div className="rounded-2xl p-3 backdrop-blur" style={{ border: '1px solid hsl(var(--dc-border)/0.1)', backgroundColor: 'hsl(var(--dc-surface)/0.9)', color: 'hsl(var(--dc-text))' }}>
             <ul className="space-y-2">
               {menus.map(m => (
                 <li key={m.label}>
                   <details className="group">
-                    <summary className="cursor-pointer list-none rounded-lg px-3 py-2 dc-tooltip" aria-label={m.label} title={m.label} style={{ color: 'hsl(var(--dc-text))' }}>{m.label}</summary>
+                    <summary className="cursor-pointer list-none rounded-lg px-3 py-2" style={{ color: 'hsl(var(--dc-text))' }}>{m.label}</summary>
                     <ul className="mt-1 ml-2 space-y-1">
                       {m.items.map((it, idx) => (
                         <li key={`${m.label}-mobile-${idx}`}><Link href={it.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-fluid-sm" style={{ color: 'hsl(var(--dc-text))' }}>{it.label}</Link></li>
