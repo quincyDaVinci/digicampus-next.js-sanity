@@ -113,7 +113,7 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
         <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-4 items-start w-full" style={{ minHeight: "8rem" }}>
           {/* Top-left: Logo */}
           <div className="col-start-1 row-start-1 flex items-start min-w-0">
-            <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg">
+            <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
               <span className="sr-only">Digicampus homepage</span>
               <Image
                 src={dark ? "/assets/images/logo-digicampus-dark.svg" : "/assets/images/logo-digicampus-light.svg"}
@@ -143,9 +143,9 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
             </button>
 
             <div role="group" aria-label="Taal switch" className="flex items-center gap-0">
-              <button type="button" onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} aria-label="Schakel naar Nederlands" className={["px-3 py-1 rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors text-fluid-sm", language === "nl" ? "font-bold" : ""].join(" ")} style={language === "nl" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'hsl(var(--dc-text) / 0.8)' }}>NL {language === "nl" && <span className="sr-only">(actief)</span>}</button>
+              <button type="button" onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} aria-label="Schakel naar Nederlands" className={["px-3 py-1 rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors text-fluid-sm", language === "nl" ? "font-bold" : "hover:bg-[hsl(var(--dc-text)/0.06)]"].join(" ")} style={language === "nl" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'hsl(var(--dc-text) / 0.8)' }}>NL {language === "nl" && <span className="sr-only">(actief)</span>}</button>
               <span aria-hidden className="w-px h-5 mx-2 divider-dc" />
-              <button type="button" onClick={() => changeLanguage("en")} aria-pressed={language === "en"} aria-label="Switch to English" className={["px-3 py-1 rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors text-fluid-sm", language === "en" ? "font-bold" : ""].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'hsl(var(--dc-text) / 0.8)' }}>EN {language === "en" && <span className="sr-only">(active)</span>}</button>
+              <button type="button" onClick={() => changeLanguage("en")} aria-pressed={language === "en"} aria-label="Switch to English" className={["px-3 py-1 rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors text-fluid-sm", language === "en" ? "font-bold" : "hover:bg-[hsl(var(--dc-text)/0.06)]"].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'hsl(var(--dc-text) / 0.8)' }}>EN {language === "en" && <span className="sr-only">(active)</span>}</button>
             </div>
 
               <form role="search" className="relative min-w-0">
@@ -161,15 +161,15 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
           <div className="col-start-1 row-start-2 flex items-end gap-4 flex-wrap sm:flex-nowrap">
             {menus.map(m => (
               <div key={m.label} className="relative">
-                <button aria-expanded={openIndex === menus.indexOf(m)} aria-controls={`menu-${menus.indexOf(m)}`} onClick={() => setOpenIndex(openIndex === menus.indexOf(m) ? null : menus.indexOf(m))} className="inline-flex items-center gap-2 rounded-lg px-2 py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] whitespace-nowrap" aria-label={m.label}>
+                <button aria-expanded={openIndex === menus.indexOf(m)} aria-controls={`menu-${menus.indexOf(m)}`} onClick={() => setOpenIndex(openIndex === menus.indexOf(m) ? null : menus.indexOf(m))} className="inline-flex items-center gap-2 rounded-lg px-2 py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] whitespace-nowrap transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" aria-label={m.label}>
                   <span className="no-wrap text-fluid-md" aria-hidden>{m.label}</span>
                   <ChevronDownIcon aria-hidden focusable="false" className="h-4 w-4" />
                 </button>
 
-                <div id={`menu-${menus.indexOf(m)}`} role="menu" aria-label={m.label} className={["absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl transition-opacity duration-150 motion-reduce:transition-none", openIndex === menus.indexOf(m) ? "opacity-100" : "opacity-0 pointer-events-none"].join(" ")} style={{ backgroundColor: 'hsl(var(--dc-surface) / 0.98)', border: '1px solid hsl(var(--dc-border) / 0.1)', color: 'hsl(var(--dc-text))' }}>
+                <div id={`menu-${menus.indexOf(m)}`} role="menu" className={["absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl transition-opacity duration-150 motion-reduce:transition-none", openIndex === menus.indexOf(m) ? "opacity-100" : "opacity-0 pointer-events-none"].join(" ")} style={{ backgroundColor: 'hsl(var(--dc-surface) / 0.98)', border: '1px solid hsl(var(--dc-border) / 0.1)', color: 'hsl(var(--dc-text))' }}>
                   <ul className="py-2">
                       {m.items.map((it, idx) => (
-                      <li key={`${m.label}-${idx}`}><Link href={it.href} role="menuitem" onClick={() => setOpenIndex(null)} className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm" style={{ color: 'hsl(var(--dc-text))' }}>{it.label}</Link></li>
+                      <li key={`${m.label}-${idx}`}><Link href={it.href} role="menuitem" onClick={() => setOpenIndex(null)} className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" style={{ color: 'hsl(var(--dc-text))' }}>{it.label}</Link></li>
                     ))}
                   </ul>
                 </div>
@@ -181,7 +181,7 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
           <div className="col-start-2 row-start-2 flex items-end justify-end">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
               style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
             >
               <span>Contact</span>
@@ -203,7 +203,7 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
             {mobileOpen ? <CloseIcon aria-hidden focusable="false" /> : <MenuIcon aria-hidden focusable="false" />}
           </button>
 
-            <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg">
+            <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
             <Image src="/assets/images/logo-digicampus.svg" alt="Digicampus logo" width={160} height={40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
           </Link>
 
@@ -222,8 +222,8 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
               <span className="sr-only">{dark ? (language === 'nl' ? 'Donkere modus actief' : 'Dark mode active') : (language === 'nl' ? 'Lichtmodus actief' : 'Light mode active')}</span>
             </button>
             <div className="flex items-center gap-1">
-              <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm", language === "nl" ? "" : ""].join(" ")} style={language === "nl" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>NL</button>
-              <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm", language === "en" ? "" : ""].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>EN</button>
+              <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors", language === "nl" ? "" : "hover:bg-[hsl(var(--dc-text)/0.06)]"].join(" ")} style={language === "nl" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>NL</button>
+              <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors", language === "en" ? "" : "hover:bg-[hsl(var(--dc-text)/0.06)]"].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>EN</button>
             </div>
           </div>
         </div>
@@ -241,10 +241,10 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
               {menus.map(m => (
                 <li key={m.label}>
                   <details className="group">
-                    <summary className="cursor-pointer list-none rounded-lg px-3 py-2" style={{ color: 'hsl(var(--dc-text))' }}>{m.label}</summary>
+                    <summary className="cursor-pointer list-none rounded-lg px-3 py-2 transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" style={{ color: 'hsl(var(--dc-text))' }}>{m.label}</summary>
                     <ul className="mt-1 ml-2 space-y-1">
                       {m.items.map((it, idx) => (
-                        <li key={`${m.label}-mobile-${idx}`}><Link href={it.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-fluid-sm" style={{ color: 'hsl(var(--dc-text))' }}>{it.label}</Link></li>
+                        <li key={`${m.label}-mobile-${idx}`}><Link href={it.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-fluid-sm transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" style={{ color: 'hsl(var(--dc-text))' }}>{it.label}</Link></li>
                       ))}
                     </ul>
                   </details>
@@ -253,11 +253,11 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
             </ul>
 
             <div className="mt-3 flex items-center gap-2">
-              <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm", language === "nl" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90"].join(" ")}>NL</button>
-              <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm", language === "en" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90"].join(" ")}>EN</button>
+              <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors", language === "nl" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90 hover:bg-white/10"].join(" ")}>NL</button>
+              <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors", language === "en" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90 hover:bg-white/10"].join(" ")}>EN</button>
               <Link
                 href="/contact"
-                className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
+                className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
                 style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
               >
                 <span>Contact</span>
