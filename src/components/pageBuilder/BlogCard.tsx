@@ -1,10 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
-
 import {urlFor} from '@sanity/lib/image'
-
 import type {BlogCardComponent, BlogCardResolvedPost} from '@/types/pageBuilder'
-
+import {CalendarIcon, getFeatherIcon} from '@/components/icons/FeatherIcons'
 import {tokenToCss} from './colorUtils'
 
 interface BlogCardProps {
@@ -29,6 +27,36 @@ const toneStyles: Record<NonNullable<BlogCardComponent['tone']>, {background: st
   },
 }
 
+// Helper function to calculate read time from text body
+function calculateReadTimeFromBody(body: unknown): number | undefined {
+  if (!body || !Array.isArray(body)) return undefined
+  
+  let wordCount = 0
+  const traverse = (blocks: unknown[]) => {
+    blocks.forEach((block: unknown) => {
+      if (typeof block === 'object' && block !== null) {
+        const typedBlock = block as {_type?: string; children?: unknown[]}
+        if (typedBlock._type === 'block' && Array.isArray(typedBlock.children)) {
+          typedBlock.children.forEach((child: unknown) => {
+            if (typeof child === 'object' && child !== null) {
+              const typedChild = child as {text?: unknown}
+              if (typeof typedChild.text === 'string') {
+                wordCount += typedChild.text.split(/\s+/).filter(Boolean).length
+              }
+            }
+          })
+        }
+        if (Array.isArray(typedBlock.children)) {
+          traverse(typedBlock.children)
+        }
+      }
+    })
+  }
+  
+  traverse(body)
+  return wordCount > 0 ? Math.max(1, Math.round(wordCount / 200)) : undefined
+}
+
 function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLabel: string; tone: NonNullable<BlogCardComponent['tone']>}) {
   const style = toneStyles[tone]
   const href = post.slug ? `/blog/${post.slug}` : '#'
@@ -37,10 +65,14 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
     ? new Intl.DateTimeFormat('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'}).format(new Date(post.publishedAt))
     : null
   const imageUrl = post.mainImage?.asset ? urlFor(post.mainImage).width(800).height(520).fit('crop').auto('format').url() : null
+  const authorImageUrl = post.author?.image?.asset ? urlFor(post.author.image).width(96).height(96).fit('crop').auto('format').url() : null
+  const firstCategory = post.categories?.[0]?.title
+  const estimatedReadTime = post.estimatedReadTime ?? calculateReadTimeFromBody(post.body)
+  const HourglassIcon = getFeatherIcon('hourglass')
 
-  const CardContent = (
+  const CardInner = (
     <article
-  className="flex h-full flex-col gap-4 rounded-3xl p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-within:ring-4 focus-within:ring-[hsl(var(--dc-focus))]"
+      className="group flex h-full flex-col rounded-3xl shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-within:ring-4 focus-within:ring-[hsl(var(--dc-focus))]"
       style={{
         background: style.background,
         border: `1px solid ${style.border}`,
@@ -48,42 +80,112 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
       }}
     >
       {imageUrl ? (
-        <div className="relative overflow-hidden rounded-2xl" style={{backgroundColor: tokenToCss('bg-soft')}}>
-          <Image src={imageUrl} alt={post.mainImage?.alt || ''} width={800} height={520} className="h-auto w-full object-cover" />
+        <div className="relative overflow-hidden rounded-t-3xl" style={{backgroundColor: tokenToCss('bg-soft')}}>
+          <Image
+            src={imageUrl}
+            alt={post.mainImage?.alt || ''}
+            width={800}
+            height={520}
+            className="h-auto w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+            priority={false}
+          />
+          <div
+            className="pointer-events-none absolute inset-0 flex flex-col justify-end p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            style={{
+              background:
+                'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 60%, rgba(0, 0, 0, 0.2) 85%, transparent 100%)',
+              color: '#ffffff',
+            }}
+            aria-hidden="true"
+          >
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                {firstCategory ? (
+                  <span className="inline-block rounded-full bg-[rgba(255,255,255,0.2)] px-3 py-1 text-sm font-medium backdrop-blur-sm">
+                    {firstCategory}
+                  </span>
+                ) : null}
+              </div>
+              <div className="flex flex-col items-end gap-1.5 text-sm font-medium">
+                {formattedDate ? (
+                  <div className="inline-flex items-center gap-1.5">
+                    <CalendarIcon aria-hidden className="h-4 w-4" />
+                    <time dateTime={post.publishedAt}>{formattedDate}</time>
+                  </div>
+                ) : null}
+                {estimatedReadTime ? (
+                  <div className="inline-flex items-center gap-1.5">
+                    {HourglassIcon ? <HourglassIcon aria-hidden className="h-4 w-4" /> : null}
+                    <span>{estimatedReadTime} min leestijd</span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 text-xs italic opacity-75">
+                    Leestijd niet beschikbaar
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       ) : null}
-      <div className="space-y-2">
-        {formattedDate ? (
-          <time dateTime={post.publishedAt} className="text-sm uppercase tracking-wide opacity-75">
-            {formattedDate}
-          </time>
-        ) : null}
-        <h3 className="text-lg font-semibold leading-snug">{post.title}</h3>
-        {post.summary ? (
-          <p className="text-sm leading-relaxed opacity-90">{post.summary}</p>
-        ) : null}
-        {post.author?.name ? (
-          <p className="text-xs uppercase tracking-wide opacity-70">Door {post.author.name}</p>
-        ) : null}
+      <div className="flex flex-1 flex-col gap-4 p-6">
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold leading-snug tracking-tight">{post.title}</h3>
+          {post.summary ? (
+            <p className="text-sm leading-relaxed text-[hsl(var(--dc-text)/0.85)]">{post.summary}</p>
+          ) : null}
+        </div>
+        {(post.author?.name || post.author?.role) && (
+          <div className="mt-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              {authorImageUrl ? (
+                <Image
+                  src={authorImageUrl}
+                  alt={post.author?.name || ''}
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 rounded-full object-cover ring-2 ring-[hsl(var(--dc-border)/0.4)]"
+                />
+              ) : (
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(var(--dc-brand)/0.15)] text-[hsl(var(--dc-brand))]"
+                  aria-hidden
+                >
+                  {post.author?.name ? post.author.name.charAt(0) : 'A'}
+                </div>
+              )}
+              <div className="flex flex-col">
+                {post.author?.name ? (
+                  <span className="text-sm font-medium leading-tight">{post.author.name}</span>
+                ) : null}
+                {post.author?.role ? (
+                  <span className="text-xs text-[hsl(var(--dc-text)/0.65)]">{post.author.role}</span>
+                ) : null}
+                {post.author?.company ? (
+                  <span className="text-xs text-[hsl(var(--dc-text)/0.5)]">{post.author.company}</span>
+                ) : null}
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-2 text-sm font-semibold whitespace-nowrap">
+              {ctaLabel}
+              <span aria-hidden>→</span>
+            </span>
+          </div>
+        )}
       </div>
-      <span className="mt-auto inline-flex items-center gap-2 text-sm font-semibold">
-        {ctaLabel}
-        <span aria-hidden>→</span>
-      </span>
     </article>
   )
 
   if (isInternal) {
     return (
       <Link href={href} aria-label={`${ctaLabel}: ${post.title}`} className="block focus-visible:outline-none">
-        {CardContent}
+        {CardInner}
       </Link>
     )
   }
-
   return (
     <a href={href} aria-label={`${ctaLabel}: ${post.title}`} className="block focus-visible:outline-none">
-      {CardContent}
+      {CardInner}
     </a>
   )
 }

@@ -1,5 +1,7 @@
+import React from 'react'
 import {BookOpenIcon} from '../../lib/featherIcons'
 import {defineField, defineType} from 'sanity'
+import {useFormValue, set} from 'sanity'
 
 export default defineType({
   name: 'blogPost',
@@ -54,6 +56,93 @@ export default defineType({
       name: 'publishedAt',
       title: 'Gepubliceerd op',
       type: 'datetime',
+    }),
+    defineField({
+      name: 'estimatedReadTime',
+      title: 'Geschatte leestijd (minuten)',
+      type: 'number',
+      description: 'Laat leeg om automatisch te berekenen op basis van de inhoud. Klik op "Bereken leestijd" om handmatig te berekenen.',
+      validation: (Rule) => Rule.min(1).integer(),
+      components: {
+        input: function CustomReadTimeInput(props) {
+          const {onChange, renderDefault} = props
+          // Use useFormValue hook to access the body field from the current form state
+          const body = useFormValue(['body'])
+          
+          const calculateReadTime = () => {
+            // Debug: log what we have access to
+            console.log('Document body:', body)
+            console.log('Body type:', typeof body)
+            console.log('Is array:', Array.isArray(body))
+            
+            if (!body || !Array.isArray(body) || body.length === 0) {
+              alert('Geen inhoud gevonden om leestijd te berekenen. Voeg eerst inhoud toe aan het veld "Inhoud".')
+              return
+            }
+
+            let wordCount = 0
+            const traverse = (blocks) => {
+              blocks.forEach((block) => {
+                if (block && typeof block === 'object' && block._type === 'block' && block.children) {
+                  block.children.forEach((child) => {
+                    if (child && typeof child === 'object' && child.text && typeof child.text === 'string') {
+                      wordCount += child.text.split(/\s+/).filter(Boolean).length
+                    }
+                  })
+                }
+                if (block && typeof block === 'object' && block.children && Array.isArray(block.children)) {
+                  traverse(block.children)
+                }
+              })
+            }
+
+            traverse(body)
+            
+            console.log('Total word count:', wordCount)
+            
+            if (wordCount === 0) {
+              alert('Geen tekst gevonden in de inhoud. Voeg eerst tekst toe aan het veld "Inhoud".')
+              return
+            }
+            
+            const minutes = Math.max(1, Math.round(wordCount / 200))
+            onChange(set(minutes))
+          }
+
+          return React.createElement(
+            'div',
+            {style: {display: 'flex', gap: '0.5rem', alignItems: 'flex-end'}},
+            React.createElement('div', {style: {flex: 1}}, renderDefault(props)),
+            React.createElement(
+              'button',
+              {
+                type: 'button',
+                onClick: calculateReadTime,
+                style: {
+                  padding: '0.5rem 1rem',
+                  background: '#2276fc',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '0.375rem',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  whiteSpace: 'nowrap',
+                  height: 'fit-content',
+                },
+              },
+              'Bereken leestijd'
+            )
+          )
+        },
+      },
+    }),
+    defineField({
+      name: 'featured',
+      title: 'Uitgelicht',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Markeer dit bericht als uitgelicht voor speciale weergave.',
     }),
     defineField({
       name: 'excerpt',

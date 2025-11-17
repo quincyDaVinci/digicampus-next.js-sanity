@@ -49,7 +49,18 @@ export interface BlogSectionProps extends BaseSection {
   _type: 'blogSection'
   heading?: string
   subheading?: string
-  variant?: string
+  variant?: 'default' | 'grid'
+  tone?: 'surface' | 'accent' | 'contrast'
+  limit?: number
+  ctaLabel?: string
+  viewAllLink?: {
+    label?: string
+    url?: string
+  } | null
+  category?: {
+    _type?: string
+    _ref?: string
+  } | null
 }
 
 export interface TestimonialsSectionProps extends BaseSection {

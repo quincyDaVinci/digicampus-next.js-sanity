@@ -287,6 +287,7 @@ export type FeatherSymbol =
   | 'external'
   | 'settings'
   | 'package'
+  | 'hourglass'
 
 export const featherIconMap: Record<FeatherSymbol, FeatherIconComponent> = {
   sun: SunIcon,
@@ -315,6 +316,16 @@ export const featherIconMap: Record<FeatherSymbol, FeatherIconComponent> = {
   external: ExternalLinkIcon,
   settings: SettingsIcon,
   package: PackageIcon,
+  hourglass: createIcon(
+    <>
+      <path d="M6 2h12" />
+      <path d="M6 22h12" />
+      <path d="M8 2h8c0 2-2 4-4 4s-4-2-4-4Z" />
+      <path d="M16 22H8c0-2 2-4 4-4s4 2 4 4Z" />
+      <path d="M12 8v4" />
+      <path d="M12 12v4" />
+    </>
+  ),
 }
 
 export function getFeatherIcon(symbol?: FeatherSymbol) {
