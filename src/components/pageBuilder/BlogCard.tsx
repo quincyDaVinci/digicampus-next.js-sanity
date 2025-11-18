@@ -68,7 +68,7 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
   const authorImageUrl = post.author?.image?.asset ? urlFor(post.author.image).width(96).height(96).fit('crop').auto('format').url() : null
   const firstCategory = post.categories?.[0]?.title
   const estimatedReadTime = post.estimatedReadTime ?? calculateReadTimeFromBody(post.body)
-  const HourglassIcon = getFeatherIcon('hourglass')
+  const ClockIconComponent = getFeatherIcon('clock')
 
   const CardInner = (
     <article
@@ -81,48 +81,75 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
     >
       {imageUrl ? (
         <div className="relative overflow-hidden rounded-t-3xl" style={{backgroundColor: tokenToCss('bg-soft')}}>
-          <Image
-            src={imageUrl}
-            alt={post.mainImage?.alt || ''}
-            width={800}
-            height={520}
-            className="h-auto w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-            priority={false}
-          />
-          <div
-            className="pointer-events-none absolute inset-0 flex flex-col justify-end p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-            style={{
-              background:
-                'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 60%, rgba(0, 0, 0, 0.2) 85%, transparent 100%)',
-              color: '#ffffff',
-            }}
-            aria-hidden="true"
-          >
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                {firstCategory ? (
-                  <span className="inline-block rounded-full bg-[rgba(255,255,255,0.2)] px-3 py-1 text-sm font-medium backdrop-blur-sm">
-                    {firstCategory}
-                  </span>
-                ) : null}
-              </div>
-              <div className="flex flex-col items-end gap-1.5 text-sm font-medium">
-                {formattedDate ? (
-                  <div className="inline-flex items-center gap-1.5">
-                    <CalendarIcon aria-hidden className="h-4 w-4" />
-                    <time dateTime={post.publishedAt}>{formattedDate}</time>
-                  </div>
-                ) : null}
-                {estimatedReadTime ? (
-                  <div className="inline-flex items-center gap-1.5">
-                    {HourglassIcon ? <HourglassIcon aria-hidden className="h-4 w-4" /> : null}
-                    <span>{estimatedReadTime} min leestijd</span>
-                  </div>
-                ) : (
-                  <div className="inline-flex items-center gap-1.5 text-xs italic opacity-75">
-                    Leestijd niet beschikbaar
-                  </div>
-                )}
+          <div className="relative transition-transform duration-300 group-hover:scale-[1.03]" style={{ marginBottom: '-2px' }}>
+            <Image
+              src={imageUrl}
+              alt={post.mainImage?.alt || ''}
+              width={800}
+              height={520}
+              className="block h-auto w-full object-cover"
+              priority={false}
+              style={{ display: 'block', marginBottom: '-1px' }}
+            />
+            {/* Base overlay - always visible with subtle gradient */}
+            <div
+              className="pointer-events-none absolute"
+              style={{
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: '-6px',
+                background: 'linear-gradient(to top, rgba(0, 0, 0, 0.3) 0%, transparent 50%)',
+              }}
+              aria-hidden="true"
+            />
+            {/* Hover overlay - fades in on hover */}
+            <div
+              className="pointer-events-none absolute opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              style={{
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: '-6px',
+                background:
+                  'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 60%, rgba(0, 0, 0, 0.2) 85%, transparent 100%)',
+              }}
+              aria-hidden="true"
+            />
+            {/* Content layer - above both overlays */}
+            <div
+              className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-end p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              style={{
+                color: '#ffffff',
+              }}
+              aria-hidden="true"
+            >
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  {firstCategory ? (
+                    <span className="inline-block rounded-full bg-[rgba(255,255,255,0.2)] px-3 py-1 text-sm font-medium backdrop-blur-sm">
+                      {firstCategory}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex flex-col items-end gap-1.5 text-sm font-medium">
+                  {formattedDate ? (
+                    <div className="inline-flex items-center gap-1.5">
+                      <CalendarIcon aria-hidden className="h-4 w-4" />
+                      <time dateTime={post.publishedAt}>{formattedDate}</time>
+                    </div>
+                  ) : null}
+                  {estimatedReadTime ? (
+                    <div className="inline-flex items-center gap-1.5">
+                      {ClockIconComponent ? <ClockIconComponent aria-hidden className="h-4 w-4" /> : null}
+                      <span>{estimatedReadTime} min leestijd</span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-1.5 text-xs italic opacity-75">
+                      Leestijd niet beschikbaar
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

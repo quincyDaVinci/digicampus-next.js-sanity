@@ -215,6 +215,13 @@ export const CalendarIcon = createIcon(
   </>
 )
 
+export const ClockIcon = createIcon(
+  <>
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </>
+)
+
 export const PlayIcon = createIcon(
   <polygon points="5 3 19 12 5 21 5 3" />
 )
@@ -281,6 +288,7 @@ export type FeatherSymbol =
   | 'shield'
   | 'book-open'
   | 'calendar'
+  | 'clock'
   | 'play'
   | 'globe'
   | 'download'
@@ -310,6 +318,7 @@ export const featherIconMap: Record<FeatherSymbol, FeatherIconComponent> = {
   shield: ShieldIcon,
   'book-open': BookOpenIcon,
   calendar: CalendarIcon,
+  clock: ClockIcon,
   play: PlayIcon,
   globe: GlobeIcon,
   download: DownloadIcon,
