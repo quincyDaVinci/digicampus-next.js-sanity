@@ -29,6 +29,7 @@ import faqSection from './modules/faqSection'
 import contactSection from './modules/contactSection'
 import newsletterSection from './modules/newsletterSection'
 import mediaSection from './modules/mediaSection'
+import documentAsset from './modules/documentAsset'
 
 export const schema: SchemaPluginOptions = {
   types: [
@@ -61,6 +62,7 @@ export const schema: SchemaPluginOptions = {
     contactSection,
     newsletterSection,
     mediaSection,
+    documentAsset,
   ],
 }
 
