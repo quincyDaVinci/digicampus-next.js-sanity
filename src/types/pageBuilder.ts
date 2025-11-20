@@ -91,6 +91,9 @@ export interface ButtonComponent {
   label: string
   ariaLabel?: string
   link: LinkField
+  isPdf?: boolean
+  accessibleVersionUrl?: string
+  accessibilityNote?: string
   variant?: 'cta' | 'filled' | 'outline' | 'ghost' | 'custom'
   customColorToken?: DesignTokenValue
   customTextColorToken?: DesignTokenValue

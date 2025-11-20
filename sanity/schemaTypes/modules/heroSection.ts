@@ -110,6 +110,24 @@ export default defineType({
                 ],
               },
             },
+            {
+              name: 'isPdf',
+              type: 'boolean',
+              title: 'Is dit een PDF-link?',
+              description: 'Markeer dit wanneer de knop naar een PDF verwijst.',
+            },
+            {
+              name: 'accessibleVersionUrl',
+              type: 'url',
+              title: 'Toegankelijke versie (URL)',
+              description: 'Optioneel: alternatieve of toegankelijke PDF die voor de knop gebruikt moet worden.',
+            },
+            {
+              name: 'accessibilityNote',
+              type: 'string',
+              title: 'Toegankelijkheidsopmerking',
+              description: 'Extra schermlezertekst, bijvoorbeeld bij PDF zonder toegankelijke versie.',
+            },
           ],
           preview: {
             select: {

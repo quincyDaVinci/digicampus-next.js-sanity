@@ -13,6 +13,7 @@ import FAQSection from "./FAQSection";
 import ContactSection from "./ContactSection";
 import NewsletterSection from "./NewsletterSection";
 import MediaSection from "./MediaSection";
+import DocumentAssetSection from "./DocumentAssetSection";
 
 // Import existing pageBuilder component renderers
 import RichTextBlock from "../pageBuilder/RichTextBlock";
@@ -58,6 +59,8 @@ export default function RenderSection({ section }: RenderSectionProps) {
       return <NewsletterSection {...(section as Extract<SectionProps, {_type: 'newsletterSection'}>)} />;
     case "mediaSection":
       return <MediaSection {...(section as Extract<SectionProps, {_type: 'mediaSection'}>)} />;
+    case "documentAsset":
+      return <DocumentAssetSection {...(section as Extract<SectionProps, {_type: 'documentAsset'}>)} />;
 
     // Existing pageBuilder component types
     case "richTextComponent":

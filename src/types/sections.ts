@@ -21,6 +21,9 @@ export interface HeroSectionProps extends BaseSection {
     url?: string
     variant?: string
     icon?: string
+    isPdf?: boolean
+    accessibleVersionUrl?: string
+    accessibilityNote?: string
   }>
   media?: {
     mediaType?: 'image' | 'video' | 'gallery'
@@ -96,6 +99,11 @@ export interface CTASectionProps extends BaseSection {
     _key: string
     label?: string
     url?: string
+    variant?: string
+    icon?: string
+    isPdf?: boolean
+    accessibleVersionUrl?: string
+    accessibilityNote?: string
   }>
 }
 
@@ -159,6 +167,25 @@ export interface MediaSectionProps extends BaseSection {
   ariaDescribedBy?: string
 }
 
+export interface DocumentAssetProps extends BaseSection {
+  _type: 'documentAsset'
+  title?: string
+  summary?: string
+  documentFile?: {
+    asset?: {
+      _ref?: string
+      url?: string
+    }
+  }
+  htmlAlternativePortableText?: Array<{
+    _key: string
+    _type: string
+    children?: Array<{_key: string; _type: string; text?: string}>
+  }>
+  wcagStatus?: boolean
+  language?: string
+}
+
 export type SectionProps =
   | HeroSectionProps
   | FeatureSectionProps
@@ -170,4 +197,5 @@ export type SectionProps =
   | ContactSectionProps
   | NewsletterSectionProps
   | MediaSectionProps
+  | DocumentAssetProps
 

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { HomePagePreview } from './HomePagePreview'
 
 // Query for the home page (singleton)
+// Dereference file asset url for documentAsset modules to avoid additional runtime fetches
 const homePageQuery = `*[_type == "homePage" && _id == "homePage"][0]{
   _id,
   title,
@@ -13,6 +14,8 @@ const homePageQuery = `*[_type == "homePage" && _id == "homePage"][0]{
     _type,
     _key,
     ...,
+    // if module is a documentAsset, include resolved URL
+    documentFile{asset-> { _id, url }},
   }
 }`
 

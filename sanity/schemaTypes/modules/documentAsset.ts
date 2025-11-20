@@ -22,6 +22,15 @@ export default defineType({
       group: 'content',
     }),
     defineField({
+      name: 'summary',
+      title: 'Summary / Abstract',
+      type: 'text',
+      rows: 3,
+      description: 'Short description for context and accessibility.',
+      validation: (Rule) => Rule.required().min(20).max(400),
+      group: 'content',
+    }),
+    defineField({
       name: 'documentFile',
       title: 'Document (PDF)',
       type: 'file',
@@ -44,15 +53,6 @@ export default defineType({
           const languageCodePattern = /^[a-z]{2}(-[A-Z]{2})?$/
           return languageCodePattern.test(value) || 'Please use a valid language code (e.g., "en", "nl", "en-US")'
         }),
-      group: 'content',
-    }),
-    defineField({
-      name: 'summary',
-      title: 'Summary / Abstract',
-      type: 'text',
-      rows: 3,
-      description: 'Short description for context and accessibility.',
-      validation: (Rule) => Rule.required().min(20).max(400),
       group: 'content',
     }),
     defineField({
