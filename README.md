@@ -51,6 +51,7 @@ npm run validate
 - **Developer Guide**: [`docs/ACCESSIBILITY.md`](docs/ACCESSIBILITY.md)
 - **Quick Reference**: [`docs/A11Y_QUICK_REFERENCE.md`](docs/A11Y_QUICK_REFERENCE.md)
 - **Implementation Checklist**: [`docs/A11Y_CHECKLIST.md`](docs/A11Y_CHECKLIST.md)
+- **PDF Remediation Guide**: [`docs/PDF_ACCESSIBILITY.md`](docs/PDF_ACCESSIBILITY.md)
 - **Public Statement**: [/accessibility](http://localhost:3000/accessibility)
 
 ## 🎨 Icons and Accessibility
