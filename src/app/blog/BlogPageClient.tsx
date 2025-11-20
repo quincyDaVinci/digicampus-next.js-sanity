@@ -2,7 +2,7 @@
 
 import {useState, useRef, useMemo} from 'react'
 import {useRouter, useSearchParams} from 'next/navigation'
-import {CalendarIcon, ChevronLeftIcon, ChevronRightIcon} from '@/components/icons/FeatherIcons'
+import {CalendarIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, MenuIcon} from '@/components/icons/FeatherIcons'
 import BlogCard from '@/components/pageBuilder/BlogCard'
 import type { BlogCardComponent, BlogCardResolvedPost } from '@/types/pageBuilder'
 
@@ -55,6 +55,9 @@ export default function BlogPageClient({
   const searchParams = useSearchParams()
   const liveRegionRef = useRef<HTMLDivElement>(null)
   const [announcement, setAnnouncement] = useState('')
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false)
+  const [viewDropdownOpen, setViewDropdownOpen] = useState(false)
 
   // Build URL with query params
   const buildUrl = (updates: {category?: string | null; sort?: string; page?: number}) => {
@@ -160,14 +163,6 @@ export default function BlogPageClient({
         )}
       </div>
 
-      {/* Divider */}
-      <div 
-        className="mb-8 h-px" 
-        style={{ 
-          background: 'linear-gradient(to right, transparent, hsl(var(--dc-border) / 0.4) 20%, hsl(var(--dc-border) / 0.4) 80%, transparent)' 
-        }} 
-      />
-
       {/* Category Filters */}
       <div className="mb-6">
         <div className="flex flex-wrap gap-2" role="group" aria-label="Filter op categorie">
@@ -225,6 +220,14 @@ export default function BlogPageClient({
         </div>
       </div>
 
+      {/* Divider */}
+      <div 
+        className="mb-8 h-px" 
+        style={{ 
+          background: 'linear-gradient(to right, transparent, hsl(var(--dc-border) / 0.4) 20%, hsl(var(--dc-border) / 0.4) 80%, transparent)' 
+        }} 
+      />
+
       {/* Live region for screen reader announcements */}
       <div
         ref={liveRegionRef}
@@ -240,33 +243,129 @@ export default function BlogPageClient({
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
         {/* Main Blog Grid */}
         <div>
-          {/* Sort Dropdown - Above Blog Grid */}
-          <div className="mb-6 flex items-center gap-3">
-            <label htmlFor="sort-select" className="text-sm font-medium whitespace-nowrap" style={{ color: 'hsl(var(--dc-text))' }}>
-              Sorteren op:
-            </label>
-            <select
-              id="sort-select"
-              value={currentSort}
-              onChange={(e) => handleSortChange(e.target.value)}
-              style={{
-                backgroundColor: 'hsl(var(--dc-surface-98))',
-                borderColor: 'hsl(var(--dc-border))',
-                color: 'hsl(var(--dc-text))',
-              }}
-              className="rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-dc-focus cursor-pointer"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'hsl(var(--dc-brand))'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'hsl(var(--dc-border))'
-              }}
-            >
-              <option value="newest">Nieuwste eerst</option>
-              <option value="oldest">Oudste eerst</option>
-              <option value="viewCount">Populairste</option>
-              <option value="readTime">Kortste leestijd</option>
-            </select>
+          {/* Sort and View Controls - Above Blog Grid */}
+          <div className="mb-6 flex items-center justify-between gap-3">
+            {/* Sort Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
+                onBlur={() => setTimeout(() => setSortDropdownOpen(false), 200)}
+                style={{
+                  backgroundColor: 'hsl(var(--dc-brand))',
+                  color: 'hsl(var(--dc-on-primary))',
+                }}
+                className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-dc-focus"
+                aria-label="Sorteer opties"
+                aria-expanded={sortDropdownOpen}
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+                <span>Sorteren</span>
+                <ChevronDownIcon className="h-4 w-4" aria-hidden />
+              </button>
+              {sortDropdownOpen && (
+                <div
+                  className="absolute left-0 top-full mt-2 rounded-lg shadow-lg z-10 min-w-[200px]"
+                  style={{
+                    backgroundColor: 'hsl(var(--dc-surface))',
+                    border: '1px solid hsl(var(--dc-border))',
+                  }}
+                >
+                  <button
+                    onClick={() => { handleSortChange('newest'); setSortDropdownOpen(false) }}
+                    className="w-full text-left px-4 py-2 text-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:pl-5 first:rounded-t-lg flex items-center gap-2"
+                    style={{ color: 'hsl(var(--dc-text))' }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: currentSort === 'newest' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
+                    Nieuwste eerst
+                  </button>
+                  <button
+                    onClick={() => { handleSortChange('oldest'); setSortDropdownOpen(false) }}
+                    className="w-full text-left px-4 py-2 text-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:pl-5 flex items-center gap-2"
+                    style={{ color: 'hsl(var(--dc-text))' }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: currentSort === 'oldest' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
+                    Oudste eerst
+                  </button>
+                  <button
+                    onClick={() => { handleSortChange('viewCount'); setSortDropdownOpen(false) }}
+                    className="w-full text-left px-4 py-2 text-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:pl-5 flex items-center gap-2"
+                    style={{ color: 'hsl(var(--dc-text))' }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: currentSort === 'viewCount' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
+                    Populairste
+                  </button>
+                  <button
+                    onClick={() => { handleSortChange('readTime'); setSortDropdownOpen(false) }}
+                    className="w-full text-left px-4 py-2 text-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:pl-5 last:rounded-b-lg flex items-center gap-2"
+                    style={{ color: 'hsl(var(--dc-text))' }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: currentSort === 'readTime' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
+                    Kortste leestijd
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* View Selector */}
+            <div className="relative">
+              <button
+                onClick={() => setViewDropdownOpen(!viewDropdownOpen)}
+                onBlur={() => setTimeout(() => setViewDropdownOpen(false), 200)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'hsl(var(--dc-brand))'
+                  e.currentTarget.style.color = 'hsl(var(--dc-brand))'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'hsl(var(--dc-border))'
+                  e.currentTarget.style.color = 'hsl(var(--dc-text))'
+                }}
+                style={{
+                  backgroundColor: 'hsl(var(--dc-surface-98))',
+                  borderColor: 'hsl(var(--dc-border))',
+                  color: 'hsl(var(--dc-text))',
+                }}
+                className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 hover:bg-[hsl(var(--dc-surface-90))] hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-dc-focus"
+                aria-label="Weergave opties"
+                aria-expanded={viewDropdownOpen}
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                <span>Weergave</span>
+                <ChevronDownIcon className="h-4 w-4" aria-hidden />
+              </button>
+              {viewDropdownOpen && (
+                <div
+                  className="absolute right-0 top-full mt-2 rounded-lg shadow-lg z-10 min-w-[150px]"
+                  style={{
+                    backgroundColor: 'hsl(var(--dc-surface))',
+                    border: '1px solid hsl(var(--dc-border))',
+                  }}
+                >
+                  <button
+                    onClick={() => { setViewMode('grid'); setViewDropdownOpen(false) }}
+                    className="w-full text-left px-4 py-2 text-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:pl-5 first:rounded-t-lg flex items-center gap-2"
+                    style={{ color: 'hsl(var(--dc-text))' }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: viewMode === 'grid' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
+                    Raster
+                  </button>
+                  <button
+                    onClick={() => { setViewMode('list'); setViewDropdownOpen(false) }}
+                    className="w-full text-left px-4 py-2 text-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:pl-5 last:rounded-b-lg flex items-center gap-2"
+                    style={{ color: 'hsl(var(--dc-text))' }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: viewMode === 'list' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
+                    Lijst
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Blog Posts Grid */}

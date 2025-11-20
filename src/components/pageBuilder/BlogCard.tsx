@@ -81,7 +81,7 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
       }}
     >
       {imageUrl ? (
-        <div className={`relative overflow-hidden ${borderRadius === 'small' ? 'rounded-t-xl' : 'rounded-t-3xl'}`} style={{backgroundColor: tokenToCss('bg-soft'), maxHeight: '220px'}}>
+        <div className={`relative overflow-hidden ${borderRadius === 'small' ? 'rounded-t-xl' : 'rounded-t-3xl'}`} style={{backgroundColor: '#ffffff', maxHeight: '220px'}}>
           <div className="relative w-full transition-transform duration-300 group-hover:scale-[1.03]">
             <Image
               src={imageUrl}
@@ -200,7 +200,9 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
                   style={{ borderRadius: '2px', pointerEvents: 'none' }}
                 />
               </span>
-              <span aria-hidden>→</span>
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
+              </svg>
           </span>
         </div>
       </div>
