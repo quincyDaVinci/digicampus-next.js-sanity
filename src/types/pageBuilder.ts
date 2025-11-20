@@ -105,10 +105,16 @@ export interface BlogCardResolvedPost {
   slug?: string
   publishedAt?: string
   summary?: string
+  body?: unknown
+  estimatedReadTime?: number
   mainImage?: BackgroundComponent['image']
   author?: {
     name?: string
+    role?: string
+    company?: string
+    image?: BackgroundComponent['image']
   }
+  categories?: { title?: string; slug?: string }[]
 }
 
 export interface BlogCardComponent {
@@ -119,6 +125,9 @@ export interface BlogCardComponent {
   limit?: number
   ctaLabel?: string
   tone?: 'surface' | 'accent' | 'contrast'
+  gridMode?: 'default' | 'single' // 'default' = 3 columns, 'single' = 1 column
+  showAuthor?: boolean // Whether to show author info
+  borderRadius?: 'default' | 'small' // 'default' = rounded-3xl, 'small' = rounded-xl
   resolvedPost?: BlogCardResolvedPost | BlogCardResolvedPost[] | null
 }
 

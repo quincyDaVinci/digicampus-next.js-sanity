@@ -181,6 +181,10 @@ html{font-size:100%;-webkit-text-size-adjust:100%}
 .hover-dc-soft:hover{background-color:hsl(var(--dc-text)/0.06)}
 .ring-dc-focus:focus-visible{outline:none;box-shadow:0 0 0 4px hsl(var(--dc-focus))}
 
+/* Keyboard-only focus for select elements */
+.select-focus-visible{outline:none}
+.select-focus-visible:focus-visible{outline:2px solid hsl(var(--dc-focus));outline-offset:2px}
+
 /* small utilities for legacy patterns */
 .divider-dc{background-color:hsl(var(--dc-border)/0.2)}
 

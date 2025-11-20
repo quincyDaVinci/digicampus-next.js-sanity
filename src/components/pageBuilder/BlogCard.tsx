@@ -57,7 +57,7 @@ function calculateReadTimeFromBody(body: unknown): number | undefined {
   return wordCount > 0 ? Math.max(1, Math.round(wordCount / 200)) : undefined
 }
 
-function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLabel: string; tone: NonNullable<BlogCardComponent['tone']>}) {
+function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = 'default'}: {post: BlogCardResolvedPost; ctaLabel: string; tone: NonNullable<BlogCardComponent['tone']>; showAuthor?: boolean; borderRadius?: 'default' | 'small'}) {
   const style = toneStyles[tone]
   const href = post.slug ? `/blog/${post.slug}` : '#'
   const isInternal = href.startsWith('/')
@@ -70,9 +70,10 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
   const estimatedReadTime = post.estimatedReadTime ?? calculateReadTimeFromBody(post.body)
   const ClockIconComponent = getFeatherIcon('clock')
 
+  const roundedClass = borderRadius === 'small' ? 'rounded-xl' : 'rounded-3xl'
   const CardInner = (
     <article
-      className="group flex h-full flex-col rounded-3xl shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-within:ring-4 focus-within:ring-[hsl(var(--dc-focus))]"
+      className={`group flex h-full flex-col ${roundedClass} shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-within:ring-4 focus-within:ring-[hsl(var(--dc-focus))]`}
       style={{
         background: style.background,
         border: `1px solid ${style.border}`,
@@ -80,16 +81,16 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
       }}
     >
       {imageUrl ? (
-        <div className="relative overflow-hidden rounded-t-3xl" style={{backgroundColor: tokenToCss('bg-soft')}}>
-          <div className="relative transition-transform duration-300 group-hover:scale-[1.03]" style={{ marginBottom: '-2px' }}>
+        <div className={`relative overflow-hidden ${borderRadius === 'small' ? 'rounded-t-xl' : 'rounded-t-3xl'}`} style={{backgroundColor: tokenToCss('bg-soft'), maxHeight: '220px'}}>
+          <div className="relative w-full transition-transform duration-300 group-hover:scale-[1.03]">
             <Image
               src={imageUrl}
               alt={post.mainImage?.alt || ''}
               width={800}
-              height={520}
-              className="block h-auto w-full object-cover"
+              height={220}
+              className="block h-[220px] w-full object-cover"
               priority={false}
-              style={{ display: 'block', marginBottom: '-1px' }}
+              style={{ display: 'block', width: '100%' }}
             />
             {/* Base overlay - always visible with subtle gradient */}
             <div
@@ -98,7 +99,7 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
                 top: 0,
                 left: 0,
                 right: 0,
-                bottom: '-6px',
+                bottom: 0,
                 background: 'linear-gradient(to top, rgba(0, 0, 0, 0.3) 0%, transparent 50%)',
               }}
               aria-hidden="true"
@@ -110,7 +111,7 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
                 top: 0,
                 left: 0,
                 right: 0,
-                bottom: '-6px',
+                bottom: 0,
                 background:
                   'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 60%, rgba(0, 0, 0, 0.2) 85%, transparent 100%)',
               }}
@@ -119,9 +120,7 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
             {/* Content layer - above both overlays */}
             <div
               className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-end p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              style={{
-                color: '#ffffff',
-              }}
+              style={{ color: '#ffffff' }}
               aria-hidden="true"
             >
               <div className="flex items-end justify-between gap-4">
@@ -144,11 +143,7 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
                       {ClockIconComponent ? <ClockIconComponent aria-hidden className="h-4 w-4" /> : null}
                       <span>{estimatedReadTime} min leestijd</span>
                     </div>
-                  ) : (
-                    <div className="inline-flex items-center gap-1.5 text-xs italic opacity-75">
-                      Leestijd niet beschikbaar
-                    </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -162,8 +157,8 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
             <p className="text-sm leading-relaxed text-[hsl(var(--dc-text)/0.85)]">{post.summary}</p>
           ) : null}
         </div>
-        {(post.author?.name || post.author?.role) && (
-          <div className="mt-auto flex items-center justify-between gap-3">
+        <div className="mt-auto flex items-center justify-between gap-3">
+          {showAuthor && (post.author?.name || post.author?.role) && (
             <div className="flex items-center gap-3">
               {authorImageUrl ? (
                 <Image
@@ -193,12 +188,21 @@ function BlogCardItem({post, ctaLabel, tone}: {post: BlogCardResolvedPost; ctaLa
                 ) : null}
               </div>
             </div>
-            <span className="inline-flex items-center gap-2 text-sm font-semibold whitespace-nowrap">
-              {ctaLabel}
+          )}
+          <span
+            className="inline-flex items-center gap-2 text-sm font-semibold whitespace-nowrap relative transition-colors duration-200 group-hover:text-[hsl(var(--dc-brand))] group-focus-within:text-[hsl(var(--dc-brand))]"
+          >
+              <span className="relative">
+                {ctaLabel}
+                <span
+                  aria-hidden
+                  className="absolute left-0 -bottom-0.5 h-0.5 w-full origin-left scale-x-0 bg-[hsl(var(--dc-brand))] transition-transform duration-300 group-hover:scale-x-100 group-focus-within:scale-x-100"
+                  style={{ borderRadius: '2px', pointerEvents: 'none' }}
+                />
+              </span>
               <span aria-hidden>→</span>
-            </span>
-          </div>
-        )}
+          </span>
+        </div>
       </div>
     </article>
   )
@@ -225,6 +229,9 @@ export default function BlogCard({component}: BlogCardProps) {
       : []
   const tone = component.tone ?? 'surface'
   const ctaLabel = component.ctaLabel ?? 'Lees meer'
+  const gridMode = component.gridMode ?? 'default'
+  const showAuthor = component.showAuthor ?? true
+  const borderRadius = component.borderRadius ?? 'default'
 
   if (posts.length === 0) {
     return (
@@ -234,10 +241,14 @@ export default function BlogCard({component}: BlogCardProps) {
     )
   }
 
+  const gridClass = gridMode === 'single' 
+    ? 'grid gap-6 grid-cols-1'
+    : 'grid gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3'
+
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className={gridClass}>
       {posts.map((post) => (
-        <BlogCardItem key={post._id} post={post} ctaLabel={ctaLabel} tone={tone} />
+        <BlogCardItem key={post._id} post={post} ctaLabel={ctaLabel} tone={tone} showAuthor={showAuthor} borderRadius={borderRadius} />
       ))}
     </div>
   )

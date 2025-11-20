@@ -81,17 +81,23 @@ export default defineType({
             }
 
             let wordCount = 0
-            const traverse = (blocks) => {
-              blocks.forEach((block) => {
-                if (block && typeof block === 'object' && block._type === 'block' && block.children) {
-                  block.children.forEach((child) => {
-                    if (child && typeof child === 'object' && child.text && typeof child.text === 'string') {
-                      wordCount += child.text.split(/\s+/).filter(Boolean).length
-                    }
-                  })
-                }
-                if (block && typeof block === 'object' && block.children && Array.isArray(block.children)) {
-                  traverse(block.children)
+            const traverse = (blocks: unknown[]) => {
+              blocks.forEach((block: unknown) => {
+                if (block && typeof block === 'object' && 'children' in block) {
+                  const typedBlock = block as {_type?: string; children?: unknown[]}
+                  if (typedBlock._type === 'block' && Array.isArray(typedBlock.children)) {
+                    typedBlock.children.forEach((child: unknown) => {
+                      if (child && typeof child === 'object' && 'text' in child) {
+                        const typedChild = child as {text?: unknown}
+                        if (typeof typedChild.text === 'string') {
+                          wordCount += typedChild.text.split(/\s+/).filter(Boolean).length
+                        }
+                      }
+                    })
+                  }
+                  if (Array.isArray(typedBlock.children)) {
+                    traverse(typedBlock.children)
+                  }
                 }
               })
             }
@@ -143,6 +149,14 @@ export default defineType({
       type: 'boolean',
       initialValue: false,
       description: 'Markeer dit bericht als uitgelicht voor speciale weergave.',
+    }),
+    defineField({
+      name: 'viewCount',
+      title: 'Aantal weergaven',
+      type: 'number',
+      initialValue: 0,
+      description: 'Het aantal keer dat dit bericht is bekeken (voor populariteit).',
+      validation: (Rule) => Rule.min(0).integer(),
     }),
     defineField({
       name: 'excerpt',

@@ -23,6 +23,18 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'role',
+      title: 'Functie',
+      type: 'string',
+      description: 'Bijvoorbeeld: Content Marketeer, Senior Developer, etc.',
+    }),
+    defineField({
+      name: 'company',
+      title: 'Bedrijf',
+      type: 'string',
+      description: 'De organisatie waar de auteur werkt',
+    }),
+    defineField({
       name: 'image',
       title: 'Afbeelding',
       type: 'image',

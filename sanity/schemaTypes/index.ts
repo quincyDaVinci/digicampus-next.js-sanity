@@ -4,6 +4,7 @@ import type {SchemaPluginOptions} from 'sanity'
 import site from './documents/site'
 import page from './documents/page'
 import homePage from './documents/homePage'
+import blogPage from './documents/blogPage'
 import blogPost from './documents/blogPost'
 import blogCategory from './documents/blogCategory'
 import navigation from './documents/navigation'
@@ -35,6 +36,7 @@ export const schema: SchemaPluginOptions = {
     site,
     page,
     homePage,
+    blogPage,
     blogPost,
     blogCategory,
     navigation,
@@ -63,4 +65,4 @@ export const schema: SchemaPluginOptions = {
 }
 
 // Document types that should only have one instance
-const singletonTypes = ['site', 'homePage', 'navigation']
+const singletonTypes = ['site', 'homePage', 'blogPage', 'navigation']

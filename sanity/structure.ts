@@ -58,6 +58,16 @@ export const structure: StructureResolver = (S) =>
           S.list()
             .title('Blog')
             .items([
+              // Blog Page (Singleton)
+              S.listItem()
+                .title('Blogpagina-instellingen')
+                .icon(SettingsIcon)
+                .child(
+                  S.document()
+                    .schemaType('blogPage')
+                    .documentId('blogPage')
+                ),
+              S.divider(),
               S.listItem()
                 .title('Blogs')
                 .icon(BookOpenIcon)

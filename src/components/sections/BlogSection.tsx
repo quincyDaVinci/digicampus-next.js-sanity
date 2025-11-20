@@ -116,6 +116,7 @@ export default function BlogSection(props: BlogSectionProps) {
     _key: "blog-section",
     tone,
     ctaLabel,
+    borderRadius: 'small',
     resolvedPost: posts,
   }), [posts, tone, ctaLabel]);
 
@@ -133,11 +134,11 @@ export default function BlogSection(props: BlogSectionProps) {
 
         <div className="mt-12" aria-live="polite">
           {isLoading ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3">
               {Array.from({ length: Math.min(resolvedLimit, 3) }).map((_, index) => (
                 <div
                   key={`skeleton-${index}`}
-                  className="h-80 animate-pulse rounded-3xl bg-[hsl(var(--dc-surface))/0.6]"
+                  className="h-80 animate-pulse rounded-xl bg-[hsl(var(--dc-surface))/0.6]"
                 />
               ))}
             </div>

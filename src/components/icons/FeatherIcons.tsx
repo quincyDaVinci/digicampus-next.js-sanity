@@ -109,6 +109,14 @@ export const ChevronDownIcon = createIcon(
   <polyline points="6 9 12 15 18 9" />
 )
 
+export const ChevronLeftIcon = createIcon(
+  <polyline points="15 18 9 12 15 6" />
+)
+
+export const ChevronRightIcon = createIcon(
+  <polyline points="9 18 15 12 9 6" />
+)
+
 export const ArrowRightIcon = createIcon(
   <>
     <line x1="5" y1="12" x2="19" y2="12" />
@@ -274,6 +282,8 @@ export type FeatherSymbol =
   | 'menu'
   | 'close'
   | 'chevron-down'
+  | 'chevron-left'
+  | 'chevron-right'
   | 'arrow-right'
   | 'users'
   | 'file-text'
@@ -304,6 +314,8 @@ export const featherIconMap: Record<FeatherSymbol, FeatherIconComponent> = {
   menu: MenuIcon,
   close: CloseIcon,
   'chevron-down': ChevronDownIcon,
+  'chevron-left': ChevronLeftIcon,
+  'chevron-right': ChevronRightIcon,
   'arrow-right': ArrowRightIcon,
   users: UsersIcon,
   'file-text': FileTextIcon,
