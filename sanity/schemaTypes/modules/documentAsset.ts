@@ -37,7 +37,13 @@ export default defineType({
       title: 'Document Language',
       type: 'string',
       description: 'Language of the document content (e.g., en, nl).',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.required().custom((value) => {
+          if (!value) return true
+          // Match ISO 639-1 (2 letters) or BCP 47 (e.g., en-US)
+          const languageCodePattern = /^[a-z]{2}(-[A-Z]{2})?$/
+          return languageCodePattern.test(value) || 'Please use a valid language code (e.g., "en", "nl", "en-US")'
+        }),
       group: 'content',
     }),
     defineField({
