@@ -72,7 +72,7 @@ export default defineType({
     defineField({
       name: 'metadata',
       type: 'metadata',
-      description: 'SEO-instellingen en URL-configuratie',
+      description: 'SEO-instellingen (de blogpagina is altijd toegankelijk via /blog)',
       group: 'metadata',
     }),
   ],

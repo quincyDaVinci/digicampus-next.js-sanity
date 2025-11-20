@@ -33,9 +33,14 @@ export default defineType({
         source: (doc: any) => doc.title || doc.metadata?.title,
         maxLength: 96,
       },
+      hidden: ({document}) => document?._type === 'homePage' || document?._type === 'blogPage',
       validation: (Rule) => Rule.custom((slug, context) => {
         // Homepage doesn't need a slug (always renders at /)
         if (context.document?._type === 'homePage') {
+          return true
+        }
+        // BlogPage doesn't need a slug (fixed route at /blog)
+        if (context.document?._type === 'blogPage') {
           return true
         }
         // For regular pages, slug is required
