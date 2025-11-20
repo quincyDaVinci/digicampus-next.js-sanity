@@ -64,7 +64,7 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
   const formattedDate = post.publishedAt
     ? new Intl.DateTimeFormat('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'}).format(new Date(post.publishedAt))
     : null
-  const imageUrl = post.mainImage?.asset ? urlFor(post.mainImage).width(800).height(520).fit('crop').auto('format').url() : null
+  const imageUrl = post.mainImage?.asset ? urlFor(post.mainImage).width(800).height(520).auto('format').url() : null
   const authorImageUrl = post.author?.image?.asset ? urlFor(post.author.image).width(96).height(96).fit('crop').auto('format').url() : null
   const categories = post.categories || []
   const estimatedReadTime = post.estimatedReadTime ?? calculateReadTimeFromBody(post.body)

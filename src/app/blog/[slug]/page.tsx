@@ -128,7 +128,7 @@ export default async function BlogPostPage({params}: PageProps) {
       : null
 
     const imageUrl = post.mainImage?.asset
-      ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
+      ? urlFor(post.mainImage).width(1200).auto('format').url()
       : null
 
     const authorImageUrl = post.author?.image?.asset
@@ -191,7 +191,7 @@ export default async function BlogPostPage({params}: PageProps) {
         {post.author && (
           <Link
             href={`/auteur/${post.author._id}`}
-            className="mb-8 flex items-center gap-4 rounded-2xl p-4 transition-all hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--dc-focus))] focus-visible:ring-offset-2"
+            className="group mb-8 flex items-center gap-4 rounded-2xl p-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:bg-[hsl(var(--dc-surface-90))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--dc-focus))] focus-visible:ring-offset-2"
             style={{backgroundColor: 'hsl(var(--dc-surface-98))', border: '1px solid hsl(var(--dc-border) / 0.2)'}}
           >
             {authorImageUrl ? (
@@ -200,7 +200,7 @@ export default async function BlogPostPage({params}: PageProps) {
                 alt={post.author.name}
                 width={64}
                 height={64}
-                className="h-16 w-16 rounded-full object-cover ring-2 ring-[hsl(var(--dc-border)/0.4)]"
+                className="h-16 w-16 rounded-full object-cover ring-2 ring-[hsl(var(--dc-border)/0.4)] transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
               <div
@@ -230,13 +230,14 @@ export default async function BlogPostPage({params}: PageProps) {
 
         {/* Main image */}
         {imageUrl && (
-          <div className="mb-12 overflow-hidden rounded-2xl" style={{backgroundColor: '#ffffff'}}>
+          <div className="mb-12 overflow-hidden rounded-2xl" style={{backgroundColor: '#ffffff', maxHeight: '500px'}}>
             <Image
               src={imageUrl}
               alt={post.mainImage?.alt || post.title}
               width={1200}
               height={630}
-              className="w-full object-cover"
+              className="w-full h-full object-cover"
+              style={{maxHeight: '500px'}}
               priority
             />
           </div>
