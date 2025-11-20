@@ -104,12 +104,15 @@ export default defineType({
     select: {
       title: 'title',
       language: 'language',
-      hasHtml: 'htmlAlternativeUrl',
+      hasHtmlUrl: 'htmlAlternativeUrl',
+      hasHtmlPortableText: 'htmlAlternativePortableText',
     },
-    prepare: ({title, language, hasHtml}) => ({
-      title: title || 'Accessible document',
-      subtitle: language ? `${language.toUpperCase()}${hasHtml ? ' • HTML alternative' : ''}` : undefined,
-      media: FileTextIcon,
-    }),
-  },
+    prepare: ({title, language, hasHtmlUrl, hasHtmlPortableText}) => {
+      const hasHtmlAlternative = hasHtmlUrl || (hasHtmlPortableText?.length ?? 0) > 0
+      return {
+        title: title || 'Accessible document',
+        subtitle: language ? `${language.toUpperCase()}${hasHtmlAlternative ? ' • HTML alternative' : ''}` : undefined,
+        media: FileTextIcon,
+      }
+    },
 })
