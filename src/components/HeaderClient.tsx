@@ -163,16 +163,28 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
               <div key={m.label} className="relative">
                 <button aria-expanded={openIndex === menus.indexOf(m)} aria-controls={`menu-${menus.indexOf(m)}`} onClick={() => setOpenIndex(openIndex === menus.indexOf(m) ? null : menus.indexOf(m))} className="inline-flex items-center gap-2 rounded-lg px-2 py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] whitespace-nowrap transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" aria-label={m.label}>
                   <span className="no-wrap text-fluid-md" aria-hidden>{m.label}</span>
-                  <ChevronDownIcon aria-hidden focusable="false" className="h-4 w-4" />
+                  <ChevronDownIcon aria-hidden focusable="false" className={`h-4 w-4 transition-transform duration-200 ${openIndex === menus.indexOf(m) ? 'rotate-180' : ''}`} />
                 </button>
 
-                <div id={`menu-${menus.indexOf(m)}`} role="menu" className={["absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl transition-opacity duration-150 motion-reduce:transition-none", openIndex === menus.indexOf(m) ? "opacity-100" : "opacity-0 pointer-events-none"].join(" ")} style={{ backgroundColor: 'hsl(var(--dc-surface) / 0.98)', border: '1px solid hsl(var(--dc-border) / 0.1)', color: 'hsl(var(--dc-text))' }}>
-                  <ul className="py-2">
+                {openIndex === menus.indexOf(m) && (
+                  <div id={`menu-${menus.indexOf(m)}`} role="menu" className="absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 duration-200" style={{ backgroundColor: 'hsl(var(--dc-surface) / 0.98)', border: '1px solid hsl(var(--dc-border) / 0.1)', color: 'hsl(var(--dc-text))' }}>
+                    <ul className="py-2">
                       {m.items.map((it, idx) => (
-                      <li key={`${m.label}-${idx}`}><Link href={it.href} role="menuitem" onClick={() => setOpenIndex(null)} className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" style={{ color: 'hsl(var(--dc-text))' }}>{it.label}</Link></li>
-                    ))}
-                  </ul>
-                </div>
+                        <li key={`${m.label}-${idx}`}>
+                          <Link 
+                            href={it.href} 
+                            role="menuitem" 
+                            onClick={() => setOpenIndex(null)} 
+                            className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:pl-5" 
+                            style={{ color: 'hsl(var(--dc-text))' }}
+                          >
+                            {it.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             ))}
           </div>

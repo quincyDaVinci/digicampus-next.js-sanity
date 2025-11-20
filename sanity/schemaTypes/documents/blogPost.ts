@@ -51,6 +51,7 @@ export default defineType({
       title: 'Categorieën',
       type: 'array',
       of: [{type: 'reference', to: {type: 'blogCategory'}}],
+      validation: (Rule) => Rule.max(3).warning('Maximum 3 categorieën aanbevolen voor een overzichtelijke weergave'),
     }),
     defineField({
       name: 'publishedAt',

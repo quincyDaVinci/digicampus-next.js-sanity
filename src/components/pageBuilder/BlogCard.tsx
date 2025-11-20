@@ -66,7 +66,7 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
     : null
   const imageUrl = post.mainImage?.asset ? urlFor(post.mainImage).width(800).height(520).fit('crop').auto('format').url() : null
   const authorImageUrl = post.author?.image?.asset ? urlFor(post.author.image).width(96).height(96).fit('crop').auto('format').url() : null
-  const firstCategory = post.categories?.[0]?.title
+  const categories = post.categories || []
   const estimatedReadTime = post.estimatedReadTime ?? calculateReadTimeFromBody(post.body)
   const ClockIconComponent = getFeatherIcon('clock')
 
@@ -124,14 +124,17 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
               aria-hidden="true"
             >
               <div className="flex items-end justify-between gap-4">
-                <div>
-                  {firstCategory ? (
-                    <span className="inline-block rounded-full bg-[rgba(255,255,255,0.2)] px-3 py-1 text-sm font-medium backdrop-blur-sm">
-                      {firstCategory}
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((category) => (
+                    <span 
+                      key={category._id}
+                      className="inline-block rounded-full bg-[rgba(255,255,255,0.2)] px-3 py-1 text-sm font-medium backdrop-blur-sm"
+                    >
+                      {category.title}
                     </span>
-                  ) : null}
+                  ))}
                 </div>
-                <div className="flex flex-col items-end gap-1.5 text-sm font-medium">
+                <div className="flex flex-col items-end gap-1.5 text-sm font-medium shrink-0">
                   {formattedDate ? (
                     <div className="inline-flex items-center gap-1.5">
                       <CalendarIcon aria-hidden className="h-4 w-4" />
