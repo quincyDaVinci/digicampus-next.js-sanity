@@ -88,7 +88,7 @@ export default function ButtonBlock({component}: ButtonBlockProps) {
   const ariaLabel = component.ariaLabel || component.link.label
   const accessibleHref = component.accessibleVersionUrl?.trim()
   const href = accessibleHref || component.link.href
-  const isPdfTarget = component.isPdf ?? /\.pdf(?:$|[?#])/i.test(href)
+  const isPdfTarget = component.isPdf ?? /\.pdf(?:$|[?#])/i.test(component.link.href)
   const hasAccessiblePdf = Boolean(accessibleHref)
   const showAccessibleBadge = hasAccessiblePdf && isPdfTarget
   const isInternal = /^\//.test(href)
