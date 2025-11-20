@@ -178,12 +178,14 @@ export default function BlogPageClient({
               if (currentCategory) {
                 e.currentTarget.style.borderColor = 'hsl(var(--dc-brand))'
                 e.currentTarget.style.color = 'hsl(var(--dc-brand))'
+                e.currentTarget.style.boxShadow = 'inset 0 0 0 1px hsl(var(--dc-brand))'
               }
             }}
             onMouseLeave={(e) => {
               if (currentCategory) {
                 e.currentTarget.style.borderColor = 'hsl(var(--dc-border))'
                 e.currentTarget.style.color = 'hsl(var(--dc-text))'
+                e.currentTarget.style.boxShadow = 'none'
               }
             }}
             aria-pressed={!currentCategory}
@@ -198,18 +200,21 @@ export default function BlogPageClient({
                 backgroundColor: currentCategory === category.slug ? 'hsl(var(--dc-brand))' : 'hsl(var(--dc-surface-98))',
                 borderColor: currentCategory === category.slug ? 'hsl(var(--dc-brand))' : 'hsl(var(--dc-border))',
                 color: currentCategory === category.slug ? 'hsl(var(--dc-on-primary))' : 'hsl(var(--dc-text))',
+                transition: 'border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease'
               }}
               className="rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-dc-focus"
               onMouseEnter={(e) => {
                 if (currentCategory !== category.slug) {
                   e.currentTarget.style.borderColor = 'hsl(var(--dc-brand))'
                   e.currentTarget.style.color = 'hsl(var(--dc-brand))'
+                  e.currentTarget.style.boxShadow = 'inset 0 0 0 1px hsl(var(--dc-brand))'
                 }
               }}
               onMouseLeave={(e) => {
                 if (currentCategory !== category.slug) {
                   e.currentTarget.style.borderColor = 'hsl(var(--dc-border))'
                   e.currentTarget.style.color = 'hsl(var(--dc-text))'
+                  e.currentTarget.style.boxShadow = 'none'
                 }
               }}
               aria-pressed={currentCategory === category.slug}
@@ -250,11 +255,24 @@ export default function BlogPageClient({
               <button
                 onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
                 onBlur={() => setTimeout(() => setSortDropdownOpen(false), 200)}
-                style={{
-                  backgroundColor: 'hsl(var(--dc-brand))',
-                  color: 'hsl(var(--dc-on-primary))',
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'hsl(var(--dc-brand))'
+                  e.currentTarget.style.borderColor = 'hsl(var(--dc-brand))'
+                  e.currentTarget.style.color = 'hsl(var(--dc-on-primary))'
                 }}
-                className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-dc-focus"
+                onMouseLeave={(e) => {
+                  if (!sortDropdownOpen) {
+                    e.currentTarget.style.backgroundColor = 'hsl(var(--dc-surface-98))'
+                    e.currentTarget.style.borderColor = 'hsl(var(--dc-border))'
+                    e.currentTarget.style.color = 'hsl(var(--dc-text))'
+                  }
+                }}
+                style={{
+                  backgroundColor: sortDropdownOpen ? 'hsl(var(--dc-brand))' : 'hsl(var(--dc-surface-98))',
+                  borderColor: sortDropdownOpen ? 'hsl(var(--dc-brand))' : 'hsl(var(--dc-border))',
+                  color: sortDropdownOpen ? 'hsl(var(--dc-on-primary))' : 'hsl(var(--dc-text))',
+                }}
+                className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-dc-focus"
                 aria-label="Sorteer opties"
                 aria-expanded={sortDropdownOpen}
               >
@@ -262,11 +280,11 @@ export default function BlogPageClient({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                 </svg>
                 <span>Sorteren</span>
-                <ChevronDownIcon className="h-4 w-4" aria-hidden />
+                <ChevronDownIcon className={`h-4 w-4 transition-transform duration-200 ${sortDropdownOpen ? 'rotate-180' : ''}`} aria-hidden />
               </button>
               {sortDropdownOpen && (
                 <div
-                  className="absolute left-0 top-full mt-2 rounded-lg shadow-lg z-10 min-w-[200px]"
+                  className="absolute left-0 top-full mt-2 rounded-lg shadow-lg z-10 min-w-[200px] animate-in fade-in slide-in-from-top-2 duration-200"
                   style={{
                     backgroundColor: 'hsl(var(--dc-surface))',
                     border: '1px solid hsl(var(--dc-border))',
@@ -314,19 +332,23 @@ export default function BlogPageClient({
                 onClick={() => setViewDropdownOpen(!viewDropdownOpen)}
                 onBlur={() => setTimeout(() => setViewDropdownOpen(false), 200)}
                 onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'hsl(var(--dc-brand))'
                   e.currentTarget.style.borderColor = 'hsl(var(--dc-brand))'
-                  e.currentTarget.style.color = 'hsl(var(--dc-brand))'
+                  e.currentTarget.style.color = 'hsl(var(--dc-on-primary))'
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'hsl(var(--dc-border))'
-                  e.currentTarget.style.color = 'hsl(var(--dc-text))'
+                  if (!viewDropdownOpen) {
+                    e.currentTarget.style.backgroundColor = 'hsl(var(--dc-surface-98))'
+                    e.currentTarget.style.borderColor = 'hsl(var(--dc-border))'
+                    e.currentTarget.style.color = 'hsl(var(--dc-text))'
+                  }
                 }}
                 style={{
-                  backgroundColor: 'hsl(var(--dc-surface-98))',
-                  borderColor: 'hsl(var(--dc-border))',
-                  color: 'hsl(var(--dc-text))',
+                  backgroundColor: viewDropdownOpen ? 'hsl(var(--dc-brand))' : 'hsl(var(--dc-surface-98))',
+                  borderColor: viewDropdownOpen ? 'hsl(var(--dc-brand))' : 'hsl(var(--dc-border))',
+                  color: viewDropdownOpen ? 'hsl(var(--dc-on-primary))' : 'hsl(var(--dc-text))',
                 }}
-                className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 hover:bg-[hsl(var(--dc-surface-90))] hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-dc-focus"
+                className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-dc-focus"
                 aria-label="Weergave opties"
                 aria-expanded={viewDropdownOpen}
               >
@@ -337,11 +359,11 @@ export default function BlogPageClient({
                   <rect x="3" y="14" width="7" height="7" />
                 </svg>
                 <span>Weergave</span>
-                <ChevronDownIcon className="h-4 w-4" aria-hidden />
+                <ChevronDownIcon className={`h-4 w-4 transition-transform duration-200 ${viewDropdownOpen ? 'rotate-180' : ''}`} aria-hidden />
               </button>
               {viewDropdownOpen && (
                 <div
-                  className="absolute right-0 top-full mt-2 rounded-lg shadow-lg z-10 min-w-[150px]"
+                  className="absolute right-0 top-full mt-2 rounded-lg shadow-lg z-10 min-w-[150px] animate-in fade-in slide-in-from-top-2 duration-200"
                   style={{
                     backgroundColor: 'hsl(var(--dc-surface))',
                     border: '1px solid hsl(var(--dc-border))',
