@@ -115,4 +115,5 @@ export default defineType({
         media: FileTextIcon,
       }
     },
+  },
 })
