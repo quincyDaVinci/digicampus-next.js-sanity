@@ -81,6 +81,8 @@ interface ButtonBlockProps {
   component: ButtonComponent
 }
 
+const INACCESSIBLE_PDF_WARNING = 'PDF-bestand zonder toegankelijke versie beschikbaar'
+
 export default function ButtonBlock({component}: ButtonBlockProps) {
   const iconPosition = component.iconPosition ?? 'trailing'
   const icon = component.icon ? iconMap[component.icon] : null
@@ -88,17 +90,27 @@ export default function ButtonBlock({component}: ButtonBlockProps) {
   const ariaLabel = component.ariaLabel || component.link.label
   const accessibleHref = component.accessibleVersionUrl?.trim()
   const href = accessibleHref || component.link.href
-  const isPdfTarget = component.isPdf ?? /\.pdf(?:$|[?#])/i.test(href)
+  const isPdfTarget = component.isPdf ?? /\.pdf(?:$|[?#])/i.test(component.link.href)
   const hasAccessiblePdf = Boolean(accessibleHref)
   const showAccessibleBadge = hasAccessiblePdf && isPdfTarget
   const isInternal = /^\//.test(href)
+  
+  // Screen reader notifications
+  const inaccessiblePdfWarning = isPdfTarget && !hasAccessiblePdf ? (
+    <span className="sr-only"> ({INACCESSIBLE_PDF_WARNING})</span>
+  ) : null
+  
+  const accessibilityNoteElement = component.accessibilityNote ? (
+    <span className="sr-only"> {component.accessibilityNote}</span>
+  ) : null
+  
   const content = (
     <span className="flex items-center gap-2">
       {iconPosition !== 'trailing' && icon ? <span className="hy-btn__icon">{icon}</span> : null}
       <span className="hy-btn__label">{component.label}</span>
       {showAccessibleBadge ? (
-        <span className="ml-1 rounded bg-[hsl(var(--dc-bg-soft))] px-2 py-0.5 text-[11px] font-semibold text-[hsl(var(--dc-text))]">
-          Accessible PDF
+        <span className="ml-1 rounded bg-[hsl(var(--dc-bg-soft))] px-2 py-0.5 text-xs font-semibold text-[hsl(var(--dc-text))]">
+          Toegankelijke PDF
         </span>
       ) : null}
       {iconPosition !== 'leading' && icon ? <span className="hy-btn__icon">{icon}</span> : null}
@@ -109,10 +121,8 @@ export default function ButtonBlock({component}: ButtonBlockProps) {
     return (
       <Link href={href} aria-label={ariaLabel} className={styles.className} style={styles.style}>
         {content}
-        {isPdfTarget && !hasAccessiblePdf ? (
-          <span className="sr-only"> (PDF-bestand zonder toegankelijke versie beschikbaar)</span>
-        ) : null}
-        {component.accessibilityNote ? <span className="sr-only"> {component.accessibilityNote}</span> : null}
+        {inaccessiblePdfWarning}
+        {accessibilityNoteElement}
       </Link>
     )
   }
@@ -129,10 +139,8 @@ export default function ButtonBlock({component}: ButtonBlockProps) {
       rel={isExternal ? 'noopener noreferrer' : undefined}
     >
       {content}
-      {isPdfTarget && !hasAccessiblePdf ? (
-        <span className="sr-only"> (PDF-bestand zonder toegankelijke versie beschikbaar)</span>
-      ) : null}
-      {component.accessibilityNote ? <span className="sr-only"> {component.accessibilityNote}</span> : null}
+      {inaccessiblePdfWarning}
+      {accessibilityNoteElement}
       {isExternal ? <span className="sr-only"> (opent in nieuw venster)</span> : null}
     </a>
   )
