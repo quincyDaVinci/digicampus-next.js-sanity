@@ -28,6 +28,24 @@ export default defineType({
       },
       initialValue: 'action',
     }),
+    defineField({
+      name: 'isPdf',
+      title: 'Is dit een PDF-link?',
+      type: 'boolean',
+      description: 'Gebruik dit om PDF-doelen te markeren wanneer dat niet automatisch gedetecteerd wordt.',
+    }),
+    defineField({
+      name: 'accessibleVersionUrl',
+      title: 'Toegankelijke versie (URL)',
+      type: 'url',
+      description: 'Optioneel: link naar een toegankelijke versie van het document (bijv. niet-PDF of toegankelijk PDF).',
+    }),
+    defineField({
+      name: 'accessibilityNote',
+      title: 'Toegankelijkheidsopmerking',
+      type: 'string',
+      description: 'Extra schermlezer-notitie, bv. wanneer geen toegankelijke PDF beschikbaar is.',
+    }),
   ],
   preview: {
     select: {
