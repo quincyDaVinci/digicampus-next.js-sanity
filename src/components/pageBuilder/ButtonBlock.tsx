@@ -97,7 +97,7 @@ export default function ButtonBlock({component}: ButtonBlockProps) {
       {iconPosition !== 'trailing' && icon ? <span className="hy-btn__icon">{icon}</span> : null}
       <span className="hy-btn__label">{component.label}</span>
       {showAccessibleBadge ? (
-        <span className="ml-1 rounded bg-[hsl(var(--dc-bg-soft))] px-2 py-0.5 text-[11px] font-semibold text-[hsl(var(--dc-text))]">
+        <span className="ml-1 rounded bg-[hsl(var(--dc-bg-soft))] px-2 py-0.5 text-xs font-semibold text-[hsl(var(--dc-text))]">
           Toegankelijke PDF
         </span>
       ) : null}
