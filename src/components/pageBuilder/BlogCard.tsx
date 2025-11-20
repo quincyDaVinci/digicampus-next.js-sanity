@@ -125,14 +125,17 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
             >
               <div className="flex items-end justify-between gap-4">
                 <div className="flex flex-wrap gap-2">
-                  {categories.map((category) => (
-                    <span 
-                      key={category._id}
-                      className="inline-block rounded-full bg-[rgba(255,255,255,0.2)] px-3 py-1 text-sm font-medium backdrop-blur-sm"
-                    >
-                      {category.title}
-                    </span>
-                  ))}
+                  {categories.filter(Boolean).map((category, idx) => {
+                    const key = category._id || `${category.slug || 'cat'}-${idx}`
+                    return (
+                      <span
+                        key={key}
+                        className="inline-block rounded-full bg-[rgba(255,255,255,0.2)] px-3 py-1 text-sm font-medium backdrop-blur-sm"
+                      >
+                        {category.title}
+                      </span>
+                    )
+                  })}
                 </div>
                 <div className="flex flex-col items-end gap-1.5 text-sm font-medium shrink-0">
                   {formattedDate ? (

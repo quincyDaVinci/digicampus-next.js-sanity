@@ -46,7 +46,7 @@
 
 /* Dark theme tokens - toggle by applying .dark to body */
 .dark{
-  --dc-bg: 235 63% 10%;          /* #0E1026 */
+  --dc-bg: 235 63% 6%;          /* #0E1026 */
   --dc-bg-soft: 228 36% 14%;     /* #161A2F */
   --dc-surface: 228 36% 14%;     /* #161A2F */
 

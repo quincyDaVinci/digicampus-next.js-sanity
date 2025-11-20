@@ -164,6 +164,14 @@ export default defineType({
       title: 'Samenvatting',
       type: 'text',
       rows: 4,
+      description: 'Korte samenvatting voor kaarten (maximaal 75 woorden)',
+      validation: (Rule) => Rule
+        .custom((value) => {
+          if (!value) return true
+          const wordCount = value.trim().split(/\s+/).filter(Boolean).length
+          return wordCount <= 75 || `Maximaal 75 woorden aanbevolen (nu ${wordCount}).`
+        })
+        .warning(),
     }),
     defineField({
       name: 'body',
