@@ -35,7 +35,6 @@ export default defineType({
         {type: 'blogSection'},
         {type: 'testimonialsSection'},
         {type: 'pricingSection'},
-        {type: 'documentAsset'},
         {type: 'ctaSection'},
         {type: 'faqSection'},
         {type: 'contactSection'},
