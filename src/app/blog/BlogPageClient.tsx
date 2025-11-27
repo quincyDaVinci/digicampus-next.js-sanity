@@ -1,10 +1,11 @@
 'use client'
 
-import {useState, useRef, useMemo} from 'react'
+import {useState, useRef} from 'react'
 import {useRouter, useSearchParams} from 'next/navigation'
-import {CalendarIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, MenuIcon} from '@/components/icons/FeatherIcons'
+import {ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon} from '@/components/icons/FeatherIcons'
 import BlogCard from '@/components/pageBuilder/BlogCard'
 import type { BlogCardComponent, BlogCardResolvedPost } from '@/types/pageBuilder'
+import Breadcrumbs from '@/components/Breadcrumbs'
 
 type Category = {
   _id: string
@@ -155,6 +156,13 @@ export default function BlogPageClient({
 
   return (
     <main id="main" className="container mx-auto px-4 py-12">
+    <Breadcrumbs
+        items={[
+          {label: 'Home', href: '/'},
+          {label: 'Blog'},
+        ]}
+        className="mb-4"
+      />
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-3 text-dc">{title}</h1>

@@ -66,7 +66,21 @@ export default defineType({
       name: 'footerContent',
       title: 'Footer-inhoud',
       type: 'array',
-      of: [{type: 'block'}],
+      of: [
+        {type: 'block'},
+        {
+          type: 'image',
+          options: {hotspot: true},
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alternatieve tekst',
+              validation: (Rule) => Rule.required(),
+            },
+          ],
+        },
+      ],
       description: 'Rijke-tekstinhoud voor de footer',
       group: 'info',
     }),
@@ -74,7 +88,21 @@ export default defineType({
       name: 'copyright',
       title: 'Copyright-tekst',
       type: 'array',
-      of: [{type: 'block'}],
+      of: [
+        {type: 'block'},
+        {
+          type: 'image',
+          options: {hotspot: true},
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alternatieve tekst',
+              validation: (Rule) => Rule.required(),
+            },
+          ],
+        },
+      ],
       description: 'Copyrightvermelding in de footer',
       group: 'info',
     }),

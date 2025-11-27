@@ -91,7 +91,21 @@ export default defineType({
       name: 'htmlAlternativePortableText',
       title: 'HTML Alternative (Portable Text)',
       type: 'array',
-      of: [{type: 'block'}],
+      of: [
+        {type: 'block'},
+        {
+          type: 'image',
+          options: {hotspot: true},
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alternatieve tekst',
+              validation: (Rule) => Rule.required(),
+            },
+          ],
+        },
+      ],
       description: 'Provide an inline HTML alternative when a PDF cannot be remediated (legacy field).',
       group: 'accessibility',
     }),

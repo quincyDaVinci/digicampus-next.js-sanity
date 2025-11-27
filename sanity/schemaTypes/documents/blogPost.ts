@@ -177,7 +177,84 @@ export default defineType({
       name: 'body',
       title: 'Inhoud',
       type: 'array',
-      of: [{type: 'block'}],
+      of: [
+        {
+          type: 'block',
+          styles: [
+            {title: 'Normal', value: 'normal'},
+            {title: 'H2', value: 'h2'},
+            {title: 'H3', value: 'h3'},
+            {title: 'H4', value: 'h4'},
+            {title: 'Quote', value: 'blockquote'},
+          ],
+          lists: [
+            {title: 'Bullet', value: 'bullet'},
+            {title: 'Numbered', value: 'number'},
+          ],
+          marks: {
+            decorators: [
+              {title: 'Strong', value: 'strong'},
+              {title: 'Emphasis', value: 'em'},
+              {title: 'Code', value: 'code'},
+            ],
+            annotations: [
+              {
+                name: 'link',
+                type: 'object',
+                title: 'Link',
+                fields: [
+                  {
+                    name: 'href',
+                    type: 'url',
+                    title: 'URL',
+                    validation: (Rule) => Rule.uri({
+                      scheme: ['http', 'https', 'mailto', 'tel'],
+                    }),
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          type: 'image',
+          icon: () => '🖼️',
+          options: {
+            hotspot: true,
+          },
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alternatieve tekst',
+              description: 'Beschrijf de afbeelding voor toegankelijkheid',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'caption',
+              type: 'string',
+              title: 'Onderschrift',
+              description: 'Optioneel onderschrift dat onder de afbeelding wordt weergegeven',
+            },
+          ],
+        },
+      ],
+      options: {
+        insertMenu: {
+          filter: true,
+          groups: [
+            {
+              name: 'media',
+              title: 'Media',
+              of: ['image'],
+            },
+          ],
+          views: [
+            {type: 'grid', layout: 'default'},
+            {type: 'inline', layout: 'default'},
+          ],
+        },
+      },
     }),
   ],
   preview: {

@@ -53,7 +53,21 @@ export default defineType({
       name: 'bio',
       title: 'Biografie',
       type: 'array',
-      of: [{type: 'block'}],
+      of: [
+        {type: 'block'},
+        {
+          type: 'image',
+          options: {hotspot: true},
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alternatieve tekst',
+              validation: (Rule) => Rule.required(),
+            },
+          ],
+        },
+      ],
     }),
   ],
   preview: {

@@ -6,6 +6,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {urlFor} from '@sanity/lib/image'
 import {CalendarIcon, ClockIcon, ChevronLeftIcon} from '@/components/icons/FeatherIcons'
+import Breadcrumbs from '@/components/Breadcrumbs'
+import {PortableText} from 'next-sanity'
 
 type BlogPost = {
   _id: string
@@ -119,12 +121,14 @@ export default async function BlogPostPage({params}: PageProps) {
       notFound()
     }
 
+    // Format date on server only to avoid hydration mismatch
     const formattedDate = post.publishedAt
-      ? new Intl.DateTimeFormat('nl-NL', {
+      ? new Date(post.publishedAt).toLocaleDateString('nl-NL', {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
-        }).format(new Date(post.publishedAt))
+          timeZone: 'Europe/Amsterdam',
+        })
       : null
 
     const imageUrl = post.mainImage?.asset
@@ -135,8 +139,15 @@ export default async function BlogPostPage({params}: PageProps) {
       ? urlFor(post.author.image).width(96).height(96).fit('crop').auto('format').url()
       : null
 
+      const breadcrumbs = [
+      {label: 'Home', href: '/'},
+      {label: 'Blog', href: '/blog'},
+      {label: post.title},
+    ]
+
     return (
       <article className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+        <Breadcrumbs items={breadcrumbs} className="mb-6" />
         {/* Back link */}
         <Link
           href="/blog"
@@ -246,40 +257,62 @@ export default async function BlogPostPage({params}: PageProps) {
         {/* Body content */}
         {post.body && post.body.length > 0 && (
           <div className="prose prose-lg max-w-none" style={{color: 'hsl(var(--dc-text))'}}>
-            {post.body.map((block: any, index: number) => {
-              if (block._type === 'block') {
-                const children = block.children?.map((child: any, childIndex: number) => {
-                  if (child._type === 'span') {
-                    return <span key={childIndex}>{child.text}</span>
-                  }
-                  return null
-                })
-
-                switch (block.style) {
-                  case 'h1':
-                    return <h2 key={index} className="text-3xl font-bold mt-12 mb-4">{children}</h2>
-                  case 'h2':
-                    return <h3 key={index} className="text-2xl font-bold mt-10 mb-4">{children}</h3>
-                  case 'h3':
-                    return <h4 key={index} className="text-xl font-bold mt-8 mb-3">{children}</h4>
-                  case 'h4':
-                    return <h5 key={index} className="text-lg font-bold mt-6 mb-3">{children}</h5>
-                  case 'blockquote':
+            <PortableText
+              value={post.body}
+              components={{
+                block: {
+                  h2: ({children}) => <h2 className="text-3xl font-bold mt-12 mb-4">{children}</h2>,
+                  h3: ({children}) => <h3 className="text-2xl font-bold mt-10 mb-4">{children}</h3>,
+                  h4: ({children}) => <h4 className="text-xl font-bold mt-8 mb-3">{children}</h4>,
+                  blockquote: ({children}) => (
+                    <blockquote
+                      className="border-l-4 pl-4 my-6 italic"
+                      style={{borderColor: 'hsl(var(--dc-brand))'}}
+                    >
+                      {children}
+                    </blockquote>
+                  ),
+                  normal: ({children}) => <p className="mb-4 leading-relaxed">{children}</p>,
+                },
+                types: {
+                  image: ({value}) => {
+                    const imageUrl = value?.asset ? urlFor(value).width(1200).auto('format').url() : null
+                    if (!imageUrl) return null
                     return (
-                      <blockquote
-                        key={index}
-                        className="border-l-4 pl-4 my-6 italic"
-                        style={{borderColor: 'hsl(var(--dc-brand))'}}
+                      <figure className="my-8">
+                        <Image
+                          src={imageUrl}
+                          alt={value?.alt || ''}
+                          width={1200}
+                          height={675}
+                          className="rounded-lg w-full"
+                        />
+                        {value?.caption && (
+                          <figcaption className="mt-2 text-center text-sm italic" style={{color: 'hsl(var(--dc-text) / 0.7)'}}>
+                            {value.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    )
+                  },
+                },
+                marks: {
+                  link: ({value, children}) => {
+                    const href = value?.href || '#'
+                    return (
+                      <a
+                        href={href}
+                        className="text-[hsl(var(--dc-brand))] hover:underline"
+                        target={href.startsWith('http') ? '_blank' : undefined}
+                        rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
                       >
                         {children}
-                      </blockquote>
+                      </a>
                     )
-                  default:
-                    return <p key={index} className="mb-4 leading-relaxed">{children}</p>
-                }
-              }
-              return null
-            })}
+                  },
+                },
+              }}
+            />
           </div>
         )}
 
