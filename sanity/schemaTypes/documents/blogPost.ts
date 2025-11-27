@@ -236,6 +236,21 @@ export default defineType({
               title: 'Onderschrift',
               description: 'Optioneel onderschrift dat onder de afbeelding wordt weergegeven',
             },
+            {
+              name: 'size',
+              type: 'string',
+              title: 'Afbeeldingsgrootte',
+              description: 'Kies de weergavegrootte van de afbeelding',
+              options: {
+                list: [
+                  {title: 'Klein', value: 'small'},
+                  {title: 'Gemiddeld', value: 'medium'},
+                  {title: 'Groot', value: 'large'},
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'large',
+            },
           ],
         },
       ],

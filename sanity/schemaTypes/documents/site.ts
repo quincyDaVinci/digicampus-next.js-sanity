@@ -78,6 +78,20 @@ export default defineType({
               title: 'Alternatieve tekst',
               validation: (Rule) => Rule.required(),
             },
+            {
+              name: 'size',
+              type: 'string',
+              title: 'Afbeeldingsgrootte',
+              options: {
+                list: [
+                  {title: 'Klein', value: 'small'},
+                  {title: 'Gemiddeld', value: 'medium'},
+                  {title: 'Groot', value: 'large'},
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'medium',
+            },
           ],
         },
       ],
@@ -99,6 +113,20 @@ export default defineType({
               type: 'string',
               title: 'Alternatieve tekst',
               validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'size',
+              type: 'string',
+              title: 'Afbeeldingsgrootte',
+              options: {
+                list: [
+                  {title: 'Klein', value: 'small'},
+                  {title: 'Gemiddeld', value: 'medium'},
+                  {title: 'Groot', value: 'large'},
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'small',
             },
           ],
         },

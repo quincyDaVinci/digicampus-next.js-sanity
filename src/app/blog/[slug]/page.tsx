@@ -8,6 +8,7 @@ import {urlFor} from '@sanity/lib/image'
 import {CalendarIcon, ClockIcon, ChevronLeftIcon} from '@/components/icons/FeatherIcons'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import {PortableText} from 'next-sanity'
+import ImageLightbox from '@/components/ImageLightbox'
 
 type BlogPost = {
   _id: string
@@ -286,21 +287,25 @@ export default async function BlogPostPage({params}: PageProps) {
                   image: ({value}) => {
                     const imageUrl = value?.asset ? urlFor(value).width(1200).auto('format').url() : null
                     if (!imageUrl) return null
+                    
+                    // Size classes based on the size field
+                    const sizeClasses = {
+                      small: 'max-w-sm mx-auto',
+                      medium: 'max-w-2xl mx-auto',
+                      large: 'w-full',
+                    }
+                    const sizeClass = sizeClasses[value?.size as keyof typeof sizeClasses] || sizeClasses.large
+                    
                     return (
-                      <figure className="my-8">
-                        <Image
-                          src={imageUrl}
-                          alt={value?.alt || ''}
-                          width={1200}
-                          height={675}
-                          className="rounded-lg w-full"
-                        />
-                        {value?.caption && (
-                          <figcaption className="mt-2 text-center text-sm italic" style={{color: 'hsl(var(--dc-text) / 0.7)'}}>
-                            {value.caption}
-                          </figcaption>
-                        )}
-                      </figure>
+                      <ImageLightbox
+                        src={imageUrl}
+                        alt={value?.alt || ''}
+                        width={1200}
+                        height={675}
+                        className="rounded-lg w-full"
+                        caption={value?.caption}
+                        sizeClass={sizeClass}
+                      />
                     )
                   },
                 },
