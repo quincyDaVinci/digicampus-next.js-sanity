@@ -78,11 +78,21 @@ export default defineType({
       group: 'accessibility',
     }),
     defineField({
+      name: 'htmlAlternativeFile',
+      title: 'HTML Alternative (Upload File)',
+      type: 'file',
+      options: {
+        accept: 'text/html,.html,.htm',
+      },
+      description: 'Upload an HTML file as an accessible alternative to the PDF.',
+      group: 'accessibility',
+    }),
+    defineField({
       name: 'htmlAlternativePortableText',
       title: 'HTML Alternative (Portable Text)',
       type: 'array',
       of: [{type: 'block'}],
-      description: 'Provide an inline HTML alternative when a PDF cannot be remediated.',
+      description: 'Provide an inline HTML alternative when a PDF cannot be remediated (legacy field).',
       group: 'accessibility',
     }),
   ],
@@ -90,9 +100,11 @@ export default defineType({
     Rule.custom((fields) => {
       if (!fields) return true
       const hasHtmlAlternative = Boolean(
-        fields.htmlAlternativeUrl || (fields.htmlAlternativePortableText?.length ?? 0) > 0
+        fields.htmlAlternativeUrl || 
+        (fields.htmlAlternativeFile?.asset) ||
+        (fields.htmlAlternativePortableText?.length ?? 0) > 0
       )
-      const hasAccessiblePdf = Boolean(fields.documentFile && fields.wcagStatus)
+      const hasAccessiblePdf = Boolean(fields.documentFile?.asset && fields.wcagStatus)
 
       if (!hasAccessiblePdf && !hasHtmlAlternative) {
         return 'Upload a tagged PDF (checked as WCAG-ready) or provide an HTML alternative before publishing.'
@@ -105,10 +117,11 @@ export default defineType({
       title: 'title',
       language: 'language',
       hasHtmlUrl: 'htmlAlternativeUrl',
+      hasHtmlFile: 'htmlAlternativeFile',
       hasHtmlPortableText: 'htmlAlternativePortableText',
     },
-    prepare: ({title, language, hasHtmlUrl, hasHtmlPortableText}) => {
-      const hasHtmlAlternative = hasHtmlUrl || (hasHtmlPortableText?.length ?? 0) > 0
+    prepare: ({title, language, hasHtmlUrl, hasHtmlFile, hasHtmlPortableText}) => {
+      const hasHtmlAlternative = hasHtmlUrl || hasHtmlFile || (hasHtmlPortableText?.length ?? 0) > 0
       return {
         title: title || 'Accessible document',
         subtitle: language ? `${language.toUpperCase()}${hasHtmlAlternative ? ' • HTML alternative' : ''}` : undefined,

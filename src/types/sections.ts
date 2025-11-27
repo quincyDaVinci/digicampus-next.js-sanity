@@ -177,6 +177,12 @@ export interface DocumentAssetProps extends BaseSection {
       url?: string
     }
   }
+  htmlAlternativeFile?: {
+    asset?: {
+      _ref?: string
+      url?: string
+    }
+  }
   htmlAlternativePortableText?: Array<{
     _key: string
     _type: string
