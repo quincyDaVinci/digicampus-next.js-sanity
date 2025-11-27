@@ -109,6 +109,56 @@ export function createTranslateFromDutchAction(
 
         const translated = await translatePayload(translationPayload, sourceLanguage, 'en')
 
+        // Defensive: ensure the translated object contains expected keys (type, language, arrays/strings)
+        if (translated && typeof translated === 'object') {
+          const t = translated as Record<string, any>
+          const proto = translationPayload as Record<string, any>
+          if (!t._type && proto && proto._type) t._type = proto._type
+          if (!t.language) t.language = 'en'
+          if (proto?.modules && !Array.isArray(t.modules)) t.modules = []
+          if (proto?.body && !Array.isArray(t.body)) t.body = []
+          if (proto?.footerContent && !Array.isArray(t.footerContent)) t.footerContent = []
+          if (typeof t.title !== 'string') t.title = proto?.title ?? ''
+          if (typeof t.metadataTitle !== 'string') t.metadataTitle = proto?.metadataTitle ?? ''
+          if (typeof t.metadataDescription !== 'string') t.metadataDescription = proto?.metadataDescription ?? ''
+          if (typeof t.excerpt !== 'string') t.excerpt = proto?.excerpt ?? ''
+        }
+
+        // Build a small preview of translated strings for the editor to confirm.
+        const previewKeys = ['title', 'metadataTitle', 'metadataDescription', 'excerpt'] as const
+        const samples: string[] = []
+        for (const key of previewKeys) {
+          const orig = (translationPayload as Record<string, unknown>)[key]
+          const after = (translated as Record<string, unknown>)[key]
+          if (typeof orig === 'string' && typeof after === 'string') {
+            const o = orig.trim()
+            const a = after.trim()
+            if (o.length > 0 && a.length > 0 && o !== a) {
+              const short = (s: string) => (s.length > 120 ? s.slice(0, 117) + '...' : s)
+              samples.push(`${key}: "${short(o)}" → "${short(a)}"`)
+            }
+          }
+        }
+
+        if (samples.length > 0) {
+          // Ask the editor to confirm before saving translations.
+          const message = `Voorbeeld vertalingen:\n\n${samples.join('\n')}\n\nVertalingen opslaan?`
+          // `window.confirm` is acceptable in Studio action UI to request a quick confirmation.
+          const proceed = typeof window !== 'undefined' ? window.confirm(message) : true
+          if (!proceed) {
+            setIsRunning(false)
+            props.onComplete()
+            return
+          }
+        } else {
+          // If nothing meaningful changed, warn the editor so they know translations may be identical.
+          toast.push({
+            status: 'info',
+            title: 'Geen zichtbare wijzigingen in voorbeeld',
+            description: 'De automatische vertaling gaf geen andere tekst terug voor de belangrijkste velden.',
+          })
+        }
+
         let setPaths: Record<string, unknown> = {}
 
         if (docType === 'page' || docType === 'homePage') {
@@ -137,11 +187,25 @@ export function createTranslateFromDutchAction(
 
         await client.patch(documentId).setIfMissing({translations: []}).set(setPaths).commit({autoGenerateArrayKeys: true})
 
-        toast.push({
-          status: 'success',
-          title: 'Vertaling voltooid',
-          description: 'Engelse velden zijn ingevuld op basis van de Nederlandse inhoud.',
-        })
+        // Try to publish the document so translations are visible on the public site.
+        // In Studio, the current user may or may not have publish rights; handle failures gracefully.
+        try {
+          // Some studio contexts provide a client with sufficient permissions to publish.
+          // If the client here doesn't allow publishing, this call will throw and we'll show a warning toast.
+          await client.publish(documentId)
+          toast.push({
+            status: 'success',
+            title: 'Vertaling voltooid en gepubliceerd',
+            description: 'Engelse velden zijn ingevuld en gepubliceerd.',
+          })
+        } catch (pubErr) {
+          console.warn('[translate] publish failed', pubErr)
+          toast.push({
+            status: 'warning',
+            title: 'Vertaling opgeslagen (niet gepubliceerd)',
+            description: 'Vertaling is opgeslagen als concept. Publiceer het document om het live te zetten.',
+          })
+        }
       } catch (error: unknown) {
         console.error('[translate] failed', error)
         toast.push({
