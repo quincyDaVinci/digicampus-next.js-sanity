@@ -8,12 +8,16 @@ import { useLanguage } from "@/lib/language"
 
 type Item = { label: string; href: string }
 type Menu = { label: string; items: Item[] }
+type Logo = { url: string; alt: string; width?: number; height?: number }
+type CTA = { label: string; href: string }
 
 type HeaderProps = {
   menus: Menu[]
+  logo?: Logo | null
+  ctas?: CTA[]
 }
 
-export default function Header({menus}: HeaderProps): React.ReactElement {
+export default function Header({menus, logo, ctas = []}: HeaderProps): React.ReactElement {
   const { lang: language, setLang: setLanguage } = useLanguage()
   const [liveMessage, setLiveMessage] = useState('')
   const firstLangRender = useRef(true)
@@ -115,14 +119,25 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
           <div className="col-start-1 row-start-1 flex items-start min-w-0">
             <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
               <span className="sr-only">Digicampus homepage</span>
-              <Image
-                src={dark ? "/assets/images/logo-digicampus-dark.svg" : "/assets/images/logo-digicampus-light.svg"}
-                alt="Digicampus logo"
-                width={320}
-                height={80}
-                className={[scrolled ? "h-12" : "h-16", "w-auto drop-shadow max-w-[60vw] sm:max-w-[320px]"].join(" ")}
-                style={{ maxWidth: "320px" }}
-              />
+              {logo ? (
+                <Image
+                  src={logo.url}
+                  alt={logo.alt}
+                  width={logo.width || 320}
+                  height={logo.height || 80}
+                  className={[scrolled ? "h-12" : "h-16", "w-auto drop-shadow max-w-[60vw] sm:max-w-[320px]"].join(" ")}
+                  style={{ maxWidth: "320px" }}
+                />
+              ) : (
+                <Image
+                  src={dark ? "/assets/images/logo-digicampus-dark.svg" : "/assets/images/logo-digicampus-light.svg"}
+                  alt="Digicampus logo"
+                  width={320}
+                  height={80}
+                  className={[scrolled ? "h-12" : "h-16", "w-auto drop-shadow max-w-[60vw] sm:max-w-[320px]"].join(" ")}
+                  style={{ maxWidth: "320px" }}
+                />
+              )}
             </Link>
           </div>
 
@@ -190,15 +205,29 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
           </div>
 
           {/* Bottom-right: Contact CTA */}
-          <div className="col-start-2 row-start-2 flex items-end justify-end">
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
-              style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
-            >
-              <span>Contact</span>
-              <ArrowRightIcon aria-hidden focusable="false" />
-            </Link>
+          <div className="col-start-2 row-start-2 flex items-end justify-end gap-2">
+            {ctas.length > 0 ? (
+              ctas.map((cta, idx) => (
+                <Link
+                  key={idx}
+                  href={cta.href}
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
+                  style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
+                >
+                  <span>{cta.label}</span>
+                  <ArrowRightIcon aria-hidden focusable="false" />
+                </Link>
+              ))
+            ) : (
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
+                style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
+              >
+                <span>Contact</span>
+                <ArrowRightIcon aria-hidden focusable="false" />
+              </Link>
+            )}
           </div>
         </div>
 
@@ -216,7 +245,11 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
           </button>
 
             <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
-            <Image src="/assets/images/logo-digicampus.svg" alt="Digicampus logo" width={160} height={40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
+            {logo ? (
+              <Image src={logo.url} alt={logo.alt} width={logo.width || 160} height={logo.height || 40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
+            ) : (
+              <Image src="/assets/images/logo-digicampus.svg" alt="Digicampus logo" width={160} height={40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
+            )}
           </Link>
 
           <div className="flex items-center gap-2">
@@ -264,17 +297,31 @@ export default function Header({menus}: HeaderProps): React.ReactElement {
               ))}
             </ul>
 
-            <div className="mt-3 flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
               <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors", language === "nl" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90 hover:bg-white/10"].join(" ")}>NL</button>
               <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors", language === "en" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90 hover:bg-white/10"].join(" ")}>EN</button>
-              <Link
-                href="/contact"
-                className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
-                style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
-              >
-                <span>Contact</span>
-                <ArrowRightIcon aria-hidden focusable="false" />
-              </Link>
+              {ctas.length > 0 ? (
+                ctas.map((cta, idx) => (
+                  <Link
+                    key={idx}
+                    href={cta.href}
+                    className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
+                    style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
+                  >
+                    <span>{cta.label}</span>
+                    <ArrowRightIcon aria-hidden focusable="false" />
+                  </Link>
+                ))
+              ) : (
+                <Link
+                  href="/contact"
+                  className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
+                  style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
+                >
+                  <span>Contact</span>
+                  <ArrowRightIcon aria-hidden focusable="false" />
+                </Link>
+              )}
             </div>
 
             <form role="search" className="mt-3">

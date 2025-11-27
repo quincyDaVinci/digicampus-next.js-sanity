@@ -35,7 +35,7 @@ export default defineType({
       name: 'internal',
       title: 'Interne pagina',
       type: 'reference',
-      to: [{type: 'page'}, {type: 'homePage'}, {type: 'blogPost'}],
+      to: [{type: 'page'}, {type: 'homePage'}, {type: 'blogPage'}, {type: 'blogPost'}],
       hidden: ({parent}) => parent?.type !== 'internal',
     }),
     defineField({
