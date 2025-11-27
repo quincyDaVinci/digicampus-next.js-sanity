@@ -1,5 +1,6 @@
 import {client} from '@sanity/lib/client'
 import {siteSettingsQuery} from '@sanity/lib/queries/site'
+import {urlFor} from '@sanity/lib/image'
 import HeaderClient from './HeaderClient'
 
 type MenuItem = {
@@ -9,15 +10,8 @@ type MenuItem = {
 
 type SiteSettings = {
   title?: string
-  logo?: {
-    url: string
-    metadata?: {
-      dimensions?: {
-        width: number
-        height: number
-      }
-    }
-  }
+  // keep as generic any so we don't need to duplicate Sanity types here
+  logo?: any
   logoAlt?: string
   header?: {
     items?: Array<{
@@ -65,13 +59,28 @@ export default async function Header() {
           .filter(menu => menu.items.length > 0)
       }
 
-      // Process logo
-      if (siteData?.logo?.url) {
-        logo = {
-          url: siteData.logo.url,
-          alt: siteData.logoAlt || siteData.title || 'Site logo',
-          width: siteData.logo.metadata?.dimensions?.width,
-          height: siteData.logo.metadata?.dimensions?.height
+      // Process logo (preserve hotspot/crop by using the full image object)
+      if (siteData?.logo) {
+        try {
+          const targetWidth = 800
+          const assetDims = siteData.logo?.asset?.metadata?.dimensions
+          const targetHeight = assetDims?.width && assetDims?.height ? Math.round((assetDims.height / assetDims.width) * targetWidth) : undefined
+          const builder = urlFor(siteData.logo).width(targetWidth)
+          const imgUrl = targetHeight ? builder.height(targetHeight).fit('crop').auto('format').url() : builder.auto('format').url()
+          logo = {
+            url: imgUrl,
+            alt: siteData.logoAlt || siteData.title || 'Site logo',
+            width: assetDims?.width,
+            height: assetDims?.height,
+          }
+        } catch (err) {
+          // fallback if image builder fails
+          if (siteData.logo?.asset?.url) {
+            logo = {
+              url: siteData.logo.asset.url,
+              alt: siteData.logoAlt || siteData.title || 'Site logo'
+            }
+          }
         }
       }
 

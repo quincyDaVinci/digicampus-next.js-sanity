@@ -9,6 +9,9 @@ import {CalendarIcon, ClockIcon, ChevronLeftIcon} from '@/components/icons/Feath
 import Breadcrumbs from '@/components/Breadcrumbs'
 import {PortableText} from 'next-sanity'
 import ImageLightbox from '@/components/ImageLightbox'
+import AuthorCard from '@/components/AuthorCard'
+import ParallaxImage from '@/components/ParallaxImage'
+import BlogSection from '@/components/sections/BlogSection'
 
 type BlogPost = {
   _id: string
@@ -42,6 +45,12 @@ type BlogPost = {
     title: string
     slug: string
   }>
+  tags?: Array<{ _ref?: string }>
+  relatedPosts?: {
+    heading?: string
+    subheading?: string
+    relationMode?: 'recent' | 'tags' | 'author' | 'readTime'
+  }
   body?: Array<any>
   excerpt?: string
 }
@@ -56,13 +65,9 @@ const blogPostQuery = groq`
     body,
     estimatedReadTime,
     viewCount,
-    mainImage{
-      asset->{
-        _id,
-        url
-      },
-      alt
-    },
+    mainImage,
+    tags[]{_ref, _type},
+    relatedPosts,
     author->{
       _id,
       name,
@@ -133,7 +138,13 @@ export default async function BlogPostPage({params}: PageProps) {
       : null
 
     const imageUrl = post.mainImage?.asset
-      ? urlFor(post.mainImage).width(1200).auto('format').url()
+      ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
+      : null
+
+    // A larger / higher-res source for the parallax inner image so vertical movement
+    // doesn't reveal empty/cropped edges. Request a larger cropped variant centered on hotspot.
+    const imageFullSrc = post.mainImage?.asset
+      ? urlFor(post.mainImage).width(2000).height(1200).fit('crop').auto('format').url()
       : null
 
     const authorImageUrl = post.author?.image?.asset
@@ -147,8 +158,14 @@ export default async function BlogPostPage({params}: PageProps) {
     ]
 
     return (
-      <article className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <Breadcrumbs items={breadcrumbs} className="mb-6" />
+      <>
+        <div className="border-b border-dc bg-dc-surface-98">
+          <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+            <Breadcrumbs items={breadcrumbs} />
+          </div>
+        </div>
+        
+        <article className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Back link */}
         <Link
           href="/blog"
@@ -201,58 +218,18 @@ export default async function BlogPostPage({params}: PageProps) {
 
         {/* Author */}
         {post.author && (
-          <Link
-            href={`/auteur/${post.author._id}`}
-            className="group mb-8 flex items-center gap-4 rounded-2xl p-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:bg-[hsl(var(--dc-surface-90))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--dc-focus))] focus-visible:ring-offset-2"
-            style={{backgroundColor: 'hsl(var(--dc-surface-98))', border: '1px solid hsl(var(--dc-border) / 0.2)'}}
-          >
-            {authorImageUrl ? (
-              <Image
-                src={authorImageUrl}
-                alt={post.author.name}
-                width={64}
-                height={64}
-                className="h-16 w-16 rounded-full object-cover ring-2 ring-[hsl(var(--dc-border)/0.4)] transition-transform duration-300 group-hover:scale-105"
-              />
-            ) : (
-              <div
-                className="flex h-16 w-16 items-center justify-center rounded-full text-xl font-bold"
-                style={{
-                  backgroundColor: 'hsl(var(--dc-brand)/0.15)',
-                  color: 'hsl(var(--dc-brand))',
-                }}
-                aria-hidden
-              >
-                {post.author.name.charAt(0)}
-              </div>
-            )}
-            <div>
-              <div className="font-semibold" style={{color: 'hsl(var(--dc-text))'}}>
-                {post.author.name}
-              </div>
-              {post.author.role && (
-                <div className="text-sm" style={{color: 'hsl(var(--dc-text) / 0.7)'}}>
-                  {post.author.role}
-                  {post.author.company && ` bij ${post.author.company}`}
-                </div>
-              )}
-            </div>
-          </Link>
+          <AuthorCard author={post.author} authorImageUrl={authorImageUrl} />
         )}
 
         {/* Main image */}
         {imageUrl && (
-          <div className="mb-12 overflow-hidden rounded-2xl" style={{backgroundColor: '#ffffff', maxHeight: '500px'}}>
-            <Image
-              src={imageUrl}
-              alt={post.mainImage?.alt || post.title}
-              width={1200}
-              height={630}
-              className="w-full h-full object-cover"
-              style={{maxHeight: '500px'}}
-              priority
-            />
-          </div>
+          <ParallaxImage
+            src={imageUrl}
+            fullSrc={imageFullSrc ?? undefined}
+            alt={post.mainImage?.alt || post.title}
+            displayHeight={630}
+            extraHeight={300}
+          />
         )}
 
         {/* Body content */}
@@ -285,7 +262,7 @@ export default async function BlogPostPage({params}: PageProps) {
                 },
                 types: {
                   image: ({value}) => {
-                    const imageUrl = value?.asset ? urlFor(value).width(1200).auto('format').url() : null
+                    const imageUrl = value?.asset ? urlFor(value).width(1200).height(675).fit('crop').auto('format').url() : null
                     if (!imageUrl) return null
                     
                     // Size classes based on the size field
@@ -341,6 +318,49 @@ export default async function BlogPostPage({params}: PageProps) {
           </Link>
         </div>
       </article>
+
+      {/* Blogs section (more posts) */}
+      {/* Related / configurable BlogSection (always displayed) */}
+      {
+        (() => {
+          const rp = post.relatedPosts || {}
+
+          // Determine tags to use (post.tags when useTags is true)
+          // Determine relation mode
+          const mode = rp.relationMode || 'tags'
+
+          const mappedTags = mode === 'tags' && Array.isArray(post.tags) ? post.tags.map((t: any) => ({ _ref: t._ref || t._id || t })) : undefined
+
+          // Author reference if requested
+          const authorRef = mode === 'author' && post.author ? { _ref: post.author._id } : undefined
+
+          // If readTime mode, compute a small window around the current post's estimatedReadTime
+          let minReadTime: number | undefined
+          let maxReadTime: number | undefined
+          if (mode === 'readTime' && typeof post.estimatedReadTime === 'number') {
+            const delta = Math.max(1, Math.round(post.estimatedReadTime * 0.25)) // 25% tolerance
+            minReadTime = Math.max(1, Math.round(post.estimatedReadTime - delta))
+            maxReadTime = Math.round(post.estimatedReadTime + delta)
+          }
+
+          return (
+            <BlogSection
+              _type="blogSection"
+              _key="more-blogs"
+              heading={rp.heading || 'Meer blogs'}
+              subheading={rp.subheading ? rp.subheading : undefined}
+              // Let BlogSection decide limit/responsiveness; pass relation flags and filters
+              useContextTags={mode === 'tags'}
+              useContextAuthor={mode === 'author'}
+              tags={mappedTags}
+              author={authorRef}
+              minReadTime={minReadTime}
+              maxReadTime={maxReadTime}
+            />
+          )
+        })()
+      }
+      </>
     )
   } catch (error) {
     console.error('Error fetching blog post:', error)

@@ -56,6 +56,11 @@ export default function BlogSection(props: BlogSectionProps) {
     ctaLabel = "Lees meer",
     viewAllLink,
     category,
+    sortBy = 'newest',
+    tags,
+    author,
+    minReadTime,
+    maxReadTime,
   } = props;
 
   const resolvedLimit = Math.min(Math.max(limit ?? 3, 1), 12);
@@ -72,10 +77,62 @@ export default function BlogSection(props: BlogSectionProps) {
       setIsLoading(true);
       setError(null);
       try {
-        const results = await client.fetch<BlogSectionQueryResult[]>(BLOG_SECTION_QUERY, {
-          limit: resolvedLimit,
-          categoryId: categoryRef,
-        });
+        // Build GROQ filter and ordering based on props
+        const filters: string[] = [
+          '_type == "blogPost"',
+          'defined(publishedAt)'
+        ]
+
+        if (categoryRef) {
+          filters.push(`$categoryId in categories[]._ref`)
+        }
+
+        if (tags && Array.isArray(tags) && tags.length > 0) {
+          // $tagRefs will be an array of tag _refs
+          filters.push(`count(tags[]._ref[@ in $tagRefs]) > 0`)
+        }
+
+        if (author?._ref) {
+          filters.push(`author._ref == $authorRef`)
+        }
+
+        if (typeof minReadTime === 'number') {
+          filters.push(`estimatedReadTime >= $minReadTime`)
+        }
+
+        if (typeof maxReadTime === 'number') {
+          filters.push(`estimatedReadTime <= $maxReadTime`)
+        }
+
+        let orderBy = 'publishedAt desc'
+        switch (sortBy) {
+          case 'oldest':
+            orderBy = 'publishedAt asc'
+            break
+          case 'viewCount':
+            orderBy = 'viewCount desc'
+            break
+          case 'readTime':
+            orderBy = 'estimatedReadTime asc'
+            break
+          case 'newest':
+          default:
+            orderBy = 'publishedAt desc'
+            break
+        }
+
+        const filterString = filters.join(' && ')
+
+        const query = `* [${filterString}] | order(${orderBy}) [0...$limit] {\n  _id,\n  title,\n  "slug": slug.current,\n  publishedAt,\n  excerpt,\n  body,\n  estimatedReadTime,\n  mainImage{ ..., },\n  author->{ name, role, company, image{ ... } },\n  categories[]->{ title, slug }\n}`
+
+        const vars: Record<string, unknown> = { limit: resolvedLimit }
+        if (categoryRef) vars['categoryId'] = categoryRef
+        if (tags && Array.isArray(tags) && tags.length > 0) vars['tagRefs'] = tags.map(t => t._ref).filter(Boolean)
+        if (author?._ref) vars['authorRef'] = author._ref
+        if (typeof minReadTime === 'number') vars['minReadTime'] = minReadTime
+        if (typeof maxReadTime === 'number') vars['maxReadTime'] = maxReadTime
+
+        const results = await client.fetch<BlogSectionQueryResult[]>(query, vars)
 
         if (!isSubscribed) return;
 
@@ -109,7 +166,7 @@ export default function BlogSection(props: BlogSectionProps) {
     return () => {
       isSubscribed = false;
     };
-  }, [resolvedLimit, categoryRef]);
+  }, [resolvedLimit, categoryRef, sortBy, tags?.length, author?._ref, minReadTime, maxReadTime]);
 
   const cardComponent = useMemo<BlogCardComponent>(() => ({
     _type: "blogCardComponent",

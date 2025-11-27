@@ -1,12 +1,25 @@
-'use client'
+ 'use client'
 
 /**
- * This route is responsible for the built-in authoring environment using Sanity Studio.
- * All routes under your geheimelocatie path is handled by this file using Next.js' catch-all routes.
+ * Render the Sanity Studio client-only. We intentionally avoid SSR for the Studio bundle
+ * to prevent hydration / DOM-nesting validation errors coming from the Studio UI during
+ * server -> client hydration. The page server-renders a lightweight container and the
+ * actual `NextStudio` component is dynamically imported on the client.
  */
-import { NextStudio } from 'next-sanity/studio'
+import dynamic from 'next/dynamic'
 import config from '../../../../sanity.config'
 
+const NextStudioClient = dynamic(
+  // load the NextStudio export from next-sanity/studio on the client only
+  () => import('next-sanity/studio').then((m) => m.NextStudio),
+  { ssr: false }
+)
+
 export default function GeheimelocatiePage() {
-  return <NextStudio config={config} />
+  return (
+    <div id="studio-root" style={{minHeight: '100vh'}}>
+      {/* mounted only on client */}
+      <NextStudioClient config={config} />
+    </div>
+  )
 }

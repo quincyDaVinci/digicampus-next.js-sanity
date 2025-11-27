@@ -30,7 +30,7 @@ export default function ImageBlock({component}: ImageBlockProps) {
   const alignmentClass = component.alignment ? alignmentClassMap[component.alignment] : alignmentClassMap.center
   const widthClass = component.displayWidth ? widthClassMap[component.displayWidth] : widthClassMap.default
   const imageBuilder = urlFor(component.image).auto('format').quality(90)
-  const imageUrl = imageBuilder.width(1600).url()
+  const imageUrl = imageBuilder.width(1600).height(900).fit('crop').url()
   const {width = 1600, height = 900} = component.image.asset.metadata?.dimensions ?? {width: 1600, height: 900}
   const rounded = component.rounded ?? true
   

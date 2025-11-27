@@ -64,6 +64,15 @@ export interface BlogSectionProps extends BaseSection {
     _type?: string
     _ref?: string
   } | null
+  // Added filters from studio
+  sortBy?: 'newest' | 'oldest' | 'viewCount' | 'readTime'
+  tags?: Array<{ _ref?: string }>
+  author?: { _ref?: string } | null
+  minReadTime?: number | null
+  maxReadTime?: number | null
+  // Context-aware toggles (set in studio)
+  useContextTags?: boolean
+  useContextAuthor?: boolean
 }
 
 export interface TestimonialsSectionProps extends BaseSection {

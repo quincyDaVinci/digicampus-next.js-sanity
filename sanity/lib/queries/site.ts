@@ -6,13 +6,7 @@ import {groq} from 'next-sanity'
 export const siteSettingsQuery = groq`
   *[_type == "site" && _id == "site"][0]{
     title,
-    "logo": logo.asset->{
-      _id,
-      url,
-      metadata {
-        dimensions
-      }
-    },
+    "logo": logo,
     "logoAlt": logo.alt,
     header->{
       title,

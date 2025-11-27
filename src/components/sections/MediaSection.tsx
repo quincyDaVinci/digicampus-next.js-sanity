@@ -118,8 +118,8 @@ export default function MediaSection(props: MediaSectionProps) {
   const aspectRatioStyle = getAspectRatioStyle();
 
   // Build image URL with optimization
-  const imageUrl = image?.asset
-    ? urlFor(image.asset)
+  const imageUrl = image
+    ? urlFor(image)
         .width(1920)
         .height(1080)
         .fit("max")
@@ -128,8 +128,8 @@ export default function MediaSection(props: MediaSectionProps) {
         .url()
     : null;
 
-  const posterUrl = video?.posterImage?.asset
-    ? urlFor(video.posterImage.asset)
+  const posterUrl = video?.posterImage
+    ? urlFor(video.posterImage)
         .width(1920)
         .height(1080)
         .fit("crop")

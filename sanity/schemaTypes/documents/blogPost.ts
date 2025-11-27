@@ -54,6 +54,13 @@ export default defineType({
       validation: (Rule) => Rule.max(3).warning('Maximum 3 categorieën aanbevolen voor een overzichtelijke weergave'),
     }),
     defineField({
+      name: 'tags',
+      title: 'Tags',
+      type: 'array',
+      of: [{ type: 'reference', to: { type: 'tag' } }],
+      description: 'Optional tags for taxonomy and related-posts filtering',
+    }),
+    defineField({
       name: 'publishedAt',
       title: 'Gepubliceerd op',
       type: 'datetime',
@@ -270,6 +277,33 @@ export default defineType({
           ],
         },
       },
+    }),
+    defineField({
+      name: 'relatedPosts',
+      title: 'Related posts (per-post settings)',
+      type: 'object',
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        { name: 'heading', title: 'Section heading', type: 'string', initialValue: 'Meer blogs' },
+        { name: 'subheading', title: 'Section subheading', type: 'string' },
+        {
+          name: 'relationMode',
+          title: 'Relation mode',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Recent posts', value: 'recent' },
+              { title: 'Related by tags', value: 'tags' },
+              { title: 'Related by author', value: 'author' },
+              { title: 'Related by read time', value: 'readTime' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'tags',
+          description: 'Choose how similar posts should be selected for the related posts section.',
+        },
+      ],
+      description: 'Configure how the related posts section should find similar articles. The section is shown by default on the blog page; choose the relation method and heading/subheading.',
     }),
   ],
   preview: {
