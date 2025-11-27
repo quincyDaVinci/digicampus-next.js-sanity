@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const draft = await draftMode()
-  const headerList = headers()
+  const headerList = await headers()
   const hintedLang = headerList.get('x-dc-lang')
   const lang = isSupportedLang(hintedLang) ? hintedLang : defaultLanguage
 

@@ -5,8 +5,8 @@ import {
   DocumentActionDescription,
   DocumentActionProps,
   SanityDocument,
-  useToast,
 } from 'sanity'
+import {useToast} from '@sanity/ui'
 import {translateDeepObject, ensureArrayWithLanguage, isTranslationSupported} from '../translation'
 
 type TranslationEntry = {_key?: string; language?: string}

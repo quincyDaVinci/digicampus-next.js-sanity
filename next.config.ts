@@ -3,11 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: { remotePatterns: [{protocol:'https', hostname:'cdn.sanity.io'}] },
-  i18n: {
-    locales: ['en', 'nl'],
-    defaultLocale: 'en',
-    localeDetection: true,
-  },
+  // Internationalization handled via App Router route groups (`src/app/[lang]/*`).
+  // Removed `i18n` here because App Router manages routing and locale detection.
   
   // Remove X-Frame-Options to allow embedding in Sanity Studio
   // Use CSP frame-ancestors for more control
