@@ -8,10 +8,9 @@ import { HomePagePreview } from '../HomePagePreview'
 
 // Query for the home page (singleton)
 // Dereference file asset url for documentAsset modules to avoid additional runtime fetches
-const homePageQuery = `*[_type == "homePage" && metadata.language == $lang][0]{
+const homePageQuery = `*[_type == "homePage"][0]{
   _id,
   title,
-  description,
   metadata,
   modules[]{
     _type,
@@ -19,6 +18,16 @@ const homePageQuery = `*[_type == "homePage" && metadata.language == $lang][0]{
     ...,
     // if module is a documentAsset, include resolved URL
     documentFile{asset-> { _id, url }},
+  },
+  "localized": translations[$lang]{
+    title,
+    metadataDescription,
+    modules[]{
+      _type,
+      _key,
+      ...,
+      documentFile{asset-> { _id, url }},
+    }
   }
 }`
 
@@ -72,6 +81,8 @@ export default async function Page({ params }: HomeParams) {
   const { lang = defaultLanguage } = params
   const draft = await draftMode()
   const page = await getHomePage(lang)
+  const localizedTitle = page?.localized?.title ?? page?.title
+  const localizedModules = page?.localized?.modules ?? page?.modules
 
   // If in draft mode, use the live preview component
   if (draft.isEnabled && page) {
@@ -79,7 +90,7 @@ export default async function Page({ params }: HomeParams) {
   }
 
   // If no home page exists yet, show a welcome message
-  if (!page || !page.modules?.length) {
+  if (!page || !localizedModules?.length) {
     return (
       <main id="main" className="flex flex-col gap-8 p-6 min-h-[60vh] items-center justify-center">
         <div className="max-w-2xl text-center">
@@ -95,7 +106,8 @@ export default async function Page({ params }: HomeParams) {
   // Render the home page modules
   return (
     <main id="main">
-      {page.modules.map((module: { _key: string; _type: string }) => (
+      <h1 className="sr-only">{localizedTitle}</h1>
+      {localizedModules?.map((module: { _key: string; _type: string }) => (
         <RenderSection key={module._key} section={module} />
       ))}
     </main>

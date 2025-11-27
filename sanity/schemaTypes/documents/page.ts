@@ -12,23 +12,10 @@ export default defineType({
   icon: FileTextIcon,
   groups: [
     {name: 'content', title: 'Inhoud', default: true},
+    {name: 'translations', title: 'Vertalingen'},
     {name: 'metadata', title: 'SEO & metadata'},
   ],
   fields: [
-    defineField({
-      name: 'language',
-      title: 'Taal',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Nederlands', value: 'nl'},
-          {title: 'English', value: 'en'},
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'nl',
-      validation: (Rule) => Rule.required(),
-    }),
     defineField({
       name: 'title',
       title: 'Paginatitel',
@@ -57,6 +44,15 @@ export default defineType({
       ],
       group: 'content',
       validation: (Rule) => Rule.min(1).error('Voeg minimaal één sectie toe aan de pagina'),
+    }),
+    defineField({
+      name: 'translations',
+      title: 'Vertalingen',
+      type: 'array',
+      of: [{type: 'pageTranslation'}],
+      group: 'translations',
+      description:
+        'Vul vertaalde titels, metabeschrijvingen en eventuele module-overschrijvingen per taal in.',
     }),
     defineField({
       name: 'metadata',

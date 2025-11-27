@@ -12,6 +12,7 @@ export default defineType({
   icon: HomeIcon,
   groups: [
     {name: 'content', title: 'Inhoud', default: true},
+    {name: 'translations', title: 'Vertalingen'},
     {name: 'metadata', title: 'SEO & metadata'},
   ],
   fields: [
@@ -44,6 +45,15 @@ export default defineType({
       ],
       group: 'content',
       validation: (Rule) => Rule.min(1).error('Voeg minimaal één sectie toe aan de startpagina'),
+    }),
+    defineField({
+      name: 'translations',
+      title: 'Vertalingen',
+      type: 'array',
+      of: [{type: 'pageTranslation'}],
+      group: 'translations',
+      description:
+        'Vertaalde titels, metabeschrijving en module-overschrijvingen voor deze startpagina.',
     }),
     defineField({
       name: 'metadata',
