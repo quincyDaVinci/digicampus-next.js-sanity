@@ -17,7 +17,7 @@ const NextStudioClient = dynamic(
 
 export default function GeheimelocatiePage() {
   return (
-    <div id="studio-root" style={{minHeight: '100vh'}}>
+    <div id="studio-root" suppressHydrationWarning style={{minHeight: '100vh'}}>
       {/* mounted only on client */}
       <NextStudioClient config={config} />
     </div>
