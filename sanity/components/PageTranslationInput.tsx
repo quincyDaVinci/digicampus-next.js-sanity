@@ -29,6 +29,7 @@ export function PageTranslationInput(props: ObjectInputProps) {
   const {renderDefault, value, onChange} = props
   const [isTranslating, setIsTranslating] = useState(false)
   const baseTitle = (useFormValue(['title']) as string | undefined) ?? ''
+  const baseMetadataTitle = (useFormValue(['metadata', 'title']) as string | undefined) ?? ''
   const baseDescription = (useFormValue(['metadata', 'description']) as string | undefined) ?? ''
   const baseModules = useFormValue(['modules']) as unknown
   const sourceLanguage =
@@ -48,17 +49,21 @@ export function PageTranslationInput(props: ObjectInputProps) {
     const title = baseTitle
       ? await translateText(baseTitle, sourceLanguage, targetLanguage)
       : undefined
+    const metaTitle = baseMetadataTitle
+      ? await translateText(baseMetadataTitle, sourceLanguage, targetLanguage)
+      : undefined
     const description = baseDescription
       ? await translateText(baseDescription, sourceLanguage, targetLanguage)
       : undefined
 
-    onChange(
-      PatchEvent.from([
-        set(title ?? baseTitle, ['title']),
-        set(description ?? baseDescription, ['metadataDescription']),
-        baseModules ? set(baseModules, ['modules']) : undefined,
-      ].filter(Boolean) as any)
-    )
+    const patches = [
+      set(title ?? baseTitle, ['title']),
+      set(metaTitle ?? baseMetadataTitle, ['metadataTitle']),
+      set(description ?? baseDescription, ['metadataDescription']),
+      baseModules ? set(baseModules, ['modules']) : undefined,
+    ].filter((patch): patch is ReturnType<typeof set> => Boolean(patch))
+
+    onChange(PatchEvent.from(patches))
     setIsTranslating(false)
   }
 

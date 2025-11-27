@@ -10,6 +10,7 @@ import blogCategory from './documents/blogCategory'
 import navigation from './documents/navigation'
 import author from './documents/author'
 import tag from './documents/tag'
+import siteSettings from './documents/siteSettings'
 
 // Objects
 import metadata from './objects/metadata'
@@ -18,6 +19,9 @@ import linkList from './objects/linkList'
 import cta from './objects/cta'
 import moduleAttributes from './objects/moduleAttributes'
 import pageTranslation from './objects/pageTranslation'
+import blogPostTranslation from './objects/blogPostTranslation'
+import siteTranslation from './objects/siteTranslation'
+import siteSettingsTranslation from './objects/siteSettingsTranslation'
 
 // Modules (Sections from sane-kit)
 import heroSection from './modules/heroSection'
@@ -44,6 +48,7 @@ export const schema: SchemaPluginOptions = {
     navigation,
     author,
     tag,
+    siteSettings,
 
     // Objects
     metadata,
@@ -52,6 +57,9 @@ export const schema: SchemaPluginOptions = {
     cta,
     moduleAttributes,
     pageTranslation,
+    blogPostTranslation,
+    siteTranslation,
+    siteSettingsTranslation,
 
     // Modules (Sections)
     heroSection,

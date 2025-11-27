@@ -28,6 +28,11 @@ export default defineType({
       type: 'string',
     }),
     defineField({
+      name: 'metadataTitle',
+      title: 'Vertaalde metatitel',
+      type: 'string',
+    }),
+    defineField({
       name: 'metadataDescription',
       title: 'Vertaalde metabeschrijving',
       type: 'text',

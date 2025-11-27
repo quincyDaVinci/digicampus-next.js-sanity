@@ -14,6 +14,7 @@ export default defineType({
     {name: 'branding', title: 'Huisstijl', default: true},
     {name: 'navigation', title: 'Navigatie'},
     {name: 'info', title: 'Site-informatie'},
+    {name: 'translations', title: 'Vertalingen'},
   ],
   fields: [
     defineField({
@@ -133,6 +134,14 @@ export default defineType({
       ],
       description: 'Copyrightvermelding in de footer',
       group: 'info',
+    }),
+    defineField({
+      name: 'translations',
+      title: 'Vertalingen',
+      type: 'array',
+      of: [{type: 'siteTranslation'}],
+      description: 'Synchroon gekopieerde Engelse varianten van sitevelden.',
+      group: 'translations',
     }),
   ],
   preview: {

@@ -8,6 +8,10 @@ export default defineType({
   title: 'Blogbericht',
   type: 'document',
   icon: BookOpenIcon,
+  groups: [
+    {name: 'content', title: 'Inhoud', default: true},
+    {name: 'translations', title: 'Vertalingen'},
+  ],
   fields: [
     defineField({
       name: 'language',
@@ -28,6 +32,7 @@ export default defineType({
       title: 'Titel',
       type: 'string',
       validation: (Rule) => Rule.required(),
+      group: 'content',
     }),
     defineField({
       name: 'slug',
@@ -38,12 +43,14 @@ export default defineType({
         maxLength: 96,
       },
       validation: (Rule) => Rule.required(),
+      group: 'content',
     }),
     defineField({
       name: 'author',
       title: 'Auteur',
       type: 'reference',
       to: [{type: 'author'}],
+      group: 'content',
     }),
     defineField({
       name: 'mainImage',
@@ -59,6 +66,7 @@ export default defineType({
           title: 'Alternatieve tekst',
         },
       ],
+      group: 'content',
     }),
     defineField({
       name: 'categories',
@@ -66,6 +74,7 @@ export default defineType({
       type: 'array',
       of: [{type: 'reference', to: {type: 'blogCategory'}}],
       validation: (Rule) => Rule.max(3).warning('Maximum 3 categorieën aanbevolen voor een overzichtelijke weergave'),
+      group: 'content',
     }),
     defineField({
       name: 'tags',
@@ -73,11 +82,13 @@ export default defineType({
       type: 'array',
       of: [{ type: 'reference', to: { type: 'tag' } }],
       description: 'Optional tags for taxonomy and related-posts filtering',
+      group: 'content',
     }),
     defineField({
       name: 'publishedAt',
       title: 'Gepubliceerd op',
       type: 'datetime',
+      group: 'content',
     }),
     defineField({
       name: 'estimatedReadTime',
@@ -164,6 +175,7 @@ export default defineType({
           )
         },
       },
+      group: 'content',
     }),
     defineField({
       name: 'featured',
@@ -171,6 +183,7 @@ export default defineType({
       type: 'boolean',
       initialValue: false,
       description: 'Markeer dit bericht als uitgelicht voor speciale weergave.',
+      group: 'content',
     }),
     defineField({
       name: 'viewCount',
@@ -179,6 +192,7 @@ export default defineType({
       initialValue: 0,
       description: 'Het aantal keer dat dit bericht is bekeken (voor populariteit).',
       validation: (Rule) => Rule.min(0).integer(),
+      group: 'content',
     }),
     defineField({
       name: 'excerpt',
@@ -193,6 +207,7 @@ export default defineType({
           return wordCount <= 75 || `Maximaal 75 woorden aanbevolen (nu ${wordCount}).`
         })
         .warning(),
+      group: 'content',
     }),
     defineField({
       name: 'body',
@@ -318,6 +333,15 @@ export default defineType({
         },
       ],
       description: 'Configure how the related posts section should find similar articles. The section is shown by default on the blog page; choose the relation method and heading/subheading.',
+      group: 'content',
+    }),
+    defineField({
+      name: 'translations',
+      title: 'Vertalingen',
+      type: 'array',
+      description: 'Automatisch ingevulde Engelse velden op basis van de Nederlandse content.',
+      of: [{type: 'blogPostTranslation'}],
+      group: 'translations',
     }),
   ],
   preview: {

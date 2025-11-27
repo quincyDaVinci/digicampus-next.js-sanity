@@ -1,37 +1,28 @@
-import {type DocumentActionComponent} from 'sanity'
+import {
+  type DocumentActionComponent,
+  type DocumentActionComponentContext,
+  type DocumentActionProps,
+} from 'sanity'
+import {createTranslateFromDutchAction} from './actions/translateFromDutch'
+import {isTranslationSupported} from './translation'
 
-export function customDocumentActions(prev: DocumentActionComponent[], context: any) {
+export function customDocumentActions(
+  prev: DocumentActionComponent[],
+  context: DocumentActionComponentContext
+) {
   const {schemaType, published} = context
-  
-  // For pages and posts: show "Publish" for new docs, "Update" for published docs
-  if (schemaType === 'page' || schemaType === 'post' || schemaType === 'homePage') {
-    return prev.map((action) => {
-      // Rename the publish action based on document state
-      if (action.action === 'publish') {
-        return (props: any) => {
-          const originalResult = action(props)
-          if (originalResult) {
-            return {
-              ...originalResult,
-              label: published ? 'Update' : 'Publish',
-            }
-          }
-          return originalResult
-        }
-      }
-      return action
-    })
-  }
-  
-  // For all other document types: rename to "Save"
-  return prev.map((action) => {
+
+  const translateAction = createTranslateFromDutchAction(context)
+
+  const renamed = prev.map((action) => {
     if (action.action === 'publish') {
-      return (props: any) => {
+      return (props: DocumentActionProps) => {
         const originalResult = action(props)
         if (originalResult) {
+          const isPageLike = schemaType === 'page' || schemaType === 'post' || schemaType === 'homePage'
           return {
             ...originalResult,
-            label: 'Save',
+            label: isPageLike ? (published ? 'Update' : 'Publish') : 'Save',
           }
         }
         return originalResult
@@ -39,4 +30,10 @@ export function customDocumentActions(prev: DocumentActionComponent[], context: 
     }
     return action
   })
+
+  if (isTranslationSupported(schemaType)) {
+    return [translateAction, ...renamed]
+  }
+
+  return renamed
 }
