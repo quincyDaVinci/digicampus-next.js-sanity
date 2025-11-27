@@ -18,6 +18,8 @@ import linkList from './objects/linkList'
 import cta from './objects/cta'
 import moduleAttributes from './objects/moduleAttributes'
 import pageTranslation from './objects/pageTranslation'
+import blogPostTranslation from './objects/blogPostTranslation'
+import siteTranslation from './objects/siteTranslation'
 
 // Modules (Sections from sane-kit)
 import heroSection from './modules/heroSection'
@@ -52,6 +54,8 @@ export const schema: SchemaPluginOptions = {
     cta,
     moduleAttributes,
     pageTranslation,
+    blogPostTranslation,
+    siteTranslation,
 
     // Modules (Sections)
     heroSection,

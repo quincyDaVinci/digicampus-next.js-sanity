@@ -12,5 +12,12 @@ export default defineType({
       title: 'Title',
       type: 'string',
     }),
+    defineField({
+      name: 'translations',
+      title: 'Translations',
+      type: 'array',
+      of: [{type: 'siteTranslation'}],
+      description: 'Keep an English copy of the legacy site settings.',
+    }),
   ],
 })

@@ -3,33 +3,14 @@ import {Button, Card, Flex, Stack, Text} from '@sanity/ui'
 import type {ObjectInputProps} from 'sanity'
 import {PatchEvent, set} from 'sanity'
 import {useFormValue} from 'sanity'
-
-async function translateText(
-  text: string,
-  source: string,
-  target: string
-): Promise<string | undefined> {
-  try {
-    const response = await fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`
-    )
-    const data = await response.json()
-    const translated = data?.responseData?.translatedText as string | undefined
-    if (translated) {
-      return translated
-    }
-    return undefined
-  } catch (error) {
-    console.warn('Translation request failed', error)
-    return undefined
-  }
-}
+import {translateTexts} from '../lib/translationClient'
 
 export function PageTranslationInput(props: ObjectInputProps) {
   const {renderDefault, value, onChange} = props
   const [isTranslating, setIsTranslating] = useState(false)
   const baseTitle = (useFormValue(['title']) as string | undefined) ?? ''
   const baseDescription = (useFormValue(['metadata', 'description']) as string | undefined) ?? ''
+  const baseMetaTitle = (useFormValue(['metadata', 'title']) as string | undefined) ?? ''
   const baseModules = useFormValue(['modules']) as unknown
   const sourceLanguage =
     (useFormValue(['metadata', 'language']) as string | undefined) ?? 'nl'
@@ -45,20 +26,20 @@ export function PageTranslationInput(props: ObjectInputProps) {
     if (!targetLanguage) return
     setIsTranslating(true)
 
-    const title = baseTitle
-      ? await translateText(baseTitle, sourceLanguage, targetLanguage)
-      : undefined
-    const description = baseDescription
-      ? await translateText(baseDescription, sourceLanguage, targetLanguage)
-      : undefined
-
-    onChange(
-      PatchEvent.from([
-        set(title ?? baseTitle, ['title']),
-        set(description ?? baseDescription, ['metadataDescription']),
-        baseModules ? set(baseModules, ['modules']) : undefined,
-      ].filter(Boolean) as any)
+    const [title, metaTitle, description] = await translateTexts(
+      [baseTitle, baseMetaTitle, baseDescription],
+      sourceLanguage,
+      targetLanguage
     )
+
+    const patches = [
+      set(title ?? baseTitle, ['title']),
+      set(metaTitle ?? baseMetaTitle, ['metadataTitle']),
+      set(description ?? baseDescription, ['metadataDescription']),
+      baseModules ? set(baseModules, ['modules']) : undefined,
+    ].filter((patch): patch is NonNullable<ReturnType<typeof set>> => Boolean(patch))
+
+    onChange(PatchEvent.from(patches))
     setIsTranslating(false)
   }
 
