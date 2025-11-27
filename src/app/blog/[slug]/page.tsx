@@ -274,6 +274,14 @@ export default async function BlogPostPage({params}: PageProps) {
                   ),
                   normal: ({children}) => <p className="mb-4 leading-relaxed">{children}</p>,
                 },
+                list: {
+                  bullet: ({children}) => <ul className="list-disc list-outside ml-6 mb-4 space-y-2">{children}</ul>,
+                  number: ({children}) => <ol className="list-decimal list-outside ml-6 mb-4 space-y-2">{children}</ol>,
+                },
+                listItem: {
+                  bullet: ({children}) => <li className="leading-relaxed">{children}</li>,
+                  number: ({children}) => <li className="leading-relaxed">{children}</li>,
+                },
                 types: {
                   image: ({value}) => {
                     const imageUrl = value?.asset ? urlFor(value).width(1200).auto('format').url() : null
