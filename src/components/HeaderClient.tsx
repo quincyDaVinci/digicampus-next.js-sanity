@@ -28,6 +28,7 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
   const navRef = useRef<HTMLElement | null>(null)
   const mobileMenuRef = useRef<HTMLDivElement | null>(null)
   const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null)
+  const homeHref = `/${language}`
 
   // Persist dark mode
   useEffect(() => {
@@ -117,7 +118,7 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
         <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-4 items-start w-full" style={{ minHeight: "8rem" }}>
           {/* Top-left: Logo */}
           <div className="col-start-1 row-start-1 flex items-start min-w-0">
-            <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
+            <Link href={homeHref} className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
               <span className="sr-only">Digicampus homepage</span>
               {logo ? (
                 <Image
@@ -220,7 +221,7 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
               ))
             ) : (
               <Link
-                href="/contact"
+                href={`/${language}/contact`}
                 className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
                 style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
               >
@@ -244,7 +245,7 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
             {mobileOpen ? <CloseIcon aria-hidden focusable="false" /> : <MenuIcon aria-hidden focusable="false" />}
           </button>
 
-            <Link href="/" className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
+            <Link href={homeHref} className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
             {logo ? (
               <Image src={logo.url} alt={logo.alt} width={logo.width || 160} height={logo.height || 40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
             ) : (
@@ -314,7 +315,7 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
                 ))
               ) : (
                 <Link
-                  href="/contact"
+                  href={`/${language}/contact`}
                   className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
                   style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
                 >

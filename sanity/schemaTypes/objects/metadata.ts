@@ -10,6 +10,21 @@ export default defineType({
   type: 'object',
   fields: [
     defineField({
+      name: 'language',
+      title: 'Taal',
+      type: 'string',
+      description: 'Welke taal is de canonieke versie van deze pagina?',
+      options: {
+        list: [
+          {title: 'Nederlands', value: 'nl'},
+          {title: 'English', value: 'en'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'nl',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'title',
       title: 'Metatitel',
       type: 'string',
@@ -23,6 +38,33 @@ export default defineType({
       rows: 3,
       description: 'SEO-beschrijving (verschijnt in zoekresultaten)',
       validation: (Rule) => Rule.max(160).warning('Houd het onder 160 tekens voor beste SEO'),
+    }),
+    defineField({
+      name: 'localizedSlugs',
+      title: 'Taal-specifieke slugs',
+      type: 'object',
+      description: 'Gebruik verschillende URL-segmenten per taal. Als leeg, wordt de standaard slug gebruikt.',
+      options: {columns: 2},
+      fields: [
+        defineField({
+          name: 'nl',
+          type: 'slug',
+          title: 'Slug (NL)',
+          options: {
+            source: (doc: any) => doc.title || doc.metadata?.title,
+            maxLength: 96,
+          },
+        }),
+        defineField({
+          name: 'en',
+          type: 'slug',
+          title: 'Slug (EN)',
+          options: {
+            source: (doc: any) => doc.title || doc.metadata?.title,
+            maxLength: 96,
+          },
+        }),
+      ],
     }),
     defineField({
       name: 'slug',

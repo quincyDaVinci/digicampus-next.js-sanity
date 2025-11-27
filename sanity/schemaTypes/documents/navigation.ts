@@ -12,6 +12,20 @@ export default defineType({
   icon: LayersIcon,
   fields: [
     defineField({
+      name: 'language',
+      title: 'Taal',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Nederlands', value: 'nl'},
+          {title: 'English', value: 'en'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'nl',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'title',
       title: 'Menutitel',
       type: 'string',

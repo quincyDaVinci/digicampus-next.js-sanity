@@ -11,7 +11,7 @@ type PageData = {
 type PagePreviewProps = {
   initial: QueryResponseInitial<PageData | null>
   query: string
-  params: {slug: string}
+  params: {slug: string; lang: string}
 }
 
 export function PagePreview({initial, query, params}: PagePreviewProps) {

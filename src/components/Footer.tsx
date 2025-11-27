@@ -34,7 +34,7 @@ const fallbackLinks = [
   { label: "Contact", href: "/contact" },
 ]
 
-export default async function Footer() {
+export default async function Footer({ lang }: { lang: string }) {
   const hasSanityCredentials = Boolean(
     process.env.NEXT_PUBLIC_SANITY_PROJECT_ID &&
       process.env.NEXT_PUBLIC_SANITY_DATASET,
@@ -46,10 +46,10 @@ export default async function Footer() {
 
   if (hasSanityCredentials) {
     try {
-      const siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery)
+      const siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery, { lang })
       
       // Process footer navigation
-      if (siteData?.footer?.items && siteData.footer.items.length > 0) {
+      if (siteData?.footer?.items && siteData.footer.items.length > 0 && (!siteData.footer.language || siteData.footer.language === lang)) {
         footerGroups = siteData.footer.items
           .map(item => {
             if (item._type === 'link.list' && item.items) {
@@ -110,8 +110,8 @@ export default async function Footer() {
                 <ul className="space-y-2 text-sm">
                   {group.items.map((link, linkIdx) => (
                     <li key={linkIdx}>
-                      <Link 
-                        href={link.href} 
+                      <Link
+                        href={`/${lang}${link.href}`}
                         className="text-dc-text-muted hover:text-dc-brand transition-colors focus-visible:ring-2 ring-dc-focus rounded inline-block"
                       >
                         {link.label}

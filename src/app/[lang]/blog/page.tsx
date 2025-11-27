@@ -7,6 +7,7 @@ import {
   buildBlogPostsCountQuery,
   buildHighlightedPostsQuery,
 } from '@sanity/lib/queries/blog'
+import {defaultLanguage, supportedLanguages} from '@/lib/i18n'
 import BlogPageClient from './BlogPageClient'
 
 type BlogPageData = {
@@ -58,14 +59,19 @@ type SearchParams = {
 }
 
 type PageProps = {
-  searchParams: Promise<SearchParams>
+  params: {lang: string}
+  searchParams: SearchParams
 }
 
-export async function generateMetadata({searchParams}: PageProps): Promise<Metadata> {
-  const params = await searchParams
+export async function generateStaticParams() {
+  return supportedLanguages.map((lang) => ({lang}))
+}
+
+export async function generateMetadata({searchParams, params}: PageProps): Promise<Metadata> {
+  const lang = params?.lang || defaultLanguage
   
   try {
-    const blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery)
+    const blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang})
     
     if (!blogPageData) {
       return {
@@ -85,6 +91,13 @@ export async function generateMetadata({searchParams}: PageProps): Promise<Metad
     return {
       title,
       description,
+      openGraph: { locale: lang === 'nl' ? 'nl_NL' : 'en_US' },
+      alternates: {
+        languages: {
+          en: '/en/blog',
+          nl: '/nl/blog',
+        },
+      },
     }
   } catch (error) {
     console.error('Error fetching blog page metadata:', error)
@@ -95,17 +108,17 @@ export async function generateMetadata({searchParams}: PageProps): Promise<Metad
   }
 }
 
-export default async function BlogPage({searchParams}: PageProps) {
-  const params = await searchParams
+export default async function BlogPage({searchParams, params}: PageProps) {
+  const lang = params?.lang || defaultLanguage
   
   // Extract and validate search params
-  const categorySlug = params.category || undefined
-  const sortBy = params.sort || 'newest'
-  const currentPage = Math.max(1, parseInt(params.page || '1', 10))
+  const categorySlug = searchParams.category || undefined
+  const sortBy = searchParams.sort || 'newest'
+  const currentPage = Math.max(1, parseInt(searchParams.page || '1', 10))
 
   try {
     // Fetch blog page configuration
-    const blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery)
+    const blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang})
     
     if (!blogPageData) {
       return (
@@ -124,11 +137,12 @@ export default async function BlogPage({searchParams}: PageProps) {
     const [categories, posts, totalPosts, highlightedPosts] = await Promise.all([
       client.fetch<Category[]>(blogCategoriesQuery),
       client.fetch<BlogPost[]>(
-        buildBlogPostsQuery(categorySlug, sortBy, currentPage, postsPerPage)
+        buildBlogPostsQuery(lang, categorySlug, sortBy, currentPage, postsPerPage)
       ),
-      client.fetch<number>(buildBlogPostsCountQuery(categorySlug)),
+      client.fetch<number>(buildBlogPostsCountQuery(lang, categorySlug)),
       client.fetch<BlogPost[]>(
         buildHighlightedPostsQuery(
+          lang,
           blogPageData.highlightCriteria,
           blogPageData.highlightCount
         )

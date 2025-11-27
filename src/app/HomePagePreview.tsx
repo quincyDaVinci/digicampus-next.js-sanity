@@ -11,10 +11,11 @@ type PageData = {
 type HomePagePreviewProps = {
   initial: QueryResponseInitial<PageData | null>
   query: string
+  params?: Record<string, unknown>
 }
 
-export function HomePagePreview({initial, query}: HomePagePreviewProps) {
-  const {data, loading, error} = useQuery<PageData | null>(query, {}, {initial})
+export function HomePagePreview({initial, query, params}: HomePagePreviewProps) {
+  const {data, loading, error} = useQuery<PageData | null>(query, params ?? {}, {initial})
   
   // Listen for navigation events from Sanity Studio
   useEffect(() => {

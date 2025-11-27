@@ -8,7 +8,8 @@ import {groq} from 'next-sanity'
 const blogPostFields = groq`
   _id,
   title,
-  "slug": slug.current,
+  language,
+  "slug": coalesce(metadata.localizedSlugs[$lang].current, slug.current),
   publishedAt,
   excerpt,
   body,
@@ -57,7 +58,7 @@ const blogPostFields = groq`
  * Fetch blog page configuration (singleton)
  */
 export const blogPageQuery = groq`
-  *[_type == "blogPage" && _id == "blogPage"][0]{
+  *[_type == "blogPage" && _id == "blogPage" && metadata.language == $lang][0]{
     _id,
     title,
     description,
@@ -88,6 +89,7 @@ export const blogCategoriesQuery = groq`
  * @param limit - Number of posts per page
  */
 export function buildBlogPostsQuery(
+  lang: string,
   categorySlug?: string,
   sortBy: string = 'newest',
   page: number = 1,
@@ -100,6 +102,7 @@ export function buildBlogPostsQuery(
   const filters = [
     '_type == "blogPost"',
     'defined(publishedAt)',
+    `language == "${lang}"`,
   ]
 
   if (categorySlug) {
@@ -136,10 +139,11 @@ export function buildBlogPostsQuery(
 /**
  * Build a query to get total count of posts (for pagination)
  */
-export function buildBlogPostsCountQuery(categorySlug?: string) {
+export function buildBlogPostsCountQuery(lang: string, categorySlug?: string) {
   const filters = [
     '_type == "blogPost"',
     'defined(publishedAt)',
+    `language == "${lang}"`,
   ]
 
   if (categorySlug) {
@@ -157,10 +161,11 @@ export function buildBlogPostsCountQuery(categorySlug?: string) {
  * @param limit - Number of posts to fetch
  */
 export function buildHighlightedPostsQuery(
+  lang: string,
   criteria: string = 'viewCount',
   limit: number = 3
 ) {
-  let filter = '_type == "blogPost" && defined(publishedAt)'
+  let filter = `_type == "blogPost" && defined(publishedAt) && language == "${lang}"`
   let orderBy = 'publishedAt desc'
 
   switch (criteria) {

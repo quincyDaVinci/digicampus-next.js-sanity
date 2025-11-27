@@ -34,22 +34,25 @@ const fallbackMenus = [
   { label: "Wie we zijn", items: [{ label: "Team", href: "/team" }, { label: "Partners", href: "/partners" }] },
 ]
 
-export default async function Header() {
+export default async function Header({ lang }: { lang: string }) {
   const hasSanityCredentials = Boolean(
     process.env.NEXT_PUBLIC_SANITY_PROJECT_ID &&
       process.env.NEXT_PUBLIC_SANITY_DATASET,
   )
 
-  let menus = fallbackMenus
+  let menus = fallbackMenus.map(menu => ({
+    ...menu,
+    items: menu.items.map(item => ({ ...item, href: `/${lang}${item.href}` })),
+  }))
   let logo: { url: string; alt: string; width?: number; height?: number } | null = null
   let ctas: Array<{ label: string; href: string }> = []
 
   if (hasSanityCredentials) {
     try {
-      const siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery)
+      const siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery, { lang })
       
       // Process navigation items
-      if (siteData?.header?.items && siteData.header.items.length > 0) {
+      if (siteData?.header?.items && siteData.header.items.length > 0 && (!siteData.header.language || siteData.header.language === lang)) {
         menus = siteData.header.items
           .filter(item => item._type === 'link.list' && item.items)
           .map(item => ({

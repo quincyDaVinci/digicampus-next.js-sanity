@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { defaultLanguage, isSupportedLang } from './lib/i18n'
 
 export function middleware(request: NextRequest) {
   // Clone the request headers
   const requestHeaders = new Headers(request.headers)
-  
+
+  const [maybeLang] = request.nextUrl.pathname.split('/').filter(Boolean)
+  const lang = isSupportedLang(maybeLang) ? maybeLang : defaultLanguage
+  requestHeaders.set('x-dc-lang', lang)
+
   // Create response
   const response = NextResponse.next({
     request: {

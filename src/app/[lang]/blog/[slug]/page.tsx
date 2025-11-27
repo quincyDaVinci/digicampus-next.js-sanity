@@ -12,6 +12,7 @@ import ImageLightbox from '@/components/ImageLightbox'
 import AuthorCard from '@/components/AuthorCard'
 import ParallaxImage from '@/components/ParallaxImage'
 import BlogSection from '@/components/sections/BlogSection'
+import {defaultLanguage} from '@/lib/i18n'
 
 type BlogPost = {
   _id: string
@@ -56,10 +57,11 @@ type BlogPost = {
 }
 
 const blogPostQuery = groq`
-  *[_type == "blogPost" && slug.current == $slug][0]{
+  *[_type == "blogPost" && language == $lang && coalesce(metadata.localizedSlugs[$lang].current, slug.current) == $slug][0]{
     _id,
     title,
-    "slug": slug.current,
+    language,
+    "slug": coalesce(metadata.localizedSlugs[$lang].current, slug.current),
     publishedAt,
     excerpt,
     body,
@@ -90,14 +92,14 @@ const blogPostQuery = groq`
 `
 
 type PageProps = {
-  params: Promise<{ slug: string }>
+  params: { slug: string; lang: string }
 }
 
 export async function generateMetadata({params}: PageProps): Promise<Metadata> {
-  const {slug} = await params
+  const {slug, lang = defaultLanguage} = params
   
   try {
-    const post = await client.fetch<BlogPost | null>(blogPostQuery, {slug})
+    const post = await client.fetch<BlogPost | null>(blogPostQuery, {slug, lang})
     
     if (!post) {
       return {
@@ -108,6 +110,13 @@ export async function generateMetadata({params}: PageProps): Promise<Metadata> {
     return {
       title: post.title,
       description: post.excerpt || `Lees ${post.title} op Digicampus`,
+      openGraph: { locale: lang === 'nl' ? 'nl_NL' : 'en_US' },
+      alternates: {
+        languages: {
+          en: `/en/blog/${slug}`,
+          nl: `/nl/blog/${slug}`,
+        },
+      },
     }
   } catch (error) {
     console.error('Error generating metadata:', error)
@@ -118,10 +127,10 @@ export async function generateMetadata({params}: PageProps): Promise<Metadata> {
 }
 
 export default async function BlogPostPage({params}: PageProps) {
-  const {slug} = await params
+  const {slug, lang = defaultLanguage} = params
 
   try {
-    const post = await client.fetch<BlogPost | null>(blogPostQuery, {slug})
+    const post = await client.fetch<BlogPost | null>(blogPostQuery, {slug, lang})
 
     if (!post) {
       notFound()
@@ -129,7 +138,7 @@ export default async function BlogPostPage({params}: PageProps) {
 
     // Format date on server only to avoid hydration mismatch
     const formattedDate = post.publishedAt
-      ? new Date(post.publishedAt).toLocaleDateString('nl-NL', {
+      ? new Date(post.publishedAt).toLocaleDateString(lang === 'nl' ? 'nl-NL' : 'en-US', {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
@@ -151,9 +160,9 @@ export default async function BlogPostPage({params}: PageProps) {
       ? urlFor(post.author.image).width(96).height(96).fit('crop').auto('format').url()
       : null
 
-      const breadcrumbs = [
-      {label: 'Home', href: '/'},
-      {label: 'Blog', href: '/blog'},
+    const breadcrumbs = [
+      {label: 'Home', href: `/${lang}`},
+      {label: 'Blog', href: `/${lang}/blog`},
       {label: post.title},
     ]
 
@@ -168,7 +177,7 @@ export default async function BlogPostPage({params}: PageProps) {
         <article className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Back link */}
         <Link
-          href="/blog"
+          href={`/${lang}/blog`}
           className="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-[hsl(var(--dc-brand))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg mb-8"
           style={{color: 'hsl(var(--dc-text) / 0.7)'}}
         >
@@ -182,7 +191,7 @@ export default async function BlogPostPage({params}: PageProps) {
             {post.categories.map((category) => (
               <Link
                 key={category._id}
-                href={`/blog?category=${category.slug}`}
+                href={`/${lang}/blog?category=${category.slug}`}
                 className="rounded-full px-3 py-1 text-sm font-medium transition-colors hover:bg-[hsl(var(--dc-brand)/0.15)]"
                 style={{
                   backgroundColor: 'hsl(var(--dc-brand)/0.1)',

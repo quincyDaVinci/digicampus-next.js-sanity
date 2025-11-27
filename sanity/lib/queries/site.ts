@@ -9,6 +9,7 @@ export const siteSettingsQuery = groq`
     "logo": logo,
     "logoAlt": logo.alt,
     header->{
+      language,
       title,
       items[]{
         _type,
@@ -18,9 +19,9 @@ export const siteSettingsQuery = groq`
           type == "internal" => {
             "internalType": internal->_type,
             "href": select(
-              internal->_type == "blogPage" => "/blog",
-              internal->_type == "homePage" => "/",
-              "/" + internal->metadata.slug.current
+              internal->_type == "blogPage" => "/" + $lang + "/blog",
+              internal->_type == "homePage" => "/" + $lang,
+              "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
             )
           },
           type == "external" => {
@@ -35,9 +36,9 @@ export const siteSettingsQuery = groq`
             type == "internal" => {
               "internalType": internal->_type,
               "href": select(
-                internal->_type == "blogPage" => "/blog",
-                internal->_type == "homePage" => "/",
-                "/" + internal->metadata.slug.current
+                internal->_type == "blogPage" => "/" + $lang + "/blog",
+                internal->_type == "homePage" => "/" + $lang,
+                "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
               )
             },
             type == "external" => {
@@ -53,9 +54,9 @@ export const siteSettingsQuery = groq`
       type == "internal" => {
         "internalType": internal->_type,
         "href": select(
-          internal->_type == "blogPage" => "/blog",
-          internal->_type == "homePage" => "/",
-          "/" + internal->metadata.slug.current
+          internal->_type == "blogPage" => "/" + $lang + "/blog",
+          internal->_type == "homePage" => "/" + $lang,
+          "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
         )
       },
       type == "external" => {
@@ -63,6 +64,7 @@ export const siteSettingsQuery = groq`
       }
     },
     footer->{
+      language,
       title,
       items[]{
         _type,
@@ -72,9 +74,9 @@ export const siteSettingsQuery = groq`
           type == "internal" => {
             "internalType": internal->_type,
             "href": select(
-              internal->_type == "blogPage" => "/blog",
-              internal->_type == "homePage" => "/",
-              "/" + internal->metadata.slug.current
+              internal->_type == "blogPage" => "/" + $lang + "/blog",
+              internal->_type == "homePage" => "/" + $lang,
+              "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
             )
           },
           type == "external" => {
@@ -89,9 +91,9 @@ export const siteSettingsQuery = groq`
             type == "internal" => {
               "internalType": internal->_type,
               "href": select(
-                internal->_type == "blogPage" => "/blog",
-                internal->_type == "homePage" => "/",
-                "/" + internal->metadata.slug.current
+                internal->_type == "blogPage" => "/" + $lang + "/blog",
+                internal->_type == "homePage" => "/" + $lang,
+                "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
               )
             },
             type == "external" => {
