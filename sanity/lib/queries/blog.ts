@@ -102,7 +102,8 @@ export function buildBlogPostsQuery(
   const filters = [
     '_type == "blogPost"',
     'defined(publishedAt)',
-    `language == "${lang}"`,
+    // Include posts that are authored in the requested language OR have a translation stored for that language
+    `(language == "${lang}" || defined(translations.${lang}))`,
   ]
 
   if (categorySlug) {
@@ -143,7 +144,7 @@ export function buildBlogPostsCountQuery(lang: string, categorySlug?: string) {
   const filters = [
     '_type == "blogPost"',
     'defined(publishedAt)',
-    `language == "${lang}"`,
+    `(language == "${lang}" || defined(translations.${lang}))`,
   ]
 
   if (categorySlug) {
@@ -165,7 +166,7 @@ export function buildHighlightedPostsQuery(
   criteria: string = 'viewCount',
   limit: number = 3
 ) {
-  let filter = `_type == "blogPost" && defined(publishedAt) && language == "${lang}"`
+  let filter = `_type == "blogPost" && defined(publishedAt) && (language == "${lang}" || defined(translations.${lang}))`
   let orderBy = 'publishedAt desc'
 
   switch (criteria) {

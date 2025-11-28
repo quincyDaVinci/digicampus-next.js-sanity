@@ -62,7 +62,27 @@ export function LanguageProvider({ children, initialLang }: { children: React.Re
       segments.unshift(nextLang)
     }
     const nextPath = '/' + segments.join('/')
-    router.push(nextPath || '/')
+    // Navigate to the new path. `router.push` may or may not return a Promise
+    // depending on Next.js version/runtime; handle both cases safely and
+    // refresh server-rendered content after navigation to re-run server
+    // components and `headers()` usage.
+    try {
+      const result = router.push(nextPath || '/')
+      if (result && typeof (result as any).then === 'function') {
+        ;(result as any).then(() => {
+          try { router.refresh() } catch { /* best-effort refresh */ }
+        })
+      } else {
+        // If push is synchronous/void, call refresh on next tick to allow
+        // the navigation to complete.
+        setTimeout(() => {
+          try { router.refresh() } catch { /* best-effort refresh */ }
+        }, 0)
+      }
+    } catch (err) {
+      // If router.push throws for any reason, fallback to a full reload.
+      try { window.location.href = nextPath } catch { /* ignore */ }
+    }
   }
 
   // Expose a stable lang value to consumers to avoid making them handle null.

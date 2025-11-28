@@ -4,6 +4,19 @@ export default defineType({
   name: 'blogPostTranslation',
   title: 'Vertaling (blog)',
   type: 'object',
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'excerpt',
+    },
+    prepare(selection) {
+      const {title, subtitle} = selection
+      return {
+        title: title || 'Vertaling',
+        subtitle: subtitle ? (typeof subtitle === 'string' ? subtitle.slice(0, 120) : '') : '',
+      }
+    },
+  },
   fields: [
     defineField({
       name: 'language',

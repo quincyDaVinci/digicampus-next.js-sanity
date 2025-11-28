@@ -7,7 +7,7 @@ import {
   buildBlogPostsCountQuery,
   buildHighlightedPostsQuery,
 } from '@sanity/lib/queries/blog'
-import {defaultLanguage, supportedLanguages} from '@/lib/i18n'
+import {defaultLanguage, supportedLanguages, isSupportedLang} from '@/lib/i18n'
 import BlogPageClient from './BlogPageClient'
 
 type BlogPageData = {
@@ -68,10 +68,16 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({searchParams, params}: PageProps): Promise<Metadata> {
-  const lang = params?.lang || defaultLanguage
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const lang = resolvedParams?.lang || defaultLanguage
   
   try {
-    const blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang})
+    // Try requested language first; if missing, fall back to defaultLanguage
+    let blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang})
+    if (!blogPageData && lang !== defaultLanguage) {
+      blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang: defaultLanguage})
+    }
     
     if (!blogPageData) {
       return {
@@ -84,7 +90,7 @@ export async function generateMetadata({searchParams, params}: PageProps): Promi
     let description = blogPageData.metadata?.description || blogPageData.description || 'Browse our blog posts'
 
     // Add context to meta description if filtered/sorted
-    if (params.category) {
+    if (resolvedSearchParams?.category) {
       description = `${description} - Filtered by category`
     }
 
@@ -109,17 +115,24 @@ export async function generateMetadata({searchParams, params}: PageProps): Promi
 }
 
 export default async function BlogPage({searchParams, params}: PageProps) {
-  const lang = params?.lang || defaultLanguage
-  
+  // Await params/searchParams per Next.js sync-dynamic-apis guidance
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const lang = resolvedParams?.lang || defaultLanguage
+
   // Extract and validate search params
-  const categorySlug = searchParams.category || undefined
-  const sortBy = searchParams.sort || 'newest'
-  const currentPage = Math.max(1, parseInt(searchParams.page || '1', 10))
+  const categorySlug = resolvedSearchParams?.category || undefined
+  const sortBy = resolvedSearchParams?.sort || 'newest'
+  const currentPage = Math.max(1, parseInt(resolvedSearchParams?.page || '1', 10))
 
   try {
     // Fetch blog page configuration
-    const blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang})
-    
+    // Fetch blog page configuration for requested language; if missing, fall back to defaultLanguage
+    let blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang})
+    if (!blogPageData && lang !== defaultLanguage) {
+      blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang: defaultLanguage})
+    }
+
     if (!blogPageData) {
       return (
         <div className="container mx-auto px-4 py-12">
@@ -133,21 +146,62 @@ export default async function BlogPage({searchParams, params}: PageProps) {
 
     const postsPerPage = blogPageData.postsPerPage || 12
 
-    // Fetch data in parallel
-    const [categories, posts, totalPosts, highlightedPosts] = await Promise.all([
-      client.fetch<Category[]>(blogCategoriesQuery),
-      client.fetch<BlogPost[]>(
-        buildBlogPostsQuery(lang, categorySlug, sortBy, currentPage, postsPerPage)
-      ),
-      client.fetch<number>(buildBlogPostsCountQuery(lang, categorySlug)),
-      client.fetch<BlogPost[]>(
+    // Use the language of the blogPageData when querying posts (this may be a fallback language).
+    // Prefer an explicit language set on the blogPage metadata or document; otherwise use the requested lang.
+    let usedLang = (blogPageData as any)?.metadata?.language || (blogPageData as any)?.language || lang || defaultLanguage
+    if (!isSupportedLang(usedLang)) usedLang = defaultLanguage
+
+    // Fetch data with per-call error handling so we can surface specific failures in the server logs
+    let categories: Category[] = []
+    let posts: BlogPost[] = []
+    let totalPosts = 0
+    let highlightedPosts: BlogPost[] = []
+
+    try {
+      console.debug('[blog] fetching categories')
+      categories = await client.fetch<Category[]>(blogCategoriesQuery)
+      console.debug('[blog] fetched categories', categories?.length)
+    } catch (err) {
+      console.error('[blog] failed to fetch categories', err)
+      categories = []
+    }
+
+    try {
+      console.debug('[blog] fetching posts', {usedLang, categorySlug, sortBy, currentPage, postsPerPage})
+      posts = await client.fetch<BlogPost[]>(
+        buildBlogPostsQuery(usedLang, categorySlug, sortBy, currentPage, postsPerPage),
+        {lang: usedLang}
+      )
+      console.debug('[blog] fetched posts', posts?.length)
+    } catch (err) {
+      console.error('[blog] failed to fetch posts', err)
+      posts = []
+    }
+
+    try {
+      console.debug('[blog] fetching posts count', {usedLang, categorySlug})
+      totalPosts = await client.fetch<number>(buildBlogPostsCountQuery(usedLang, categorySlug), {lang: usedLang})
+      console.debug('[blog] total posts count', totalPosts)
+    } catch (err) {
+      console.error('[blog] failed to fetch posts count', err)
+      totalPosts = 0
+    }
+
+    try {
+      console.debug('[blog] fetching highlighted posts', {usedLang, criteria: blogPageData.highlightCriteria, count: blogPageData.highlightCount})
+      highlightedPosts = await client.fetch<BlogPost[]>(
         buildHighlightedPostsQuery(
-          lang,
+          usedLang,
           blogPageData.highlightCriteria,
           blogPageData.highlightCount
-        )
-      ),
-    ])
+        ),
+        {lang: usedLang}
+      )
+      console.debug('[blog] fetched highlighted posts', highlightedPosts?.length)
+    } catch (err) {
+      console.error('[blog] failed to fetch highlighted posts', err)
+      highlightedPosts = []
+    }
 
     const totalPages = Math.ceil(totalPosts / postsPerPage)
 

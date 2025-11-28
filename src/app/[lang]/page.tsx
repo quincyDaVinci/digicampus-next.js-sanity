@@ -31,14 +31,14 @@ const homePageQuery = `*[_type == "homePage"][0]{
   }
 }`
 
-type HomeParams = { params: { lang: string } }
+type HomeParams = { params: Promise<{ lang: string }> }
 
 export function generateStaticParams() {
   return supportedLanguages.map((lang) => ({ lang }))
 }
 
 export async function generateMetadata({ params }: HomeParams): Promise<Metadata> {
-  const { lang } = params
+  const { lang } = await params
   const locale = lang === 'nl' ? 'nl_NL' : 'en_US'
 
   return {
@@ -61,28 +61,42 @@ export async function generateMetadata({ params }: HomeParams): Promise<Metadata
   }
 }
 
-async function getHomePage(lang: string) {
+type FetchedHomePage = { page: any | null; isFallback: boolean }
+
+async function getHomePage(lang: string): Promise<FetchedHomePage> {
   try {
-    const page = await client.fetch(homePageQuery, { lang }, {
-      cache: 'no-store', // Disable caching for now to test
-    })
-    if (page) return page
-    if (lang !== defaultLanguage) {
-      return client.fetch(homePageQuery, { lang: defaultLanguage }, { cache: 'no-store' })
+    // Try fetching the page for the requested language first
+    const pageForLang = await client.fetch(homePageQuery, { lang }, { cache: 'no-store' })
+
+    // If requesting the default language, return it directly (no fallback semantics)
+    if (lang === defaultLanguage) {
+      return { page: pageForLang ?? null, isFallback: false }
     }
-    return null
+
+    // If a page exists and it contains a localized payload for this lang, use it
+    const hasTranslation = !!(pageForLang && pageForLang.localized && (
+      pageForLang.localized.title || (pageForLang.localized.modules && pageForLang.localized.modules.length > 0)
+    ))
+
+    if (hasTranslation) {
+      return { page: pageForLang, isFallback: false }
+    }
+
+    // No translation available — fetch the default language page as a fallback
+    const fallbackPage = await client.fetch(homePageQuery, { lang: defaultLanguage }, { cache: 'no-store' })
+    return { page: fallbackPage ?? null, isFallback: true }
   } catch (error) {
     console.error('Error fetching home page:', error)
-    return null
+    return { page: null, isFallback: false }
   }
 }
 
 export default async function Page({ params }: HomeParams) {
-  const { lang = defaultLanguage } = params
+  const { lang = defaultLanguage } = await params
   const draft = await draftMode()
-  const page = await getHomePage(lang)
-  const localizedTitle = page?.localized?.title ?? page?.title
-  const localizedModules = page?.localized?.modules ?? page?.modules
+  const { page, isFallback } = await getHomePage(lang)
+  const localizedTitle = !isFallback ? page?.localized?.title ?? page?.title : page?.title
+  const localizedModules = !isFallback ? page?.localized?.modules ?? page?.modules : page?.modules
 
   // If in draft mode, use the live preview component
   if (draft.isEnabled && page) {
@@ -102,11 +116,21 @@ export default async function Page({ params }: HomeParams) {
       </main>
     )
   }
-
-  // Render the home page modules
+  // Render the home page modules. If we're showing a fallback (default language)
+  // because the requested language has no translation, show a polite notice.
   return (
     <main id="main">
       <h1 className="sr-only">{localizedTitle}</h1>
+      {isFallback && lang !== defaultLanguage && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-md text-sm text-yellow-800">
+          {lang === 'en' ? (
+            <p>This page is not yet translated to English — showing the default language content.</p>
+          ) : (
+            <p>Deze pagina is nog niet vertaald naar Nederlands — we tonen de standaardinhoud.</p>
+          )}
+        </div>
+      )}
+
       {localizedModules?.map((module: { _key: string; _type: string }) => (
         <RenderSection key={module._key} section={module} />
       ))}

@@ -7,7 +7,25 @@ import {
   SanityDocument,
 } from 'sanity'
 import {useToast} from '@sanity/ui'
-import {translateDeepObject, ensureArrayWithLanguage, isTranslationSupported} from '../translation'
+import {translateDeepObject, isTranslationSupported} from '../translation'
+
+function ensureTranslationsObject(existing: any, translation: any, lang = 'en') {
+  // If existing is an array (legacy), convert to object keyed by language
+  if (Array.isArray(existing)) {
+    const obj: Record<string, any> = {}
+    for (const item of existing) {
+      if (item && item.language) obj[item.language] = item
+    }
+    obj[lang] = translation
+    return obj
+  }
+
+  if (existing && typeof existing === 'object' && !Array.isArray(existing)) {
+    return {...existing, [lang]: translation}
+  }
+
+  return {[lang]: translation}
+}
 
 type TranslationEntry = {_key?: string; language?: string}
 
@@ -36,8 +54,7 @@ function buildPageTranslation(doc: TranslatableDocument) {
 
 function buildBlogTranslation(doc: TranslatableDocument) {
   return {
-    _type: 'blogPostTranslation',
-    language: 'en',
+    // Inline translation object — copy only textual fields as starting point.
     title: doc?.title || '',
     excerpt: doc?.excerpt || '',
     body: doc?.body || [],
@@ -151,41 +168,50 @@ export function createTranslateFromDutchAction(
             return
           }
         } else {
-          // If nothing meaningful changed, warn the editor so they know translations may be identical.
-          toast.push({
-            status: 'info',
-            title: 'Geen zichtbare wijzigingen in voorbeeld',
-            description: 'De automatische vertaling gaf geen andere tekst terug voor de belangrijkste velden.',
-          })
+          // If nothing meaningful changed, continue and overwrite the translation object anyway.
+          // We avoid showing the 'no visible changes' info toast so the editor sees the replacement happen.
         }
 
         let setPaths: Record<string, unknown> = {}
 
         if (docType === 'page' || docType === 'homePage') {
           setPaths = {
-            translations: ensureArrayWithLanguage(draft?.translations, translated),
+            translations: ensureTranslationsObject(draft?.translations, translated, 'en'),
           }
         }
 
         if (docType === 'blogPost') {
           setPaths = {
-            translations: ensureArrayWithLanguage(draft?.translations, translated),
+            translations: ensureTranslationsObject(draft?.translations, translated, 'en'),
           }
         }
 
         if (docType === 'site') {
           setPaths = {
-            translations: ensureArrayWithLanguage(draft?.translations, translated),
+            translations: ensureTranslationsObject(draft?.translations, translated),
           }
         }
 
         if (docType === 'siteSettings') {
           setPaths = {
-            translations: ensureArrayWithLanguage(draft?.translations, translated),
+            translations: ensureTranslationsObject(draft?.translations, translated),
           }
         }
 
-        await client.patch(documentId).setIfMissing({translations: []}).set(setPaths).commit({autoGenerateArrayKeys: true})
+        // Force-replace the language entry so we always write a new object even when contents are identical.
+        const langKey = 'en'
+        // Build the translated object to save for this language
+        const translatedObj = translated as Record<string, unknown>
+
+        // Use a transaction: unset the existing key, then set our new translation for that key.
+        // This ensures Sanity recognizes a change and the document is updated.
+        const tx = client.transaction()
+        tx.patch(documentId, {unset: [`translations.${langKey}`]})
+        tx.patch(documentId, {set: {[`translations.${langKey}`]: translatedObj}})
+        const commitResult = await tx.commit({autoGenerateArrayKeys: true})
+
+        // Debug: show what was written so editors can verify translations exist
+        console.debug('[translate] commit result', commitResult)
 
         // Try to publish the document so translations are visible on the public site.
         // In Studio, the current user may or may not have publish rights; handle failures gracefully.
@@ -193,17 +219,25 @@ export function createTranslateFromDutchAction(
           // Some studio contexts provide a client with sufficient permissions to publish.
           // If the client here doesn't allow publishing, this call will throw and we'll show a warning toast.
           await client.publish(documentId)
+          // If publishing succeeds, show summary of saved translations
           toast.push({
             status: 'success',
             title: 'Vertaling voltooid en gepubliceerd',
-            description: 'Engelse velden zijn ingevuld en gepubliceerd.',
+            description:
+              commitResult?.translations && Array.isArray(commitResult.translations)
+                ? `Saved ${commitResult.translations.length} translation(s). Published.`
+                : 'Vertaling voltooid en gepubliceerd',
           })
         } catch (pubErr) {
           console.warn('[translate] publish failed', pubErr)
+          // If publish fails, still show the saved translations summary
           toast.push({
             status: 'warning',
             title: 'Vertaling opgeslagen (niet gepubliceerd)',
-            description: 'Vertaling is opgeslagen als concept. Publiceer het document om het live te zetten.',
+            description:
+              commitResult?.translations && Array.isArray(commitResult.translations)
+                ? `Saved ${commitResult.translations.length} translation(s) as draft. Publiceer het document om het live te zetten.`
+                : 'Vertaling is opgeslagen als concept. Publiceer het document om het live te zetten.',
           })
         }
       } catch (error: unknown) {

@@ -13,20 +13,8 @@ export default defineType({
     {name: 'translations', title: 'Vertalingen'},
   ],
   fields: [
-    defineField({
-      name: 'language',
-      title: 'Taal',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Nederlands', value: 'nl'},
-          {title: 'English', value: 'en'},
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'nl',
-      validation: (Rule) => Rule.required(),
-    }),
+    // The canonical content fields on this document are Dutch originals.
+    // We intentionally hide the language selector to avoid editors changing the canonical language.
     defineField({
       name: 'title',
       title: 'Titel',
@@ -306,6 +294,7 @@ export default defineType({
           ],
         },
       },
+      group: 'content',
     }),
     defineField({
       name: 'relatedPosts',
@@ -338,9 +327,19 @@ export default defineType({
     defineField({
       name: 'translations',
       title: 'Vertalingen',
-      type: 'array',
-      description: 'Automatisch ingevulde Engelse velden op basis van de Nederlandse content.',
-      of: [{type: 'blogPostTranslation'}],
+      type: 'object',
+      description:
+        'Originele velden bevatten de Nederlandse (canonieke) tekst. Bewerk geen originele Nederlandse velden hier — plaats Engelse vertalingen onder Vertalingen → English.',
+      fields: [
+        defineField({
+          name: 'en',
+          title: 'English',
+          type: 'blogPostTranslationInline',
+        }),
+      ],
+      options: {
+        collapsible: false,
+      },
       group: 'translations',
     }),
   ],

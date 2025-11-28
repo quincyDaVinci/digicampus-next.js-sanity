@@ -92,7 +92,9 @@ async function requestTranslations(segments: string[], sourceLanguage: string, t
   })
 
   if (!response.ok) {
-    throw new Error(`Translation request failed (${response.status})`)
+    const body = await response.json().catch(() => ({}))
+    const msg = body?.error || `Translation request failed (${response.status})`
+    throw new Error(msg)
   }
 
   const data = (await response.json()) as {translations?: string[]}

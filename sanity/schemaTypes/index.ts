@@ -20,6 +20,7 @@ import cta from './objects/cta'
 import moduleAttributes from './objects/moduleAttributes'
 import pageTranslation from './objects/pageTranslation'
 import blogPostTranslation from './objects/blogPostTranslation'
+import blogPostTranslationInline from './objects/blogPostTranslationInline'
 import siteTranslation from './objects/siteTranslation'
 import siteSettingsTranslation from './objects/siteSettingsTranslation'
 
@@ -58,6 +59,7 @@ export const schema: SchemaPluginOptions = {
     moduleAttributes,
     pageTranslation,
     blogPostTranslation,
+    blogPostTranslationInline,
     siteTranslation,
     siteSettingsTranslation,
 

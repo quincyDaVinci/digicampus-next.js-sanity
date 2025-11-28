@@ -1,7 +1,7 @@
 'use client'
 
 import {useState, useRef} from 'react'
-import {useRouter, useSearchParams} from 'next/navigation'
+import {useRouter, useSearchParams, usePathname} from 'next/navigation'
 import {ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon} from '@/components/icons/FeatherIcons'
 import BlogCard from '@/components/pageBuilder/BlogCard'
 import type { BlogCardComponent, BlogCardResolvedPost } from '@/types/pageBuilder'
@@ -59,6 +59,9 @@ export default function BlogPageClient({
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false)
   const [viewDropdownOpen, setViewDropdownOpen] = useState(false)
+  const pathname = usePathname()
+  const localePrefix = pathname?.split('/')?.[1]
+  const basePrefix = localePrefix ? `/${localePrefix}` : ''
 
   // Build URL with query params
   const buildUrl = (updates: {category?: string | null; sort?: string; page?: number}) => {
@@ -87,7 +90,10 @@ export default function BlogPageClient({
     }
     
     const queryString = params.toString()
-    return queryString ? `/blog?${queryString}` : '/blog'
+
+    const base = basePrefix ? `${basePrefix}/blog` : '/blog'
+
+    return queryString ? `${base}?${queryString}` : base
   }
 
   // Handle filter/sort changes
