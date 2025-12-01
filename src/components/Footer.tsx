@@ -16,6 +16,7 @@ type FooterGroup = {
 
 type SiteSettings = {
   footer?: {
+    language?: string
     items?: Array<{
       _type: string
       label?: string

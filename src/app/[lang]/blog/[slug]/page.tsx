@@ -2,12 +2,11 @@ import {Metadata} from 'next'
 import {notFound} from 'next/navigation'
 import {client} from '@sanity/lib/client'
 import {groq} from 'next-sanity'
-import Image from 'next/image'
 import Link from 'next/link'
 import {urlFor} from '@sanity/lib/image'
 import {CalendarIcon, ClockIcon, ChevronLeftIcon} from '@/components/icons/FeatherIcons'
 import Breadcrumbs from '@/components/Breadcrumbs'
-import {PortableText} from 'next-sanity'
+import {PortableText, type PortableTextBlock} from 'next-sanity'
 import ImageLightbox from '@/components/ImageLightbox'
 import AuthorCard from '@/components/AuthorCard'
 import ParallaxImage from '@/components/ParallaxImage'
@@ -55,7 +54,7 @@ type BlogPost = {
     subheading?: string
     relationMode?: 'recent' | 'tags' | 'author' | 'readTime'
   }
-  body?: Array<any>
+  body?: PortableTextBlock[]
   excerpt?: string
 }
 
@@ -119,11 +118,11 @@ const blogPostQuery = groq`
 `
 
 type PageProps = {
-  params: { slug: string; lang: string }
+  params: Promise<{ slug: string; lang: string }>
 }
 
 export async function generateMetadata({params}: PageProps): Promise<Metadata> {
-  const {slug, lang = defaultLanguage} = params
+  const {slug, lang = defaultLanguage} = await params
   
   try {
     const post = await client.fetch<BlogPost | null>(blogPostQuery, {slug, lang})
@@ -154,7 +153,7 @@ export async function generateMetadata({params}: PageProps): Promise<Metadata> {
 }
 
 export default async function BlogPostPage({params}: PageProps) {
-  const {slug, lang = defaultLanguage} = params
+  const {slug, lang = defaultLanguage} = await params
   const t = (key: Parameters<typeof getBlogTranslation>[1]) => getBlogTranslation(lang, key)
 
   try {
@@ -366,7 +365,7 @@ export default async function BlogPostPage({params}: PageProps) {
           // Determine relation mode
           const mode = rp.relationMode || 'tags'
 
-          const mappedTags = mode === 'tags' && Array.isArray(post.tags) ? post.tags.map((t: any) => ({ _ref: t._ref || t._id || t })) : undefined
+          const mappedTags = mode === 'tags' && Array.isArray(post.tags) ? post.tags.map((t) => ({ _ref: t._ref || (t as Record<string, unknown>)._id as string || t as string })) : undefined
 
           // Author reference if requested
           const authorRef = mode === 'author' && post.author ? { _ref: post.author._id } : undefined

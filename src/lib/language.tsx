@@ -1,7 +1,7 @@
 
 'use client'
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { Lang, defaultLanguage, isSupportedLang, supportedLanguages } from './i18n'
@@ -41,7 +41,7 @@ export function LanguageProvider({ children, initialLang }: { children: React.Re
     } else {
       setLang('nl')
     }
-  }, [])
+  }, [initialLang])
 
   useEffect(() => {
     if (lang == null) return
@@ -52,7 +52,7 @@ export function LanguageProvider({ children, initialLang }: { children: React.Re
     }
   }, [lang])
 
-  const navigateWithLang = (nextLang: Lang) => {
+  const navigateWithLang = useCallback((nextLang: Lang) => {
     if (!pathname) return
     const segments = pathname.split('/').filter(Boolean)
     // Replace first segment when it is a supported language, otherwise prefix.
@@ -62,16 +62,12 @@ export function LanguageProvider({ children, initialLang }: { children: React.Re
       segments.unshift(nextLang)
     }
     const nextPath = '/' + segments.join('/')
-    // Navigate to the new path. `router.push` may or may not return a Promise
-    // depending on Next.js version/runtime; handle both cases safely and
-    // refresh server-rendered content after navigation to re-run server
-    // components and `headers()` usage.
     try {
-      const result = router.push(nextPath || '/')
-      if (result && typeof (result as any).then === 'function') {
-        ;(result as any).then(() => {
+      const result = router.push(nextPath || '/') as unknown
+      if (result && typeof (result as Record<string, unknown>).then === 'function') {
+        ;(result as Promise<unknown>).then(() => {
           try { router.refresh() } catch { /* best-effort refresh */ }
-        })
+        }).catch(() => { /* ignore errors */ })
       } else {
         // If push is synchronous/void, call refresh on next tick to allow
         // the navigation to complete.
@@ -81,9 +77,10 @@ export function LanguageProvider({ children, initialLang }: { children: React.Re
       }
     } catch (err) {
       // If router.push throws for any reason, fallback to a full reload.
+      console.warn('[language] navigateWithLang push failed, falling back to hard navigation', err)
       try { window.location.href = nextPath } catch { /* ignore */ }
     }
-  }
+  }, [pathname, router])
 
   // Expose a stable lang value to consumers to avoid making them handle null.
   const value = useMemo(
@@ -94,7 +91,7 @@ export function LanguageProvider({ children, initialLang }: { children: React.Re
         navigateWithLang(next)
       },
     }),
-    [lang, pathname, router]
+    [lang, navigateWithLang]
   )
 
   return (

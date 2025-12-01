@@ -44,18 +44,17 @@ export async function POST(req: Request) {
           `https://us.api.sanity.io/v1/projects/${projectId}/memberships`,
           `https://us.api.sanity.io/v2021-06-07/projects/${projectId}/memberships`,
         ]
-        let list: any[] | null = null
+        let list: Array<Record<string, unknown>> | null = null
         let lastStatus = 0
-        let lastText = ''
         for (const url of urls) {
           const r = await fetch(url, {headers})
           lastStatus = r.status
           if (r.ok) {
-            const payload = await r.json() as any
+            const payload = await r.json() as Record<string, unknown>
             list = Array.isArray(payload?.result) ? payload.result : Array.isArray(payload?.memberships) ? payload.memberships : Array.isArray(payload) ? payload : []
             if (Array.isArray(list)) break
           } else if (r.status !== 404) {
-            lastText = await r.text()
+            await r.text()
             break
           }
         }
@@ -67,7 +66,7 @@ export async function POST(req: Request) {
             return NextResponse.json({error: `Failed to fetch members: ${lastStatus}`}, {status: 500})
           }
         }
-        const me = list.find((m: any) => m?.userId === userId || m?.id === userId || m?.user?.id === userId)
+        const me = list.find((m) => (m as Record<string, unknown>)?.userId === userId || (m as Record<string, unknown>)?.id === userId || ((m as Record<string, unknown>)?.user as Record<string, unknown>)?.id === userId)
         if (!me) {
           if (!hasValidSecret) {
             return NextResponse.json({error: 'User not a member of this project'}, {status: 403})
@@ -75,7 +74,7 @@ export async function POST(req: Request) {
         }
         if (me) {
           const rolesRaw = me?.roles || (me?.role ? [me.role] : [])
-          const roleIds: string[] = (Array.isArray(rolesRaw) ? rolesRaw : []).map((r: any) => (typeof r === 'string' ? r : (r?.name || r?.id))).filter(Boolean)
+          const roleIds: string[] = (Array.isArray(rolesRaw) ? rolesRaw : []).map((r) => (typeof r === 'string' ? r : ((r as Record<string, unknown>)?.name || (r as Record<string, unknown>)?.id) as string)).filter(Boolean)
           const allowed = roleIds.includes('administrator') || roleIds.includes('admin')
           if (!allowed && !hasValidSecret) {
             return NextResponse.json({error: 'Forbidden: requires administrator role'}, {status: 403})

@@ -19,10 +19,8 @@ function humanFileSize(bytes: number | null) {
 }
 
 export default function DocumentAssetSection(props: DocumentAssetProps) {
-  const { title, summary, documentFile, htmlAlternativeFile, htmlAlternativePortableText, wcagStatus, language } = props;
-  // Debug incoming props when developing — remove in production
-  // eslint-disable-next-line no-console
-  console.log('DocumentAssetSection props:', {title, summary, documentFile, htmlAlternativeFile, htmlAlternativePortableText, wcagStatus, language});
+  const { title, summary, documentFile, htmlAlternativeFile, htmlAlternativePortableText, language } = props;
+  // Remove development debug logging for production build
 
   const originalPdfUrl = documentFile?.asset?.url;
   const [pdfSrc, setPdfSrc] = useState<string | undefined>(originalPdfUrl || undefined);
@@ -62,7 +60,7 @@ export default function DocumentAssetSection(props: DocumentAssetProps) {
           return () => URL.revokeObjectURL(url);
         }
       } catch (err) {
-        // ignore
+        console.warn('[DocumentAsset] htmlAlternativePortableText parse failed', err)
       }
     }
   }, [htmlAlternativeFile, htmlAlternativePortableText, language, title]);
@@ -83,7 +81,7 @@ export default function DocumentAssetSection(props: DocumentAssetProps) {
           if (size) setPdfFileSizeLabel(size);
         }
       } catch (e) {
-        // HEAD may fail on some hosts; ignore
+        console.debug('[DocumentAsset] HEAD request failed or blocked', e)
       }
 
       try {
@@ -98,7 +96,6 @@ export default function DocumentAssetSection(props: DocumentAssetProps) {
         }
       } catch (err) {
         // Can't fetch as blob (CORS or network). Keep original URL as fallback.
-        // eslint-disable-next-line no-console
         console.warn('Could not fetch PDF as blob, will use original URL as fallback.', err);
       }
     }
@@ -109,7 +106,7 @@ export default function DocumentAssetSection(props: DocumentAssetProps) {
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [originalPdfUrl]);
+  }, [originalPdfUrl, pdfFileSizeLabel]);
 
   return (
     <DocumentViewer

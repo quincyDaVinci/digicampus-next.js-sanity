@@ -291,9 +291,9 @@ export default function ShowcasePage() {
                   </h2>
                   <p className="text-sm text-muted-foreground">
                     Type: <code className="bg-dc-surface-98 px-2 py-0.5 rounded">{section._type}</code>
-                    {(section as any).variant && (
+                    {typeof (section as Record<string, unknown>).variant === 'string' && (
                       <span className="ml-2">
-                        • Variant: <code className="bg-dc-surface-98 px-2 py-0.5 rounded">{(section as any).variant}</code>
+                        • Variant: <code className="bg-dc-surface-98 px-2 py-0.5 rounded">{(section as Record<string, unknown>).variant as string}</code>
                       </span>
                     )}
                   </p>

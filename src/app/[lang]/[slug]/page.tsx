@@ -34,7 +34,7 @@ const hasSanityCredentials = Boolean(
   process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && process.env.NEXT_PUBLIC_SANITY_DATASET,
 )
 
-type PageParams = { params: { lang: string; slug: string } }
+type PageParams = { params: Promise<{ lang: string; slug: string }> }
 
 export async function generateStaticParams() {
   if (!hasSanityCredentials) return []
@@ -59,7 +59,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageParams) {
-  const { slug, lang = defaultLanguage } = params
+  const { slug, lang = defaultLanguage } = await params
 
   if (!hasSanityCredentials) {
     return { title: slug, alternates: { languages: { en: '/en', nl: '/nl' } } }
@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: PageParams) {
 }
 
 export default async function Page({ params }: PageParams) {
-  const { slug, lang = defaultLanguage } = params
+  const { slug, lang = defaultLanguage } = await params
   const draft = await draftMode()
 
   if (!hasSanityCredentials) {

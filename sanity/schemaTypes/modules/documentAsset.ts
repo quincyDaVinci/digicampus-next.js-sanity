@@ -127,12 +127,13 @@ export default defineType({
   validation: (Rule) =>
     Rule.custom((fields) => {
       if (!fields) return true
+      const f = fields as any
       const hasHtmlAlternative = Boolean(
-        fields.htmlAlternativeUrl || 
-        (fields.htmlAlternativeFile?.asset) ||
-        (fields.htmlAlternativePortableText?.length ?? 0) > 0
+        f.htmlAlternativeUrl ||
+        (f.htmlAlternativeFile?.asset) ||
+        (f.htmlAlternativePortableText?.length ?? 0) > 0
       )
-      const hasAccessiblePdf = Boolean(fields.documentFile?.asset && fields.wcagStatus)
+      const hasAccessiblePdf = Boolean(f.documentFile?.asset && f.wcagStatus)
 
       if (!hasAccessiblePdf && !hasHtmlAlternative) {
         return 'Upload a tagged PDF (checked as WCAG-ready) or provide an HTML alternative before publishing.'

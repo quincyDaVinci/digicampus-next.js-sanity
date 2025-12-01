@@ -4,7 +4,7 @@ import {useCurrentUser} from 'sanity'
 
 export default function TranslationFixer() {
   const [running, setRunning] = React.useState(false)
-  const [result, setResult] = React.useState(null)
+  const [result, setResult] = React.useState<any>(null)
   const currentUser = useCurrentUser()
   const [adminSecret, setAdminSecret] = React.useState('')
 
@@ -17,7 +17,7 @@ export default function TranslationFixer() {
         headers: {
           'content-type': 'application/json',
           // Studio should provide the secret via environment when building, but during dev you'll need to set via Studio proxy or local env.
-          'x-translation-fixer-secret': window.__SANITY_TRANSLATION_FIXER_SECRET || ''
+              'x-translation-fixer-secret': (window as any)?.__SANITY_TRANSLATION_FIXER_SECRET || ''
         },
         body: JSON.stringify({commit: false}),
       })

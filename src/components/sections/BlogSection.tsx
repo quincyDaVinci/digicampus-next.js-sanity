@@ -10,31 +10,8 @@ import type { BlogSectionProps } from "@/types/sections";
 import type { BlogCardComponent, BlogCardResolvedPost } from "@/types/pageBuilder";
 import { getBlogTranslation } from "@/lib/blogTranslations";
 
-const BLOG_SECTION_QUERY = `*[_type == "blogPost" && defined(publishedAt) && (!defined($categoryId) || $categoryId in categories[]._ref)]
-  | order(publishedAt desc)[0...$limit]{
-    _id,
-    title,
-    "slug": slug.current,
-    publishedAt,
-    excerpt,
-    body,
-    estimatedReadTime,
-    mainImage{
-      ...,
-    },
-    author->{
-      name,
-      role,
-      company,
-      image{
-        ...,
-      }
-    },
-    categories[]->{
-      title,
-      slug
-    }
-  }`;
+// NOTE: previously had a static query constant here; removed because the section builds dynamic queries
+// based on incoming props (category, tags, author, etc.).
 
 type BlogSectionQueryResult = {
   _id: string;
@@ -172,7 +149,7 @@ export default function BlogSection(props: BlogSectionProps) {
     return () => {
       isSubscribed = false;
     };
-  }, [resolvedLimit, categoryRef, sortBy, tags?.length, author?._ref, minReadTime, maxReadTime]);
+  }, [resolvedLimit, categoryRef, sortBy, tags, tags?.length, author?._ref, minReadTime, maxReadTime]);
 
   const cardComponent = useMemo<BlogCardComponent>(() => ({
     _type: "blogCardComponent",

@@ -62,7 +62,19 @@ export async function generateMetadata({ params }: HomeParams): Promise<Metadata
   }
 }
 
-type FetchedHomePage = { page: any | null; isFallback: boolean }
+type HomePageData = {
+  _id: string
+  title?: string
+  metadata?: Record<string, unknown>
+  modules?: Array<{_key: string; _type: string}>
+  localized?: {
+    title?: string
+    metadataDescription?: string
+    modules?: Array<{_key: string; _type: string}>
+  }
+}
+
+type FetchedHomePage = { page: HomePageData | null; isFallback: boolean }
 
 async function getHomePage(lang: string): Promise<FetchedHomePage> {
   try {

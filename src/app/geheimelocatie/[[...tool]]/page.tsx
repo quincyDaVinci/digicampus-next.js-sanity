@@ -21,7 +21,7 @@ export default function GeheimelocatiePage() {
   useEffect(() => {
     if (process.env.NODE_ENV !== 'development') return
     const originalError = console.error
-    console.error = (...args: any[]) => {
+    console.error = (...args: unknown[]) => {
       const first = args?.[0]
       if (
         typeof first === 'string' &&

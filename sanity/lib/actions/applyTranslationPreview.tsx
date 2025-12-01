@@ -1,14 +1,13 @@
 import {useCallback} from 'react'
 import type {
   DocumentActionComponent,
-  DocumentActionComponentContext,
   DocumentActionDescription,
   DocumentActionProps,
 } from 'sanity'
 import {useToast} from '@sanity/ui'
 
 export function createApplyTranslationPreviewAction(
-  context: DocumentActionComponentContext
+  context: any
 ): DocumentActionComponent {
   return function ApplyTranslationPreviewAction(props: DocumentActionProps): DocumentActionDescription {
     const toast = useToast()

@@ -44,7 +44,7 @@ export default function RenderSection({ section }: RenderSectionProps) {
     case "featureSection":
       return <FeatureSection {...(section as Extract<SectionProps, {_type: 'featureSection'}>)} />;
     case "blogSection":
-      return <BlogSection />;
+      return <BlogSection {...(section as Extract<SectionProps, {_type: 'blogSection'}>)} />;
     case "testimonialsSection":
       return <TestimonialsSection {...(section as Extract<SectionProps, {_type: 'testimonialsSection'}>)} />;
     case "pricingSection":

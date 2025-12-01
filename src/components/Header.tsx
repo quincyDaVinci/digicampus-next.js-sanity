@@ -10,10 +10,10 @@ type MenuItem = {
 
 type SiteSettings = {
   title?: string
-  // keep as generic any so we don't need to duplicate Sanity types here
-  logo?: any
+  logo?: Record<string, unknown>
   logoAlt?: string
   header?: {
+    language?: string
     items?: Array<{
       _type: string
       label?: string
@@ -48,6 +48,7 @@ export default async function Header({ lang }: { lang: string }) {
   let ctas: Array<{ label: string; href: string }> = []
 
   if (hasSanityCredentials) {
+    type LogoAsset = { asset?: { metadata?: { dimensions?: { width?: number; height?: number } }, url?: string } }
     try {
       const siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery, { lang })
       
@@ -66,7 +67,8 @@ export default async function Header({ lang }: { lang: string }) {
       if (siteData?.logo) {
         try {
           const targetWidth = 800
-          const assetDims = siteData.logo?.asset?.metadata?.dimensions
+          type LogoAsset = { asset?: { metadata?: { dimensions?: { width?: number; height?: number } }, url?: string } }
+          const assetDims = (siteData.logo as unknown as LogoAsset)?.asset?.metadata?.dimensions
           const targetHeight = assetDims?.width && assetDims?.height ? Math.round((assetDims.height / assetDims.width) * targetWidth) : undefined
           const builder = urlFor(siteData.logo).width(targetWidth)
           const imgUrl = targetHeight ? builder.height(targetHeight).fit('crop').auto('format').url() : builder.auto('format').url()
@@ -78,9 +80,10 @@ export default async function Header({ lang }: { lang: string }) {
           }
         } catch (err) {
           // fallback if image builder fails
-          if (siteData.logo?.asset?.url) {
+          console.warn('Logo image builder failed', err)
+          if ((siteData.logo as unknown as LogoAsset)?.asset?.url) {
             logo = {
-              url: siteData.logo.asset.url,
+              url: (siteData.logo as unknown as LogoAsset).asset!.url || '',
               alt: siteData.logoAlt || siteData.title || 'Site logo'
             }
           }

@@ -5,7 +5,6 @@ import {urlFor} from '@sanity/lib/image'
 import type {BlogCardComponent, BlogCardResolvedPost} from '@/types/pageBuilder'
 import {CalendarIcon, getFeatherIcon} from '@/components/icons/FeatherIcons'
 import {getBlogTranslation} from '@/lib/blogTranslations'
-import {tokenToCss} from './colorUtils'
 
 interface BlogCardProps {
   component: BlogCardComponent
@@ -131,7 +130,8 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
               <div className="flex items-end justify-between gap-4">
                 <div className="flex flex-wrap gap-2">
                   {categories.filter(Boolean).map((category, idx) => {
-                    const key = category._id || `${category.slug || 'cat'}-${idx}`
+                    const typedCategory = category as { _id?: string; slug?: string; title?: string }
+                    const key = typedCategory._id || `${typedCategory.slug || 'cat'}-${idx}`
                     return (
                       <span
                         key={key}
@@ -241,7 +241,7 @@ export default function BlogCard({component}: BlogCardProps) {
       ? [component.resolvedPost]
       : []
   const tone = component.tone ?? 'surface'
-  const ctaLabel = component.ctaLabel ?? t('readMore')
+  const ctaLabel = component.ctaLabel ?? 'Read more'
   const gridMode = component.gridMode ?? 'default'
   const showAuthor = component.showAuthor ?? true
   const borderRadius = component.borderRadius ?? 'default'

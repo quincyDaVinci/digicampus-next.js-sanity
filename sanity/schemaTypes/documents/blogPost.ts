@@ -289,8 +289,8 @@ export default defineType({
             },
           ],
           views: [
-            {type: 'grid', layout: 'default'},
-            {type: 'inline', layout: 'default'},
+            {name: 'grid'},
+            {name: 'list'},
           ],
         },
       },

@@ -59,8 +59,8 @@ type SearchParams = {
 }
 
 type PageProps = {
-  params: {lang: string}
-  searchParams: SearchParams
+  params: Promise<{lang: string}>
+  searchParams: Promise<SearchParams>
 }
 
 export async function generateStaticParams() {

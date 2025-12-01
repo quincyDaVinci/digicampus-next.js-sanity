@@ -1,7 +1,6 @@
 import {useCallback, useState} from 'react'
 import {
   DocumentActionComponent,
-  DocumentActionComponentContext,
   DocumentActionDescription,
   DocumentActionProps,
   SanityDocument,
@@ -84,7 +83,7 @@ async function translatePayload(payload: Record<string, unknown>, sourceLanguage
 }
 
 export function createTranslateFromDutchAction(
-  context: DocumentActionComponentContext
+  context: any
 ): DocumentActionComponent {
   return function TranslateFromDutchAction(props: DocumentActionProps): DocumentActionDescription {
     const toast = useToast()
@@ -357,7 +356,9 @@ export function createTranslateFromDutchAction(
     }, [client, docType, documentId, draft, props, sourceLanguage, toast])
 
     if (!isTranslationSupported(docType)) {
-      return props.renderDefault(props)
+      // Some Sanity versions/types may not include `renderDefault` on the props type.
+      // Fall back to calling it via `any` when present, otherwise return a disabled action.
+      return (props as any).renderDefault ? (props as any).renderDefault(props) : {disabled: true, label: 'Translate from Dutch'}
     }
 
     return {

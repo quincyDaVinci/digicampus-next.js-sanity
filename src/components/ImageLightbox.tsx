@@ -72,7 +72,10 @@ export default function ImageLightbox({
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
           style={{backgroundColor: 'hsl(0 0% 0% / 0.9)', overflow: 'hidden'}}
-          onClick={() => setIsOpen(false)}
+        onClick={() => setIsOpen(false)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsOpen(false) }}
+        role="button"
+        tabIndex={0}
         >
           <button
             onClick={() => setIsOpen(false)}
@@ -86,7 +89,9 @@ export default function ImageLightbox({
           <div className="relative flex flex-col items-center justify-center gap-4 max-w-7xl max-h-[90vh]">
             <div
               className="relative"
-              onClick={(e) => e.stopPropagation()}
+               onClick={(e) => e.stopPropagation()}
+               onKeyDown={(e) => e.stopPropagation()}
+               role="presentation"
             >
               <Image
                 src={src}
@@ -100,9 +105,11 @@ export default function ImageLightbox({
             
             {caption && (
               <div
-                className="max-w-3xl px-6 py-3 rounded-lg text-center text-white text-sm"
+                  className="max-w-3xl px-6 py-3 rounded-lg text-center text-white text-sm"
                 style={{backgroundColor: 'hsl(0 0% 0% / 0.7)'}}
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                role="presentation"
               >
                 {caption}
               </div>

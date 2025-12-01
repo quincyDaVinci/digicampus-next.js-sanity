@@ -1,6 +1,5 @@
 import {
   type DocumentActionComponent,
-  type DocumentActionComponentContext,
   type DocumentActionProps,
 } from 'sanity'
 import {createTranslateFromDutchAction} from './actions/translateFromDutch'
@@ -9,7 +8,7 @@ import {isTranslationSupported} from './translation'
 
 export function customDocumentActions(
   prev: DocumentActionComponent[],
-  context: DocumentActionComponentContext
+  context: any
 ) {
   const {schemaType, published} = context
 
