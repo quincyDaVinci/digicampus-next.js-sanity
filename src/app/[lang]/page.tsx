@@ -1,5 +1,7 @@
 import RenderSection from '@/components/sections/RenderSection'
 import { client } from '@sanity/lib/client'
+// Revalidate this page every 300 seconds (ISR). Sanity webhook can call /api/revalidate to update immediately.
+export const revalidate = 300
 import { defaultLanguage, supportedLanguages } from '@/lib/i18n'
 import { draftMode } from 'next/headers'
 import type { Metadata } from 'next'
@@ -78,8 +80,8 @@ type FetchedHomePage = { page: HomePageData | null; isFallback: boolean }
 
 async function getHomePage(lang: string): Promise<FetchedHomePage> {
   try {
-    // Try fetching the page for the requested language first
-    const pageForLang = await client.fetch(homePageQuery, { lang }, { cache: 'no-store' })
+    // Try fetching the page for the requested language first (ISR-friendly)
+    const pageForLang = await client.fetch(homePageQuery, { lang }, { next: { revalidate: 300 } })
 
     // If requesting the default language, return it directly (no fallback semantics)
     if (lang === defaultLanguage) {
@@ -96,7 +98,7 @@ async function getHomePage(lang: string): Promise<FetchedHomePage> {
     }
 
     // No translation available — fetch the default language page as a fallback
-    const fallbackPage = await client.fetch(homePageQuery, { lang: defaultLanguage }, { cache: 'no-store' })
+    const fallbackPage = await client.fetch(homePageQuery, { lang: defaultLanguage }, { next: { revalidate: 300 } })
     return { page: fallbackPage ?? null, isFallback: true }
   } catch (error) {
     console.error('Error fetching home page:', error)

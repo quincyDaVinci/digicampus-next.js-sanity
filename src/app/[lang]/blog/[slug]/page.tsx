@@ -14,6 +14,9 @@ import BlogSection from '@/components/sections/BlogSection'
 import {defaultLanguage} from '@/lib/i18n'
 import {getBlogTranslation} from '@/lib/blogTranslations'
 
+// Revalidate this page every 300 seconds (ISR). Use the webhook to revalidate immediately when content changes.
+export const revalidate = 300
+
 
 
 type BlogPost = {
@@ -125,7 +128,7 @@ export async function generateMetadata({params}: PageProps): Promise<Metadata> {
   const {slug, lang = defaultLanguage} = await params
   
   try {
-    const post = await client.fetch<BlogPost | null>(blogPostQuery, {slug, lang})
+    const post = await client.fetch<BlogPost | null>(blogPostQuery, {slug, lang}, { next: { revalidate: 300 } })
     
     if (!post) {
       return {
@@ -157,7 +160,7 @@ export default async function BlogPostPage({params}: PageProps) {
   const t = (key: Parameters<typeof getBlogTranslation>[1]) => getBlogTranslation(lang, key)
 
   try {
-    const post = await client.fetch<BlogPost | null>(blogPostQuery, {slug, lang})
+    const post = await client.fetch<BlogPost | null>(blogPostQuery, {slug, lang}, { next: { revalidate: 300 } })
 
     if (!post) {
       notFound()

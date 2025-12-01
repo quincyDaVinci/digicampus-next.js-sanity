@@ -27,3 +27,10 @@ export const previewClient = createClient({
     studioUrl: '/geheimelocatie',
   },
 })
+
+// Helper: fetch queries with Next.js ISR-compatible options by default
+export async function fetchQuery<T = unknown>(query: string, params?: Record<string, unknown> | undefined, revalidateSeconds = 300): Promise<T> {
+  // Use an empty params object when none is provided to satisfy type overloads
+  const safeParams = params ?? {}
+  return client.fetch<T>(query, safeParams as any, { next: { revalidate: revalidateSeconds } } as any)
+}

@@ -67,6 +67,9 @@ export async function generateStaticParams() {
   return supportedLanguages.map((lang) => ({lang}))
 }
 
+// Revalidate this page every 300 seconds (ISR). Use the webhook to revalidate on publish.
+export const revalidate = 300
+
 export async function generateMetadata({searchParams, params}: PageProps): Promise<Metadata> {
   const resolvedParams = await params
   const resolvedSearchParams = await searchParams
@@ -74,9 +77,9 @@ export async function generateMetadata({searchParams, params}: PageProps): Promi
   
   try {
     // Try requested language first; if missing, fall back to defaultLanguage
-    let blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang})
+    let blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang}, { next: { revalidate: 300 } })
     if (!blogPageData && lang !== defaultLanguage) {
-      blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang: defaultLanguage})
+      blogPageData = await client.fetch<BlogPageData | null>(blogPageQuery, {lang: defaultLanguage}, { next: { revalidate: 300 } })
     }
     
     if (!blogPageData) {
@@ -157,7 +160,7 @@ export default async function BlogPage({searchParams, params}: PageProps) {
 
     try {
       console.debug('[blog] fetching categories')
-      categories = await client.fetch<Category[]>(blogCategoriesQuery)
+      categories = await client.fetch<Category[]>(blogCategoriesQuery, {}, { next: { revalidate: 300 } })
       console.debug('[blog] fetched categories', categories?.length)
     } catch (err) {
       console.error('[blog] failed to fetch categories', err)
@@ -168,7 +171,8 @@ export default async function BlogPage({searchParams, params}: PageProps) {
       console.debug('[blog] fetching posts', {usedLang, categorySlug, sortBy, currentPage, postsPerPage})
       posts = await client.fetch<BlogPost[]>(
         buildBlogPostsQuery(usedLang, categorySlug, sortBy, currentPage, postsPerPage),
-        {lang: usedLang}
+        {lang: usedLang},
+        { next: { revalidate: 300 } }
       )
       console.debug('[blog] fetched posts', posts?.length)
     } catch (err) {
@@ -178,7 +182,7 @@ export default async function BlogPage({searchParams, params}: PageProps) {
 
     try {
       console.debug('[blog] fetching posts count', {usedLang, categorySlug})
-      totalPosts = await client.fetch<number>(buildBlogPostsCountQuery(usedLang, categorySlug), {lang: usedLang})
+      totalPosts = await client.fetch<number>(buildBlogPostsCountQuery(usedLang, categorySlug), {lang: usedLang}, { next: { revalidate: 300 } })
       console.debug('[blog] total posts count', totalPosts)
     } catch (err) {
       console.error('[blog] failed to fetch posts count', err)
@@ -193,7 +197,8 @@ export default async function BlogPage({searchParams, params}: PageProps) {
           blogPageData.highlightCriteria,
           blogPageData.highlightCount
         ),
-        {lang: usedLang}
+        {lang: usedLang},
+        { next: { revalidate: 300 } }
       )
       console.debug('[blog] fetched highlighted posts', highlightedPosts?.length)
     } catch (err) {
