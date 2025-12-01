@@ -1,8 +1,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import {usePathname} from 'next/navigation'
 import {urlFor} from '@sanity/lib/image'
 import type {BlogCardComponent, BlogCardResolvedPost} from '@/types/pageBuilder'
 import {CalendarIcon, getFeatherIcon} from '@/components/icons/FeatherIcons'
+import {getBlogTranslation} from '@/lib/blogTranslations'
 import {tokenToCss} from './colorUtils'
 
 interface BlogCardProps {
@@ -59,7 +61,10 @@ function calculateReadTimeFromBody(body: unknown): number | undefined {
 
 function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = 'default'}: {post: BlogCardResolvedPost; ctaLabel: string; tone: NonNullable<BlogCardComponent['tone']>; showAuthor?: boolean; borderRadius?: 'default' | 'small'}) {
   const style = toneStyles[tone]
-  const href = post.slug ? `/blog/${post.slug}` : '#'
+  const pathname = usePathname()
+  const lang = pathname?.split('/')?.[1] || 'nl'
+    const t = (key: Parameters<typeof getBlogTranslation>[1]) => getBlogTranslation(lang, key)
+  const href = post.slug ? `/${lang}/blog/${post.slug}` : '#'
   const isInternal = href.startsWith('/')
   const formattedDate = post.publishedAt
     ? new Intl.DateTimeFormat('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'}).format(new Date(post.publishedAt))
@@ -147,7 +152,7 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
                   {estimatedReadTime ? (
                     <div className="inline-flex items-center gap-1.5">
                       {ClockIconComponent ? <ClockIconComponent aria-hidden className="h-4 w-4" /> : null}
-                      <span>{estimatedReadTime} min leestijd</span>
+                      <span>{estimatedReadTime} {t('minRead')}</span>
                     </div>
                   ) : null}
                 </div>
@@ -236,7 +241,7 @@ export default function BlogCard({component}: BlogCardProps) {
       ? [component.resolvedPost]
       : []
   const tone = component.tone ?? 'surface'
-  const ctaLabel = component.ctaLabel ?? 'Lees meer'
+  const ctaLabel = component.ctaLabel ?? t('readMore')
   const gridMode = component.gridMode ?? 'default'
   const showAuthor = component.showAuthor ?? true
   const borderRadius = component.borderRadius ?? 'default'

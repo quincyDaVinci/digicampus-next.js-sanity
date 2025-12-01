@@ -5,14 +5,23 @@ import {groq} from 'next-sanity'
  */
 
 // Blog post fields commonly used across queries
+// For English, use translations.en fields; for Dutch, use root fields
 const blogPostFields = groq`
   _id,
-  title,
-  language,
-  "slug": coalesce(metadata.localizedSlugs[$lang].current, slug.current),
+  "title": select(
+    $lang == "en" && defined(translations.en.title) => translations.en.title,
+    title
+  ),
+  "slug": coalesce(slug.current),
   publishedAt,
-  excerpt,
-  body,
+  "excerpt": select(
+    $lang == "en" && defined(translations.en.excerpt) => translations.en.excerpt,
+    excerpt
+  ),
+  "body": select(
+    $lang == "en" && defined(translations.en.body) => translations.en.body,
+    body
+  ),
   estimatedReadTime,
   featured,
   viewCount,
@@ -99,12 +108,16 @@ export function buildBlogPostsQuery(
   const skip = (page - 1) * limit
 
   // Build filter conditions
+  // Blog posts are authored in Dutch (nl) by default, with translations in translations.en
   const filters = [
     '_type == "blogPost"',
     'defined(publishedAt)',
-    // Include posts that are authored in the requested language OR have a translation stored for that language
-    `(language == "${lang}" || defined(translations.${lang}))`,
   ]
+  
+  // Only filter by translation availability if requesting English
+  if (lang === 'en') {
+    filters.push('defined(translations.en)')
+  }
 
   if (categorySlug) {
     filters.push(`"${categorySlug}" in categories[]->slug.current`)
@@ -144,8 +157,12 @@ export function buildBlogPostsCountQuery(lang: string, categorySlug?: string) {
   const filters = [
     '_type == "blogPost"',
     'defined(publishedAt)',
-    `(language == "${lang}" || defined(translations.${lang}))`,
   ]
+  
+  // Only filter by translation availability if requesting English
+  if (lang === 'en') {
+    filters.push('defined(translations.en)')
+  }
 
   if (categorySlug) {
     filters.push(`"${categorySlug}" in categories[]->slug.current`)
@@ -166,7 +183,14 @@ export function buildHighlightedPostsQuery(
   criteria: string = 'viewCount',
   limit: number = 3
 ) {
-  let filter = `_type == "blogPost" && defined(publishedAt) && (language == "${lang}" || defined(translations.${lang}))`
+  // Blog posts are authored in Dutch (nl) by default, with translations in translations.en
+  let filter = '_type == "blogPost" && defined(publishedAt)'
+  
+  // Only filter by translation availability if requesting English
+  if (lang === 'en') {
+    filter += ' && defined(translations.en)'
+  }
+  
   let orderBy = 'publishedAt desc'
 
   switch (criteria) {
@@ -174,7 +198,7 @@ export function buildHighlightedPostsQuery(
       orderBy = 'viewCount desc'
       break
     case 'featured':
-      filter = '_type == "blogPost" && defined(publishedAt) && featured == true'
+      filter += ' && featured == true'
       orderBy = 'publishedAt desc'
       break
     case 'newest':

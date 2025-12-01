@@ -1,5 +1,10 @@
 import {NextResponse} from 'next/server'
 
+type TranslationResult = {
+  text: string
+  provider: 'google' | 'deepl' | 'adapter' | 'mymemory' | 'failed'
+}
+
 function sanitizeHtml(input: string) {
   if (!input || typeof input !== 'string') return ''
   // Remove any HTML tags
@@ -19,18 +24,76 @@ async function translateSegment(
   text: string,
   sourceLanguage: string,
   targetLanguage: string
-): Promise<string> {
-  // If a custom adapter URL is configured, prefer that (allows self-hosted adapters
-  // or third-party translation providers). We forward the segments as a JSON body
-  // and include the SANITY_CONTENT_AI_KEY when available so adapters can call
-  // Content AI on your behalf.
+): Promise<TranslationResult> {
+  // Google Translate API - Recommended primary provider
+  // Free tier: 500,000 chars/month, then $20 per million chars
+  if (process.env.GOOGLE_TRANSLATE_API_KEY) {
+    try {
+      const url = `https://translation.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANSLATE_API_KEY}`
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          q: text,
+          source: sourceLanguage,
+          target: targetLanguage,
+          format: 'text',
+        }),
+        cache: 'no-store',
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const translated = data?.data?.translations?.[0]?.translatedText
+        if (translated) {
+          console.log('[translate] ✓ Google Translate')
+          return {text: sanitizeHtml(String(translated)), provider: 'google'}
+        }
+      } else {
+        console.warn('[translate] Google Translate responded with', response.status)
+      }
+    } catch (err) {
+      console.warn('[translate] Google Translate failed', err)
+    }
+  }
+
+  // DeepL API - premium quality translations
+  if (process.env.DEEPL_API_KEY) {
+    try {
+      const url = 'https://api-free.deepl.com/v2/translate'
+      const formData = new URLSearchParams()
+      formData.append('auth_key', process.env.DEEPL_API_KEY)
+      formData.append('text', text)
+      formData.append('source_lang', sourceLanguage.toUpperCase())
+      formData.append('target_lang', targetLanguage.toUpperCase())
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: formData,
+        cache: 'no-store',
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const translated = data?.translations?.[0]?.text
+        if (translated) {
+          console.log('[translate] ✓ DeepL (premium quality)')
+          return {text: sanitizeHtml(String(translated)), provider: 'deepl'}
+        }
+      } else {
+        console.warn('[translate] DeepL responded with', response.status)
+      }
+    } catch (err) {
+      console.warn('[translate] DeepL failed', err)
+    }
+  }
+
+  // Custom adapter URL (e.g., LibreTranslate, self-hosted service)
   const adapterUrl = process.env.TRANSLATION_API_URL
   if (adapterUrl) {
     try {
       const headers: Record<string, string> = {'Content-Type': 'application/json'}
-      if (process.env.SANITY_CONTENT_AI_KEY) {
-        headers['Authorization'] = `Bearer ${process.env.SANITY_CONTENT_AI_KEY}`
-      }
 
       const response = await fetch(adapterUrl, {
         method: 'POST',
@@ -41,7 +104,10 @@ async function translateSegment(
 
       if (response.ok) {
         const data = (await response.json()) as {translation?: string}
-        if (data?.translation) return sanitizeHtml(String(data.translation))
+        if (data?.translation) {
+          console.log('[translate] ✓ Custom adapter')
+          return {text: sanitizeHtml(String(data.translation)), provider: 'adapter'}
+        }
       } else {
         console.warn('[translate] adapter responded with non-ok status', response.status)
       }
@@ -50,61 +116,34 @@ async function translateSegment(
     }
   }
 
-  // If SANITY_CONTENT_AI_KEY + SANITY_PROJECT_ID are present, attempt to call
-  // Sanity's Content AI assist endpoint directly. If this call fails or is not
-  // configured, we honor the TRANSLATION_FALLBACK policy (allow-dev) or return
-  // an error to the caller (fail-fast) so editors see a clear message.
-  const projectId = process.env.SANITY_PROJECT_ID
-  const dataset = process.env.SANITY_DATASET
-  if (process.env.SANITY_CONTENT_AI_KEY && projectId && dataset) {
-    try {
-      // Sanity's public Assist API is used here. The exact endpoint shape may
-      // evolve; this implementation follows the documented server-assisted
-      // pattern and supplies the API key in the Authorization header.
-      const assistUrl = `https://api.sanity.io/v1/assist/${encodeURIComponent(projectId)}/${encodeURIComponent(dataset)}/translate`
-      const resp = await fetch(assistUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.SANITY_CONTENT_AI_KEY}`,
-        },
-        body: JSON.stringify({segments: [text], sourceLanguage, targetLanguage}),
-        cache: 'no-store',
-      })
+  // NOTE: Sanity AI Assist requires the @sanity/assist plugin and Growth plan or higher.
+  // It's not available as a standalone API for translations.
+  // Use Google Translate API or DeepL instead for programmatic translations.
 
-      if (resp.ok) {
-        const json = await resp.json()
-        // The assist API should return translations in order; adapt to common shapes.
-        const translated = (json?.translations && Array.isArray(json.translations) && json.translations[0]) || json?.translation || json?.result
-        if (typeof translated === 'string') return sanitizeHtml(translated)
-      } else {
-        console.warn('[translate] Content AI responded with', resp.status)
-      }
-    } catch (err) {
-      console.warn('[translate] Content AI request failed', err)
-    }
-  }
-
-  // Development-only fallback: if TRANSLATION_FALLBACK is explicitly set to
-  // `allow-dev` we will use a public free service (MyMemory) for local testing.
+  // Development-only fallback: MyMemory (100 requests/day limit)
   if (process.env.TRANSLATION_FALLBACK === 'allow-dev') {
     try {
       const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLanguage}|${targetLanguage}`
       const response = await fetch(url, {cache: 'no-store'})
       if (response.ok) {
-        const data = (await response.json()) as {responseData?: {translatedText?: string}}
+        const data = (await response.json()) as {responseData?: {translatedText?: string}; responseStatus?: number}
         const translated = data?.responseData?.translatedText
-        if (translated) return sanitizeHtml(translated)
+        // Check for rate limit or error responses
+        if (data?.responseStatus === 429 || (translated && translated.includes('MYMEMORY WARNING'))) {
+          console.warn('[translate] ✗ MyMemory rate limit (100/day exceeded)')
+        } else if (translated) {
+          console.log('[translate] ✓ MyMemory (dev fallback)')
+          return {text: sanitizeHtml(translated), provider: 'mymemory'}
+        }
       }
     } catch (error) {
       console.warn('[translate] MyMemory fallback failed', error)
     }
   }
 
-  // Fail-fast: when no provider produced a translation, return the original
-  // text. The caller (Studio) will surface a clear error when translations
-  // could not be produced.
-  return text
+  // Fail-fast: no provider succeeded
+  console.error('[translate] ✗ All providers failed for:', text.slice(0, 50))
+  throw new Error(`Translation failed: Set GOOGLE_TRANSLATE_API_KEY or DEEPL_API_KEY in .env.local`)
 }
 
 export async function POST(request: Request) {
@@ -131,9 +170,29 @@ export async function POST(request: Request) {
     return NextResponse.json({error: 'Content AI not configured. Set SANITY_CONTENT_AI_KEY (server-side) or TRANSLATION_API_URL.'}, {status: 503})
   }
 
-  const translations = await Promise.all(
-    body.segments.map((segment) => translateSegment(segment, sourceLanguage, targetLanguage))
+  const results = await Promise.all(
+    body.segments.map(async (segment) => {
+      try {
+        return await translateSegment(segment, sourceLanguage, targetLanguage)
+      } catch (err) {
+        console.error('[translate] Segment failed:', segment.slice(0, 50), err)
+        return {text: `[TRANSLATION FAILED] ${segment}`, provider: 'failed' as const}
+      }
+    })
   )
 
-  return NextResponse.json({translations})
+  const translations = results.map(r => r.text)
+  const provider = results[0]?.provider || 'failed'
+
+  return NextResponse.json({
+    translations,
+    provider,
+    providerName: {
+      google: 'Google Translate API',
+      deepl: 'DeepL API (Premium)',
+      adapter: 'Custom Translation Service',
+      mymemory: 'MyMemory (Dev Fallback)',
+      failed: 'Translation Failed',
+    }[provider]
+  })
 }

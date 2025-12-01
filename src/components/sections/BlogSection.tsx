@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { client } from "@sanity/lib/client";
 
 import BlogCard from "../pageBuilder/BlogCard";
 import type { BlogSectionProps } from "@/types/sections";
 import type { BlogCardComponent, BlogCardResolvedPost } from "@/types/pageBuilder";
+import { getBlogTranslation } from "@/lib/blogTranslations";
 
 const BLOG_SECTION_QUERY = `*[_type == "blogPost" && defined(publishedAt) && (!defined($categoryId) || $categoryId in categories[]._ref)]
   | order(publishedAt desc)[0...$limit]{
@@ -53,7 +55,7 @@ export default function BlogSection(props: BlogSectionProps) {
     subheading,
     limit = 3,
     tone = "surface",
-    ctaLabel = "Lees meer",
+    ctaLabel,
     viewAllLink,
     category,
     sortBy = 'newest',
@@ -65,6 +67,10 @@ export default function BlogSection(props: BlogSectionProps) {
 
   const resolvedLimit = Math.min(Math.max(limit ?? 3, 1), 12);
   const categoryRef = category?._ref ?? null;
+  const pathname = usePathname();
+  const lang = (pathname?.split('/')?.[1] === 'en' ? 'en' : 'nl');
+  const t = (key: Parameters<typeof getBlogTranslation>[1]) => getBlogTranslation(lang, key);
+  const resolvedCtaLabel = ctaLabel ?? t('readMore');
 
   const [posts, setPosts] = useState<BlogCardResolvedPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -172,10 +178,10 @@ export default function BlogSection(props: BlogSectionProps) {
     _type: "blogCardComponent",
     _key: "blog-section",
     tone,
-    ctaLabel,
+    ctaLabel: resolvedCtaLabel,
     borderRadius: 'small',
     resolvedPost: posts,
-  }), [posts, tone, ctaLabel]);
+  }), [posts, tone, resolvedCtaLabel]);
 
   return (
     <section className="w-full py-20 lg:py-32">

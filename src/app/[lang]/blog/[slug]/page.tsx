@@ -13,6 +13,9 @@ import AuthorCard from '@/components/AuthorCard'
 import ParallaxImage from '@/components/ParallaxImage'
 import BlogSection from '@/components/sections/BlogSection'
 import {defaultLanguage} from '@/lib/i18n'
+import {getBlogTranslation} from '@/lib/blogTranslations'
+
+
 
 type BlogPost = {
   _id: string
@@ -57,17 +60,36 @@ type BlogPost = {
 }
 
 const blogPostQuery = groq`
-  *[_type == "blogPost" && language == $lang && coalesce(metadata.localizedSlugs[$lang].current, slug.current) == $slug][0]{
+  *[_type == "blogPost" && slug.current == $slug][0]{
     _id,
-    title,
-    language,
-    "slug": coalesce(metadata.localizedSlugs[$lang].current, slug.current),
+    "title": select(
+      $lang == "en" && defined(translations.en.title) => translations.en.title,
+      title
+    ),
+    "slug": slug.current,
     publishedAt,
-    excerpt,
-    body,
+    "excerpt": select(
+      $lang == "en" && defined(translations.en.excerpt) => translations.en.excerpt,
+      excerpt
+    ),
+    "body": select(
+      $lang == "en" && defined(translations.en.body) => translations.en.body,
+      body
+    ),
     estimatedReadTime,
     viewCount,
-    mainImage,
+    mainImage{
+      asset->{
+        _id,
+        url,
+        metadata {
+          dimensions,
+          lqip
+        }
+      },
+      hotspot,
+      alt
+    },
     tags[]{_ref, _type},
     relatedPosts,
     author->{
@@ -79,8 +101,13 @@ const blogPostQuery = groq`
       image{
         asset->{
           _id,
-          url
-        }
+          url,
+          metadata {
+            dimensions,
+            lqip
+          }
+        },
+        hotspot
       }
     },
     categories[]->{
@@ -128,6 +155,7 @@ export async function generateMetadata({params}: PageProps): Promise<Metadata> {
 
 export default async function BlogPostPage({params}: PageProps) {
   const {slug, lang = defaultLanguage} = params
+  const t = (key: Parameters<typeof getBlogTranslation>[1]) => getBlogTranslation(lang, key)
 
   try {
     const post = await client.fetch<BlogPost | null>(blogPostQuery, {slug, lang})
@@ -161,8 +189,8 @@ export default async function BlogPostPage({params}: PageProps) {
       : null
 
     const breadcrumbs = [
-      {label: 'Home', href: `/${lang}`},
-      {label: 'Blog', href: `/${lang}/blog`},
+      {label: t('home'), href: `/${lang}`},
+      {label: t('blog'), href: `/${lang}/blog`},
       {label: post.title},
     ]
 
@@ -182,7 +210,7 @@ export default async function BlogPostPage({params}: PageProps) {
           style={{color: 'hsl(var(--dc-text) / 0.7)'}}
         >
           <ChevronLeftIcon className="h-4 w-4" aria-hidden />
-          Terug naar blog
+          {t('backToBlog')}
         </Link>
 
         {/* Categories */}
@@ -220,7 +248,7 @@ export default async function BlogPostPage({params}: PageProps) {
           {post.estimatedReadTime && (
             <div className="flex items-center gap-2">
               <ClockIcon className="h-4 w-4" aria-hidden />
-              <span>{post.estimatedReadTime} min leestijd</span>
+              <span>{post.estimatedReadTime} {t('minRead')}</span>
             </div>
           )}
         </div>
@@ -318,12 +346,12 @@ export default async function BlogPostPage({params}: PageProps) {
         {/* Back to blog link */}
         <div className="mt-12 pt-8 border-t" style={{borderColor: 'hsl(var(--dc-border) / 0.3)'}}>
           <Link
-            href="/blog"
+            href={`/${lang}/blog`}
             className="inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors hover:bg-[hsl(var(--dc-brand)/0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--dc-focus))]"
             style={{color: 'hsl(var(--dc-brand))'}}
           >
             <ChevronLeftIcon className="h-4 w-4" aria-hidden />
-            Terug naar alle blogs
+            {t('backToAllBlogs')}
           </Link>
         </div>
       </article>
@@ -356,7 +384,7 @@ export default async function BlogPostPage({params}: PageProps) {
             <BlogSection
               _type="blogSection"
               _key="more-blogs"
-              heading={rp.heading || 'Meer blogs'}
+              heading={rp.heading || t('moreBlogs')}
               subheading={rp.subheading ? rp.subheading : undefined}
               // Let BlogSection decide limit/responsiveness; pass relation flags and filters
               useContextTags={mode === 'tags'}

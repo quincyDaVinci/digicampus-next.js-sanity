@@ -6,6 +6,7 @@ import {ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon} from '@/components/i
 import BlogCard from '@/components/pageBuilder/BlogCard'
 import type { BlogCardComponent, BlogCardResolvedPost } from '@/types/pageBuilder'
 import Breadcrumbs from '@/components/Breadcrumbs'
+import {getBlogTranslation} from '@/lib/blogTranslations'
 
 type Category = {
   _id: string
@@ -62,6 +63,8 @@ export default function BlogPageClient({
   const pathname = usePathname()
   const localePrefix = pathname?.split('/')?.[1]
   const basePrefix = localePrefix ? `/${localePrefix}` : ''
+  const lang = localePrefix || 'nl'
+  const t = (key: Parameters<typeof getBlogTranslation>[1]) => getBlogTranslation(lang, key)
 
   // Build URL with query params
   const buildUrl = (updates: {category?: string | null; sort?: string; page?: number}) => {
@@ -104,9 +107,9 @@ export default function BlogPageClient({
     // Announce to screen readers
     if (categorySlug) {
       const category = categories.find(c => c.slug === categorySlug)
-      setAnnouncement(`Gefilterd op categorie ${category?.title || categorySlug}. ${totalPosts} berichten gevonden.`)
+      setAnnouncement(`${t('filteredByCategory')} ${category?.title || categorySlug}. ${totalPosts} ${t('postsFound')}.`)
     } else {
-      setAnnouncement(`Alle categorieën weergegeven. ${totalPosts} berichten gevonden.`)
+      setAnnouncement(`${t('allCategoriesShown')}. ${totalPosts} ${t('postsFound')}.`)
     }
   }
 
@@ -115,12 +118,12 @@ export default function BlogPageClient({
     router.push(url)
     
     const sortLabels: Record<string, string> = {
-      newest: 'nieuwste eerst',
-      oldest: 'oudste eerst',
-      viewCount: 'populairste eerst',
-      readTime: 'kortste leestijd eerst',
+      newest: t('newest'),
+      oldest: t('oldest'),
+      viewCount: t('mostPopular'),
+      readTime: t('shortestReadTime'),
     }
-    setAnnouncement(`Gesorteerd op ${sortLabels[sort] || sort}`)
+    setAnnouncement(`${t('sortedBy')} ${sortLabels[sort] || sort}`)
   }
 
   const handlePageChange = (page: number) => {
@@ -164,8 +167,8 @@ export default function BlogPageClient({
     <main id="main" className="container mx-auto px-4 py-12">
     <Breadcrumbs
         items={[
-          {label: 'Home', href: '/'},
-          {label: 'Blog'},
+          {label: t('home'), href: '/'},
+          {label: t('blog')},
         ]}
         className="mb-4"
       />
@@ -179,7 +182,7 @@ export default function BlogPageClient({
 
       {/* Category Filters */}
       <div className="mb-6">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Filter op categorie">
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t('filterByCategory')}>
           <button
             onClick={() => handleCategoryChange(null)}
             style={{
@@ -204,7 +207,7 @@ export default function BlogPageClient({
             }}
             aria-pressed={!currentCategory}
           >
-            Alle categorieën
+            {t('allCategories')}
           </button>
           {categories.map((category) => (
             <button
@@ -287,13 +290,13 @@ export default function BlogPageClient({
                   color: sortDropdownOpen ? 'hsl(var(--dc-on-primary))' : 'hsl(var(--dc-text))',
                 }}
                 className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-dc-focus"
-                aria-label="Sorteer opties"
+                aria-label={t('sortOptions')}
                 aria-expanded={sortDropdownOpen}
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                 </svg>
-                <span>Sorteren</span>
+                <span>{t('sort')}</span>
                 <ChevronDownIcon className={`h-4 w-4 transition-transform duration-200 ${sortDropdownOpen ? 'rotate-180' : ''}`} aria-hidden />
               </button>
               {sortDropdownOpen && (
@@ -310,7 +313,7 @@ export default function BlogPageClient({
                     style={{ color: 'hsl(var(--dc-text))' }}
                   >
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: currentSort === 'newest' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
-                    Nieuwste eerst
+                    {t('newest')}
                   </button>
                   <button
                     onClick={() => { handleSortChange('oldest'); setSortDropdownOpen(false) }}
@@ -318,7 +321,7 @@ export default function BlogPageClient({
                     style={{ color: 'hsl(var(--dc-text))' }}
                   >
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: currentSort === 'oldest' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
-                    Oudste eerst
+                    {t('oldest')}
                   </button>
                   <button
                     onClick={() => { handleSortChange('viewCount'); setSortDropdownOpen(false) }}
@@ -326,7 +329,7 @@ export default function BlogPageClient({
                     style={{ color: 'hsl(var(--dc-text))' }}
                   >
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: currentSort === 'viewCount' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
-                    Populairste
+                    {t('mostPopular')}
                   </button>
                   <button
                     onClick={() => { handleSortChange('readTime'); setSortDropdownOpen(false) }}
@@ -334,7 +337,7 @@ export default function BlogPageClient({
                     style={{ color: 'hsl(var(--dc-text))' }}
                   >
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: currentSort === 'readTime' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
-                    Kortste leestijd
+                    {t('shortestReadTime')}
                   </button>
                 </div>
               )}
@@ -363,7 +366,7 @@ export default function BlogPageClient({
                   color: viewDropdownOpen ? 'hsl(var(--dc-on-primary))' : 'hsl(var(--dc-text))',
                 }}
                 className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-dc-focus"
-                aria-label="Weergave opties"
+                aria-label={t('viewOptions')}
                 aria-expanded={viewDropdownOpen}
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -372,7 +375,7 @@ export default function BlogPageClient({
                   <rect x="14" y="14" width="7" height="7" />
                   <rect x="3" y="14" width="7" height="7" />
                 </svg>
-                <span>Weergave</span>
+                <span>{t('view')}</span>
                 <ChevronDownIcon className={`h-4 w-4 transition-transform duration-200 ${viewDropdownOpen ? 'rotate-180' : ''}`} aria-hidden />
               </button>
               {viewDropdownOpen && (
@@ -389,7 +392,7 @@ export default function BlogPageClient({
                     style={{ color: 'hsl(var(--dc-text))' }}
                   >
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: viewMode === 'grid' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
-                    Raster
+                    {t('grid')}
                   </button>
                   <button
                     onClick={() => { setViewMode('list'); setViewDropdownOpen(false) }}
@@ -397,7 +400,7 @@ export default function BlogPageClient({
                     style={{ color: 'hsl(var(--dc-text))' }}
                   >
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: viewMode === 'list' ? 'hsl(var(--dc-brand))' : 'transparent' }} />
-                    Lijst
+                    {t('list')}
                   </button>
                 </div>
               )}
@@ -424,7 +427,7 @@ export default function BlogPageClient({
                 _type: 'blogCardComponent',
                 _key: 'blog-list',
                 tone: 'surface',
-                ctaLabel: 'Lees meer',
+                ctaLabel: t('readMore'),
                 borderRadius: 'small',
                 resolvedPost: mappedPosts,
               }
@@ -432,13 +435,13 @@ export default function BlogPageClient({
             })()
           ) : (
             <div className="rounded-2xl border border-dashed border-dc p-12 text-center">
-              <p className="text-dc-muted">Geen blogberichten gevonden voor de geselecteerde filters.</p>
+              <p className="text-dc-muted">{t('noPosts')}</p>
             </div>
           )}
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <nav className="mt-12 flex items-center justify-center gap-2" aria-label="Paginering">
+            <nav className="mt-12 flex items-center justify-center gap-2" aria-label={t('page')}>
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
@@ -459,11 +462,11 @@ export default function BlogPageClient({
                     e.currentTarget.style.backgroundColor = 'hsl(var(--dc-surface-98))'
                   }
                 }}
-                aria-label="Vorige pagina"
+                aria-label={t('previous')}
                 aria-disabled={currentPage === 1}
               >
                 <ChevronLeftIcon className="h-4 w-4" aria-hidden />
-                Vorige
+                {t('previous')}
               </button>
 
               <div className="flex gap-1">
@@ -495,7 +498,7 @@ export default function BlogPageClient({
                           e.currentTarget.style.backgroundColor = 'hsl(var(--dc-surface-98))'
                         }
                       }}
-                      aria-label={`Pagina ${page}`}
+                      aria-label={`${t('page')} ${page}`}
                       aria-current={currentPage === page ? 'page' : undefined}
                     >
                       {page}
@@ -524,10 +527,10 @@ export default function BlogPageClient({
                     e.currentTarget.style.backgroundColor = 'hsl(var(--dc-surface-98))'
                   }
                 }}
-                aria-label="Volgende pagina"
+                aria-label={t('next')}
                 aria-disabled={currentPage === totalPages}
               >
-                Volgende
+                {t('next')}
                 <ChevronRightIcon className="h-4 w-4" aria-hidden />
               </button>
             </nav>
@@ -536,14 +539,14 @@ export default function BlogPageClient({
 
         {/* Highlighted Posts Sidebar */}
         {highlightedPosts.length > 0 && (
-          <aside className="space-y-4 border-l pl-8" style={{ borderColor: 'hsl(var(--dc-border) / 0.15)' }} aria-label="Uitgelichte berichten">
-            <h2 className="text-lg font-semibold text-dc">Uitgelicht</h2>
+          <aside className="space-y-4 border-l pl-8" style={{ borderColor: 'hsl(var(--dc-border) / 0.15)' }} aria-label={t('highlightedPosts')}>
+            <h2 className="text-lg font-semibold text-dc">{t('highlightedPosts')}</h2>
             <BlogCard
               component={{
                 _type: 'blogCardComponent',
                 _key: 'highlighted-posts',
                 tone: 'surface',
-                ctaLabel: 'Lees meer',
+                ctaLabel: t('readMore'),
                 gridMode: 'single',
                 showAuthor: false,
                 resolvedPost: highlightedPosts.map((post) => ({

@@ -7,7 +7,7 @@ import {
   SanityDocument,
 } from 'sanity'
 import {useToast} from '@sanity/ui'
-import {translateDeepObject, isTranslationSupported} from '../translation'
+import {translateDeepObject, isTranslationSupported, ensureArrayWithLanguage} from '../translation'
 
 function ensureTranslationsObject(existing: any, translation: any, lang = 'en') {
   // If existing is an array (legacy), convert to object keyed by language
@@ -124,21 +124,46 @@ export function createTranslateFromDutchAction(
           throw new Error('Geen vertaalbare gegevens gevonden voor dit document')
         }
 
-        const translated = await translatePayload(translationPayload, sourceLanguage, 'en')
+        const result = await translatePayload(translationPayload, sourceLanguage, 'en')
+        let translated: any = result.translated
+        const translationProvider = result.providerName
 
-        // Defensive: ensure the translated object contains expected keys (type, language, arrays/strings)
+        // Defensive: normalize the translated payload per document type
         if (translated && typeof translated === 'object') {
           const t = translated as Record<string, any>
           const proto = translationPayload as Record<string, any>
-          if (!t._type && proto && proto._type) t._type = proto._type
-          if (!t.language) t.language = 'en'
-          if (proto?.modules && !Array.isArray(t.modules)) t.modules = []
-          if (proto?.body && !Array.isArray(t.body)) t.body = []
-          if (proto?.footerContent && !Array.isArray(t.footerContent)) t.footerContent = []
-          if (typeof t.title !== 'string') t.title = proto?.title ?? ''
-          if (typeof t.metadataTitle !== 'string') t.metadataTitle = proto?.metadataTitle ?? ''
-          if (typeof t.metadataDescription !== 'string') t.metadataDescription = proto?.metadataDescription ?? ''
-          if (typeof t.excerpt !== 'string') t.excerpt = proto?.excerpt ?? ''
+
+          if (docType === 'blogPost') {
+            // Inline blog translation must only contain: title, excerpt, body
+            const cleaned: Record<string, any> = {
+              title: typeof t.title === 'string' ? t.title : (typeof proto?.title === 'string' ? proto.title : ''),
+              excerpt: typeof t.excerpt === 'string' ? t.excerpt : (typeof proto?.excerpt === 'string' ? proto.excerpt : ''),
+              body: Array.isArray(t.body) ? t.body : (Array.isArray(proto?.body) ? proto.body : []),
+            }
+            translated = cleaned
+          } else if (docType === 'page' || docType === 'homePage') {
+            // Page translation object shape
+            if (!t._type) t._type = 'pageTranslation'
+            t.language = 'en'
+            if (!Array.isArray(t.modules) && Array.isArray(proto?.modules)) t.modules = []
+            if (typeof t.title !== 'string') t.title = typeof proto?.title === 'string' ? proto.title : ''
+            if (typeof t.metadataTitle !== 'string') t.metadataTitle = typeof proto?.metadataTitle === 'string' ? proto.metadataTitle : ''
+            if (typeof t.metadataDescription !== 'string') t.metadataDescription = typeof proto?.metadataDescription === 'string' ? proto.metadataDescription : ''
+            translated = t
+          } else if (docType === 'site') {
+            // Site translation object shape
+            if (!t._type) t._type = 'siteTranslation'
+            t.language = 'en'
+            if (!Array.isArray(t.footerContent) && Array.isArray(proto?.footerContent)) t.footerContent = []
+            if (!Array.isArray(t.copyright) && Array.isArray(proto?.copyright)) t.copyright = []
+            if (typeof t.title !== 'string') t.title = typeof proto?.title === 'string' ? proto.title : ''
+            translated = t
+          } else if (docType === 'siteSettings') {
+            if (!t._type) t._type = 'siteSettingsTranslation'
+            t.language = 'en'
+            if (typeof t.title !== 'string') t.title = typeof proto?.title === 'string' ? proto.title : ''
+            translated = t
+          }
         }
 
         // Build a small preview of translated strings for the editor to confirm.
@@ -157,57 +182,138 @@ export function createTranslateFromDutchAction(
           }
         }
 
-        if (samples.length > 0) {
-          // Ask the editor to confirm before saving translations.
-          const message = `Voorbeeld vertalingen:\n\n${samples.join('\n')}\n\nVertalingen opslaan?`
-          // `window.confirm` is acceptable in Studio action UI to request a quick confirmation.
-          const proceed = typeof window !== 'undefined' ? window.confirm(message) : true
-          if (!proceed) {
-            setIsRunning(false)
-            props.onComplete()
-            return
-          }
-        } else {
-          // If nothing meaningful changed, continue and overwrite the translation object anyway.
-          // We avoid showing the 'no visible changes' info toast so the editor sees the replacement happen.
+        // Always confirm overwrite for consistency, include samples when available
+        const baseConfirm = samples.length > 0
+          ? `Vertaling via: ${translationProvider}\n\nVoorbeeld vertalingen:\n\n${samples.join('\n')}\n\nBestaande Engelse vertaling overschrijven?`
+          : `Vertaling via: ${translationProvider}\n\nBestaande Engelse vertaling overschrijven? Dit vervangt alle vertaalde velden (titel, samenvatting, inhoud).`
+        const proceed = typeof window !== 'undefined' ? window.confirm(baseConfirm) : true
+        if (!proceed) {
+          setIsRunning(false)
+          props.onComplete()
+          return
         }
 
-        let setPaths: Record<string, unknown> = {}
-
-        if (docType === 'page' || docType === 'homePage') {
-          setPaths = {
-            translations: ensureTranslationsObject(draft?.translations, translated, 'en'),
-          }
-        }
-
-        if (docType === 'blogPost') {
-          setPaths = {
-            translations: ensureTranslationsObject(draft?.translations, translated, 'en'),
-          }
-        }
-
-        if (docType === 'site') {
-          setPaths = {
-            translations: ensureTranslationsObject(draft?.translations, translated),
-          }
-        }
-
-        if (docType === 'siteSettings') {
-          setPaths = {
-            translations: ensureTranslationsObject(draft?.translations, translated),
-          }
-        }
+        // We will overwrite the translation for the target language entirely
 
         // Force-replace the language entry so we always write a new object even when contents are identical.
         const langKey = 'en'
         // Build the translated object to save for this language
         const translatedObj = translated as Record<string, unknown>
 
-        // Use a transaction: unset the existing key, then set our new translation for that key.
-        // This ensures Sanity recognizes a change and the document is updated.
+        // Sanitize structural fields in portable text so we don't write translated structural keys
+        const protoBody = (translationPayload as Record<string, any>)?.body
+        const translatedBody = (translatedObj as Record<string, any>)?.body
+
+        let structuralChangeDetected = false
+        let sanitizedBody: any[] | undefined = undefined
+
+        try {
+          if (Array.isArray(protoBody) && Array.isArray(translatedBody)) {
+            const allowedListItems = new Set(['bullet', 'number'])
+            sanitizedBody = translatedBody.map((tItem: any, i: number) => {
+              const pItem = protoBody[i]
+              if (!tItem || typeof tItem !== 'object') return tItem
+              const copy: Record<string, any> = {...tItem}
+
+              // Preserve block type
+              if (pItem && typeof pItem === 'object' && pItem._type && copy._type !== pItem._type) {
+                copy._type = pItem._type
+              }
+
+              // Preserve or repair listItem
+              if (pItem && typeof pItem === 'object' && pItem.listItem) {
+                if (copy.listItem !== pItem.listItem) {
+                  copy.listItem = pItem.listItem
+                }
+              } else if (copy.listItem && !allowedListItems.has(copy.listItem)) {
+                delete copy.listItem
+              }
+
+              // Preserve style; if invalid or missing, default to original or 'normal'
+              if (pItem && typeof pItem === 'object') {
+                const originalStyle = (pItem as any).style
+                if (originalStyle && copy.style !== originalStyle) {
+                  copy.style = originalStyle
+                } else if (!copy.style && originalStyle) {
+                  copy.style = originalStyle
+                } else if (copy.style && typeof copy.style !== 'string') {
+                  copy.style = originalStyle || 'normal'
+                }
+              } else if (copy && copy._type === 'block' && !copy.style) {
+                copy.style = 'normal'
+              }
+
+              // Preserve marks and markDefs from original
+              if (pItem && typeof pItem === 'object') {
+                if (pItem.markDefs && JSON.stringify(copy.markDefs) !== JSON.stringify(pItem.markDefs)) {
+                  copy.markDefs = pItem.markDefs
+                }
+                if (pItem.marks && JSON.stringify(copy.marks) !== JSON.stringify(pItem.marks)) {
+                  copy.marks = pItem.marks
+                }
+              }
+
+              // Detect if we've made structural edits by comparing JSON
+              try {
+                const before = JSON.stringify(tItem)
+                const after = JSON.stringify(copy)
+                if (before !== after) structuralChangeDetected = true
+              } catch (e) {
+                structuralChangeDetected = true
+              }
+
+              return copy
+            })
+          }
+        } catch (sanErr) {
+          console.warn('[translate] sanitization failed', sanErr)
+        }
+
+        // If structural changes were detected, let editor choose to force-apply or save as preview
+        if (structuralChangeDetected) {
+          const previewObj = {...translatedObj}
+          if (sanitizedBody) previewObj.body = sanitizedBody
+
+          const forceApply = typeof window !== 'undefined'
+            ? window.confirm('Structuurwijzigingen gedetecteerd in de vertaalde inhoud. Toch live overschrijven? Klik op Annuleren om als Preview op te slaan.')
+            : false
+
+          if (!forceApply) {
+            const txPrev = client.transaction()
+            const targetId = draft?._id || documentId
+            txPrev.patch(targetId, {setIfMissing: {translationsPreview: {}}})
+            txPrev.patch(targetId, {set: {[`translationsPreview.${langKey}`]: previewObj}})
+            const previewResult = await txPrev.commit({autoGenerateArrayKeys: true})
+            console.debug('[translate] preview saved', previewResult)
+            toast.push({
+              status: 'warning',
+              title: 'Preview opgeslagen i.v.m. structuurwijzigingen',
+              description:
+                'We hebben een preview opgeslagen onder Vertalingen → Preview. Controleer en pas handmatig aan of klik op "Apply translation preview" om live te zetten.',
+            })
+            setIsRunning(false)
+            props.onComplete()
+            return
+          }
+        }
+
+        // No structural changes detected — proceed to overwrite translations
+        if (sanitizedBody) translatedObj.body = sanitizedBody
         const tx = client.transaction()
-        tx.patch(documentId, {unset: [`translations.${langKey}`]})
-        tx.patch(documentId, {set: {[`translations.${langKey}`]: translatedObj}})
+        const targetId = draft?._id || documentId
+        if (docType === 'blogPost') {
+          // Inline object keyed by language
+          tx.patch(targetId, {unset: [`translations.${langKey}`]})
+          tx.patch(targetId, {set: {[`translations.${langKey}`]: translatedObj}})
+        } else if (docType === 'page' || docType === 'homePage' || docType === 'site' || docType === 'siteSettings') {
+          // Array-based translations with language field
+          const existing = (draft?.translations || []) as any[]
+          const withLang = ensureArrayWithLanguage(existing as any, {
+            ...(translatedObj as any),
+            language: langKey,
+          })
+          tx.patch(targetId, {set: {translations: withLang}})
+        }
         const commitResult = await tx.commit({autoGenerateArrayKeys: true})
 
         // Debug: show what was written so editors can verify translations exist
@@ -223,10 +329,7 @@ export function createTranslateFromDutchAction(
           toast.push({
             status: 'success',
             title: 'Vertaling voltooid en gepubliceerd',
-            description:
-              commitResult?.translations && Array.isArray(commitResult.translations)
-                ? `Saved ${commitResult.translations.length} translation(s). Published.`
-                : 'Vertaling voltooid en gepubliceerd',
+            description: `Vertaald via ${translationProvider}. Document gepubliceerd.`,
           })
         } catch (pubErr) {
           console.warn('[translate] publish failed', pubErr)
@@ -234,10 +337,7 @@ export function createTranslateFromDutchAction(
           toast.push({
             status: 'warning',
             title: 'Vertaling opgeslagen (niet gepubliceerd)',
-            description:
-              commitResult?.translations && Array.isArray(commitResult.translations)
-                ? `Saved ${commitResult.translations.length} translation(s) as draft. Publiceer het document om het live te zetten.`
-                : 'Vertaling is opgeslagen als concept. Publiceer het document om het live te zetten.',
+            description: `Vertaald via ${translationProvider}. Publiceer het document om live te zetten.`,
           })
         }
       } catch (error: unknown) {

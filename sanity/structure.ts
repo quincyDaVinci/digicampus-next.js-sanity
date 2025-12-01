@@ -1,4 +1,5 @@
 import {BookOpenIcon, FileTextIcon, HomeIcon, LayersIcon, UsersIcon, TagIcon, SettingsIcon, PackageIcon} from './lib/featherIcons'
+import TranslationFixer from './components/TranslationFixer'
 import type {StructureResolver} from 'sanity/structure'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
@@ -11,9 +12,24 @@ export const structure: StructureResolver = (S) =>
         .title('Website-instellingen')
         .icon(SettingsIcon)
         .child(
-          S.document()
-            .schemaType('site')
-            .documentId('site')
+          S.list()
+            .title('Website-instellingen')
+            .items([
+              S.listItem()
+                .title('Site metadata')
+                .icon(SettingsIcon)
+                .child(
+                  S.document()
+                    .schemaType('site')
+                    .documentId('site')
+                ),
+              S.listItem()
+                .title('Fix translations')
+                .icon(SettingsIcon)
+                .child(
+                  S.component(TranslationFixer).id('translationFixer').title('Fix translations')
+                ),
+            ])
         ),
       
       S.divider(),

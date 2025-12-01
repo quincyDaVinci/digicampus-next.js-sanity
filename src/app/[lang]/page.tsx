@@ -3,6 +3,7 @@ import { client } from '@sanity/lib/client'
 import { defaultLanguage, supportedLanguages } from '@/lib/i18n'
 import { draftMode } from 'next/headers'
 import type { Metadata } from 'next'
+import { getTranslation } from '@/lib/translations'
 
 import { HomePagePreview } from '../HomePagePreview'
 
@@ -19,7 +20,7 @@ const homePageQuery = `*[_type == "homePage"][0]{
     // if module is a documentAsset, include resolved URL
     documentFile{asset-> { _id, url }},
   },
-  "localized": translations[$lang]{
+  "localized": translations[language == $lang][0]{
     title,
     metadataDescription,
     modules[]{
@@ -93,6 +94,7 @@ async function getHomePage(lang: string): Promise<FetchedHomePage> {
 
 export default async function Page({ params }: HomeParams) {
   const { lang = defaultLanguage } = await params
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key)
   const draft = await draftMode()
   const { page, isFallback } = await getHomePage(lang)
   const localizedTitle = !isFallback ? page?.localized?.title ?? page?.title : page?.title
@@ -108,9 +110,9 @@ export default async function Page({ params }: HomeParams) {
     return (
       <main id="main" className="flex flex-col gap-8 p-6 min-h-[60vh] items-center justify-center">
         <div className="max-w-2xl text-center">
-          <h1 className="text-4xl font-bold mb-4">Welcome to Your New Next.js &amp; Sanity App!</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('welcomeTitle')}</h1>
           <p className="text-lg mb-6 text-muted-foreground">
-            It looks like you haven&apos;t set up your home page content yet. To get started, head over to the Sanity Studio and create your home page by adding modules and content.
+            {t('welcomeMessage')}
           </p>
         </div>
       </main>
@@ -123,11 +125,7 @@ export default async function Page({ params }: HomeParams) {
       <h1 className="sr-only">{localizedTitle}</h1>
       {isFallback && lang !== defaultLanguage && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-md text-sm text-yellow-800">
-          {lang === 'en' ? (
-            <p>This page is not yet translated to English — showing the default language content.</p>
-          ) : (
-            <p>Deze pagina is nog niet vertaald naar Nederlands — we tonen de standaardinhoud.</p>
-          )}
+          <p>{lang === 'en' ? t('notTranslatedToEnglish') : t('notTranslatedToDutch')}</p>
         </div>
       )}
 

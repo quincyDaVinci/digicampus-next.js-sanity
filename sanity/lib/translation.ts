@@ -17,12 +17,16 @@ const NON_TRANSLATABLE_KEYS = new Set([
   'asset',
   'style',
   'list',
+  'listItem',
   'level',
   'marks',
   'markDefs',
   'email',
   'relationMode',
 ])
+
+// Block styles that cause hydration errors when nested incorrectly
+const PROTECTED_BLOCK_STYLES = new Set(['blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value)
@@ -97,32 +101,40 @@ async function requestTranslations(segments: string[], sourceLanguage: string, t
     throw new Error(msg)
   }
 
-  const data = (await response.json()) as {translations?: string[]}
+  const data = (await response.json()) as {translations?: string[]; provider?: string; providerName?: string}
   if (!data?.translations || data.translations.length !== segments.length) {
     throw new Error('Translation response did not match requested segments')
   }
 
-  return data.translations
+  return {
+    translations: data.translations,
+    provider: data.provider || 'unknown',
+    providerName: data.providerName || 'Unknown Provider',
+  }
 }
 
 export async function translateDeepObject<T extends TranslatableValue>(
   value: T,
   sourceLanguage: string,
   targetLanguage: string
-): Promise<T> {
+): Promise<{translated: T; provider: string; providerName: string}> {
   const segments = collectSegments(value)
-  if (segments.length === 0) return value
+  if (segments.length === 0) return {translated: value, provider: 'none', providerName: 'No translation needed'}
 
-  const translationsList = await requestTranslations(
+  const result = await requestTranslations(
     segments.map((segment) => segment.text),
     sourceLanguage,
     targetLanguage
   )
 
   const translationMap = new Map<string, string>()
-  segments.forEach((segment, index) => translationMap.set(segment.path.join('.'), translationsList[index]))
+  segments.forEach((segment, index) => translationMap.set(segment.path.join('.'), result.translations[index]))
 
-  return applyTranslations(value, translationMap) as T
+  return {
+    translated: applyTranslations(value, translationMap) as T,
+    provider: result.provider,
+    providerName: result.providerName,
+  }
 }
 
 export function ensureArrayWithLanguage<T extends {_type?: string; language?: string; _key?: string}>(

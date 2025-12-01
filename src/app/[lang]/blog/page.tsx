@@ -146,10 +146,8 @@ export default async function BlogPage({searchParams, params}: PageProps) {
 
     const postsPerPage = blogPageData.postsPerPage || 12
 
-    // Use the language of the blogPageData when querying posts (this may be a fallback language).
-    // Prefer an explicit language set on the blogPage metadata or document; otherwise use the requested lang.
-    let usedLang = (blogPageData as any)?.metadata?.language || (blogPageData as any)?.language || lang || defaultLanguage
-    if (!isSupportedLang(usedLang)) usedLang = defaultLanguage
+      // Use the route's lang parameter for fetching posts (from the [lang] dynamic segment)
+      const usedLang = isSupportedLang(lang) ? lang : defaultLanguage
 
     // Fetch data with per-call error handling so we can surface specific failures in the server logs
     let categories: Category[] = []

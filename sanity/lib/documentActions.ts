@@ -4,6 +4,7 @@ import {
   type DocumentActionProps,
 } from 'sanity'
 import {createTranslateFromDutchAction} from './actions/translateFromDutch'
+import {createApplyTranslationPreviewAction} from './actions/applyTranslationPreview'
 import {isTranslationSupported} from './translation'
 
 export function customDocumentActions(
@@ -13,6 +14,7 @@ export function customDocumentActions(
   const {schemaType, published} = context
 
   const translateAction = createTranslateFromDutchAction(context)
+  const applyPreviewAction = createApplyTranslationPreviewAction(context)
 
   const renamed = prev.map((action) => {
     if (action.action === 'publish') {
@@ -32,7 +34,7 @@ export function customDocumentActions(
   })
 
   if (isTranslationSupported(schemaType)) {
-    return [translateAction, ...renamed]
+    return [translateAction, applyPreviewAction, ...renamed]
   }
 
   return renamed
