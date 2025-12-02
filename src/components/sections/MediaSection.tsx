@@ -2,7 +2,7 @@
 
 import type { MediaSectionProps } from "@/types/sections";
 import { urlFor } from "@sanity/lib/image";
-import Image from 'next/image'
+import SanityNextImage from '@/components/SanityNextImage'
 import { useRef, useState, useEffect } from "react";
 
 /**
@@ -133,8 +133,8 @@ export default function MediaSection(props: MediaSectionProps) {
     ? urlFor(video.posterImage)
         .width(1920)
         .height(1080)
-        .fit("crop")
-        .auto("format")
+        .fit('crop')
+        .auto('format')
         .quality(80)
         .url()
     : null;
@@ -215,15 +215,14 @@ export default function MediaSection(props: MediaSectionProps) {
           {mediaType === "image" && imageUrl && image?.alt ? (
             <figure className={mediaClasses} style={aspectRatioStyle}>
               <div id={mediaId} aria-describedby={image.caption ? captionId : undefined} className="relative block w-full h-full">
-                <Image
-                  src={imageUrl}
+                <SanityNextImage
+                  image={image}
                   alt={image.alt}
                   width={(image.asset?.metadata?.dimensions?.width) || 1600}
                   height={(image.asset?.metadata?.dimensions?.height) || 900}
                   className="w-full h-full object-cover"
                   sizes="(max-width: 768px) 100vw, 70vw"
                   placeholder={image?.blurDataURL ? 'blur' : undefined}
-                  blurDataURL={image?.blurDataURL}
                 />
                 {/* Gradient overlay from image.overlay */}
                 {image?.overlay?.enabled && (() => {

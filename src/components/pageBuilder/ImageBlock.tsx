@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import SanityNextImage from '@/components/SanityNextImage'
 import Link from 'next/link'
 
 import {urlFor} from '@sanity/lib/image'
@@ -76,16 +76,15 @@ export default function ImageBlock({component}: ImageBlockProps) {
             boxShadow: '0 20px 40px hsl(var(--dc-text)/0.12)',
           }}
         >
-          <Image
-            src={imageUrl}
+          <SanityNextImage
+            image={component.image}
             alt={component.image.alt || ''}
             width={width}
             height={height}
             className="h-auto w-full object-cover"
-          sizes="(max-width: 768px) 100vw, 70vw"
-          placeholder={component.image?.blurDataURL ? 'blur' : undefined}
-          blurDataURL={component.image?.blurDataURL}
-        />
+            sizes="(max-width: 768px) 100vw, 70vw"
+            placeholder={component.image?.blurDataURL ? 'blur' : undefined}
+          />
       </span>
       </WrapperComponent>
       {component.image.caption ? (

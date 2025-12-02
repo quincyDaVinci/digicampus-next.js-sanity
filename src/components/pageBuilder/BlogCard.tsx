@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import SanityNextImage from '@/components/SanityNextImage'
 import Link from 'next/link'
 import {usePathname} from 'next/navigation'
 import {urlFor} from '@sanity/lib/image'
@@ -87,8 +87,8 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
       {imageUrl ? (
         <div className={`relative overflow-hidden ${borderRadius === 'small' ? 'rounded-t-xl' : 'rounded-t-3xl'}`} style={{backgroundColor: '#ffffff', maxHeight: '220px'}}>
           <div className="relative w-full transition-transform duration-300 group-hover:scale-[1.03]">
-            <Image
-              src={imageUrl}
+            <SanityNextImage
+              image={post.mainImage}
               alt={post.mainImage?.alt || ''}
               width={800}
               height={220}
@@ -96,7 +96,6 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
               priority={false}
               style={{ display: 'block', width: '100%' }}
               placeholder={post.mainImage?.blurDataURL ? 'blur' : undefined}
-              blurDataURL={post.mainImage?.blurDataURL}
             />
             {/* Base overlay - always visible with subtle gradient */}
             <div
@@ -174,8 +173,8 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
           {showAuthor && (post.author?.name || post.author?.role) && (
             <div className="flex items-center gap-3">
               {authorImageUrl ? (
-                <Image
-                  src={authorImageUrl}
+                <SanityNextImage
+                  image={post.author?.image}
                   alt={post.author?.name || ''}
                   width={48}
                   height={48}

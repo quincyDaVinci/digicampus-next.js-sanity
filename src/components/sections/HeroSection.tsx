@@ -2,7 +2,7 @@
 
 import type { HeroSectionProps } from "@/types/sections";
 import { urlFor } from "@sanity/lib/image";
-import Image from 'next/image'
+import SanityNextImage from '@/components/SanityNextImage'
 
 /**
  * Hero Section Router
@@ -22,14 +22,13 @@ export default function HeroSection(props: HeroSectionProps) {
     <div className="w-full py-20 lg:py-40 relative">
       {bgUrl && media?.image?.asset && (
         <div aria-hidden style={{position: 'absolute', inset: 0, zIndex: 0}}>
-          <Image
-            src={bgUrl}
+          <SanityNextImage
+            image={media.image}
             alt={media.image.alt || ''}
             fill
             priority={true}
             style={{objectFit: 'cover'}}
             placeholder={media.image?.blurDataURL ? 'blur' : undefined}
-            blurDataURL={media.image?.blurDataURL}
           />
         </div>
       )}

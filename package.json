@@ -26,6 +26,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "sanity": "^4.10.2",
+    "sanity-image": "^1.0.0",
     "server-only": "^0.0.1",
     "styled-components": "^6.1.19"
   },
