@@ -3,6 +3,7 @@
 import type { HeroSectionProps } from "@/types/sections";
 import { urlFor } from "@sanity/lib/image";
 import SanityNextImage from '@/components/SanityNextImage'
+import { buildSrc } from 'sanity-image'
 
 /**
  * Hero Section Router
@@ -11,10 +12,24 @@ import SanityNextImage from '@/components/SanityNextImage'
 export default function HeroSection(props: HeroSectionProps) {
   const { heading, subheading, badgeText, buttons = [], media } = props;
 
-  // Build background image URL with hotspot/crop applied (also rasterize vectors)
-  const bgUrl = media?.image
-    ? urlFor(media.image).width(2400).height(1200).fit('crop').auto('format').url()
-    : null;
+  // Prefer plugin-generated background URL when possible
+  const bgUrl = (() => {
+    if (!media?.image?.asset) return null
+    try {
+      const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+      const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+      const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+      const asset = media.image.asset
+      const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+      if (assetId && baseUrl) {
+        const srcObj = buildSrc({ id: assetId, baseUrl, width: 2400, height: 1200, mode: 'cover' })
+        return srcObj?.src ?? null
+      }
+    } catch (err) {
+      return urlFor(media.image).width(2400).height(1200).fit('crop').auto('format').url()
+    }
+    return null
+  })()
 
   // For now, render a simple hero section
   // TODO: Implement variants from sane-kit (buttonBanner, badgeBanner, gridGallery)

@@ -7,11 +7,26 @@ import {client, previewClient} from '@sanity/lib/client'
 import {defaultLanguage, supportedLanguages} from '@/lib/i18n'
 import {PagePreview} from './PagePreview'
 import {urlFor} from '@sanity/lib/image'
+import { buildSrc } from 'sanity-image'
 
 // Helper: generate a tiny base64 LQIP for a Sanity image source
 async function generateBlurDataURL(source: any) {
   try {
-    const tinyUrl = urlFor(source).width(24).height(16).auto('format').quality(20).url()
+    let tinyUrl: string | null = null
+    try {
+      const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+      const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+      const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+      const asset = source?.asset
+      const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+      if (baseUrl && assetId) {
+        const srcObj = buildSrc({ id: assetId, baseUrl, width: 24, height: 16, mode: 'contain', queryParams: { q: 20 } })
+        tinyUrl = srcObj?.src ?? null
+      }
+    } catch (err) {
+      tinyUrl = null
+    }
+    if (!tinyUrl) tinyUrl = urlFor(source).width(24).height(16).auto('format').quality(20).url()
     const res = await fetch(tinyUrl)
     if (!res.ok) return null
     const arrayBuffer = await res.arrayBuffer()

@@ -2,6 +2,7 @@ import SanityNextImage from '@/components/SanityNextImage'
 import Link from 'next/link'
 
 import {urlFor} from '@sanity/lib/image'
+import { buildSrc } from 'sanity-image'
 
 import type {ImageComponent} from '@/types/pageBuilder'
 
@@ -29,9 +30,22 @@ export default function ImageBlock({component}: ImageBlockProps) {
 
   const alignmentClass = component.alignment ? alignmentClassMap[component.alignment] : alignmentClassMap.center
   const widthClass = component.displayWidth ? widthClassMap[component.displayWidth] : widthClassMap.default
-  const imageBuilder = urlFor(component.image).auto('format').quality(90)
-  const imageUrl = imageBuilder.width(1600).height(900).fit('crop').url()
   const {width = 1600, height = 900} = component.image.asset.metadata?.dimensions ?? {width: 1600, height: 900}
+  let imageUrl: string | null = null
+  try {
+    const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+    const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+    const asset = component.image.asset
+    const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+    if (assetId && baseUrl) {
+      const srcObj = buildSrc({ id: assetId, baseUrl, width: 1600, height: 900, mode: 'cover' })
+      imageUrl = srcObj?.src ?? null
+    }
+  } catch (err) {
+    imageUrl = null
+  }
+  if (!imageUrl) imageUrl = urlFor(component.image).auto('format').quality(90).width(1600).height(900).fit('crop').url()
   const rounded = component.rounded ?? true
   
   // Determine wrapper type and props properly

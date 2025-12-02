@@ -2,6 +2,7 @@
 
 import type { MediaSectionProps } from "@/types/sections";
 import { urlFor } from "@sanity/lib/image";
+import { buildSrc } from 'sanity-image'
 import SanityNextImage from '@/components/SanityNextImage'
 import { useRef, useState, useEffect } from "react";
 
@@ -118,26 +119,27 @@ export default function MediaSection(props: MediaSectionProps) {
 
   const aspectRatioStyle = getAspectRatioStyle();
 
-  // Build image URL with optimization
-  const imageUrl = image
-    ? urlFor(image)
-        .width(1920)
-        .height(1080)
-        .fit("max")
-        .auto("format")
-        .quality(90)
-        .url()
-    : null;
+  // Build image URL with plugin when possible, fallback to urlFor
+  const makeSrc = (img: any, w?: number, h?: number, mode: 'cover'|'contain' = 'contain') => {
+    if (!img?.asset) return null
+    try {
+      const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+      const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+      const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+      const asset = img.asset
+      const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+      if (assetId && baseUrl) {
+        const srcObj = buildSrc({ id: assetId, baseUrl, width: w, height: h, mode })
+        return srcObj?.src ?? null
+      }
+    } catch (err) {
+      // fall through to urlFor fallback
+    }
+    return img?.asset ? urlFor(img).width(w || 1920).height(h || 1080).fit('max').auto('format').quality(90).url() : null
+  }
 
-  const posterUrl = video?.posterImage
-    ? urlFor(video.posterImage)
-        .width(1920)
-        .height(1080)
-        .fit('crop')
-        .auto('format')
-        .quality(80)
-        .url()
-    : null;
+  const imageUrl = makeSrc(image, 1920, 1080, 'contain')
+  const posterUrl = makeSrc(video?.posterImage, 1920, 1080, 'cover')
 
   // Determine if video is embedded (YouTube, Vimeo) or direct
   const isEmbeddedVideo = (url?: string) => {

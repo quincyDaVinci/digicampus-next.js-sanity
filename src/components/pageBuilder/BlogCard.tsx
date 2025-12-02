@@ -68,8 +68,9 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
   const formattedDate = post.publishedAt
     ? new Intl.DateTimeFormat('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'}).format(new Date(post.publishedAt))
     : null
-  const imageUrl = post.mainImage?.asset ? urlFor(post.mainImage).width(800).height(520).fit('crop').auto('format').url() : null
-  const authorImageUrl = post.author?.image?.asset ? urlFor(post.author.image).width(96).height(96).fit('crop').auto('format').url() : null
+  // Use presence of assets to gate rendering; actual rendering uses `SanityNextImage` which uses the plugin
+  const hasMainImage = Boolean(post.mainImage?.asset)
+  const hasAuthorImage = Boolean(post.author?.image?.asset)
   const categories = post.categories || []
   const estimatedReadTime = post.estimatedReadTime ?? calculateReadTimeFromBody(post.body)
   const ClockIconComponent = getFeatherIcon('clock')
@@ -84,7 +85,7 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
         color: style.color,
       }}
     >
-      {imageUrl ? (
+      {hasMainImage ? (
         <div className={`relative overflow-hidden ${borderRadius === 'small' ? 'rounded-t-xl' : 'rounded-t-3xl'}`} style={{backgroundColor: '#ffffff', maxHeight: '220px'}}>
           <div className="relative w-full transition-transform duration-300 group-hover:scale-[1.03]">
             <SanityNextImage
@@ -172,7 +173,7 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
         <div className="mt-auto flex items-center justify-between gap-3">
           {showAuthor && (post.author?.name || post.author?.role) && (
             <div className="flex items-center gap-3">
-              {authorImageUrl ? (
+              {hasAuthorImage ? (
                 <SanityNextImage
                   image={post.author?.image}
                   alt={post.author?.name || ''}

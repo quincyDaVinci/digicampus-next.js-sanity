@@ -4,6 +4,7 @@ import {client} from '@sanity/lib/client'
 import {groq} from 'next-sanity'
 import Link from 'next/link'
 import {urlFor} from '@sanity/lib/image'
+import { buildSrc } from 'sanity-image'
 import {CalendarIcon, ClockIcon, ChevronLeftIcon} from '@/components/icons/FeatherIcons'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import {PortableText, type PortableTextBlock} from 'next-sanity'
@@ -176,19 +177,27 @@ export default async function BlogPostPage({params}: PageProps) {
         })
       : null
 
-    const imageUrl = post.mainImage?.asset
-      ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
-      : null
+    const makeSrc = (img: any, w?: number, h?: number, mode: 'cover'|'contain' = 'cover') => {
+      if (!img?.asset) return null
+      try {
+        const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+        const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+        const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+        const asset = img.asset
+        const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+        if (assetId && baseUrl) {
+          const srcObj = buildSrc({ id: assetId, baseUrl, width: w, height: h, mode })
+          return srcObj?.src ?? null
+        }
+      } catch (err) {
+        // fall through to urlFor fallback
+      }
+      return img?.asset ? urlFor(img).width(w || 1200).height(h || 630).fit('crop').auto('format').url() : null
+    }
 
-    // A larger / higher-res source for the parallax inner image so vertical movement
-    // doesn't reveal empty/cropped edges. Request a larger cropped variant centered on hotspot.
-    const imageFullSrc = post.mainImage?.asset
-      ? urlFor(post.mainImage).width(2000).height(1200).fit('crop').auto('format').url()
-      : null
-
-    const authorImageUrl = post.author?.image?.asset
-      ? urlFor(post.author.image).width(96).height(96).fit('crop').auto('format').url()
-      : null
+    const imageUrl = makeSrc(post.mainImage, 1200, 630, 'cover')
+    const imageFullSrc = makeSrc(post.mainImage, 2000, 1200, 'cover')
+    const authorImageUrl = makeSrc(post.author?.image, 96, 96, 'cover')
 
     const breadcrumbs = [
       {label: t('home'), href: `/${lang}`},
@@ -301,7 +310,23 @@ export default async function BlogPostPage({params}: PageProps) {
                 },
                 types: {
                   image: ({value}) => {
-                    const imageUrl = value?.asset ? urlFor(value).width(1200).height(675).fit('crop').auto('format').url() : null
+                      const imageUrl = ((): string | null => {
+                        if (!value?.asset) return null
+                        try {
+                          const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+                          const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+                          const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+                          const asset = value.asset
+                          const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+                          if (assetId && baseUrl) {
+                            const srcObj = buildSrc({ id: assetId, baseUrl, width: 1200, height: 675, mode: 'cover' })
+                            return srcObj?.src ?? null
+                          }
+                        } catch (err) {
+                          // fallback
+                        }
+                        return value?.asset ? urlFor(value).width(1200).height(675).fit('crop').auto('format').url() : null
+                      })()
                     if (!imageUrl) return null
                     
                     // Size classes based on the size field

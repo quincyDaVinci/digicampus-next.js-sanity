@@ -1,6 +1,7 @@
 import {client} from '@sanity/lib/client'
 import {siteSettingsQuery} from '@sanity/lib/queries/site'
 import {urlFor} from '@sanity/lib/image'
+import { buildSrc } from 'sanity-image'
 import HeaderClient from './HeaderClient'
 
 type MenuItem = {
@@ -70,8 +71,28 @@ export default async function Header({ lang }: { lang: string }) {
           type LogoAsset = { asset?: { metadata?: { dimensions?: { width?: number; height?: number } }, url?: string } }
           const assetDims = (siteData.logo as unknown as LogoAsset)?.asset?.metadata?.dimensions
           const targetHeight = assetDims?.width && assetDims?.height ? Math.round((assetDims.height / assetDims.width) * targetWidth) : undefined
-          const builder = urlFor(siteData.logo).width(targetWidth)
-          const imgUrl = targetHeight ? builder.height(targetHeight).fit('crop').auto('format').url() : builder.auto('format').url()
+
+          // Prefer plugin-generated URL
+          let imgUrl: string | null = null
+          try {
+            const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+            const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+            const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+            const asset = (siteData.logo as any)?.asset
+            const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+            if (assetId && baseUrl) {
+              const srcObj = buildSrc({ id: assetId, baseUrl, width: targetWidth, height: targetHeight, mode: targetHeight ? 'cover' : 'contain' })
+              imgUrl = srcObj?.src ?? null
+            }
+          } catch (err) {
+            imgUrl = null
+          }
+
+          if (!imgUrl) {
+            const builder = urlFor(siteData.logo).width(targetWidth)
+            imgUrl = targetHeight ? builder.height(targetHeight).fit('crop').auto('format').url() : builder.auto('format').url()
+          }
+
           logo = {
             url: imgUrl,
             alt: siteData.logoAlt || siteData.title || 'Site logo',
@@ -81,9 +102,10 @@ export default async function Header({ lang }: { lang: string }) {
         } catch (err) {
           // fallback if image builder fails
           console.warn('Logo image builder failed', err)
-          if ((siteData.logo as unknown as LogoAsset)?.asset?.url) {
+          const assetUrl = (siteData.logo as unknown as LogoAsset)?.asset?.url
+          if (assetUrl) {
             logo = {
-              url: (siteData.logo as unknown as LogoAsset).asset!.url || '',
+              url: assetUrl,
               alt: siteData.logoAlt || siteData.title || 'Site logo'
             }
           }

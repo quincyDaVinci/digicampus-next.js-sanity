@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import {urlFor} from '@sanity/lib/image'
+import { buildSrc } from 'sanity-image'
 import { SanityImage } from 'sanity-image'
 import type {CSSProperties} from 'react'
 
@@ -47,11 +48,26 @@ export default function SanityNextImage(props: SanityNextImageProps) {
         />
       )
     }
-    // fallback to URL builder when asset id not found
-    const builder = urlFor(image).auto('format')
-    if (width) builder.width(width)
-    if (height) builder.height(height)
-    resolvedSrc = builder.url()
+    // Try to use the plugin URL builder first
+    try {
+      const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+      const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+      const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+      const asset = image.asset
+      const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+      if (assetId && baseUrl) {
+        const srcObj = buildSrc({ id: assetId, baseUrl, width, height, mode: fill ? 'cover' : 'contain' })
+        resolvedSrc = srcObj?.src ?? undefined
+      }
+    } catch (err) {
+      resolvedSrc = undefined
+    }
+    // Fallback to urlFor if plugin did not return a URL
+    if (!resolvedSrc) {
+      const builder = urlFor(image).auto('format')
+      if (width) builder.width(width)
+      if (height) builder.height(height)
+      resolvedSrc = builder.url()
   }
 
   // Fallback: if no resolved src, render nothing
