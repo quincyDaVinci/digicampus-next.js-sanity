@@ -6,10 +6,19 @@ import Image from 'next/image'
 import { ArrowRightIcon, ChevronDownIcon, CloseIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from '@/components/icons/FeatherIcons'
 import { useLanguage } from "@/lib/language"
 
-type Item = { label: string; href: string }
-type Menu = { label: string; items: Item[] }
+import {client} from '@sanity/lib/client'
+import {siteSettingsQuery} from '@sanity/lib/queries/site'
+import {
+  buildFallbackMenus,
+  extractCtasFromSiteSettings,
+  extractLogoFromSiteSettings,
+  extractMenusFromSiteSettings,
+  type CTA,
+  type Menu,
+  type SiteSettings,
+} from './headerData'
+
 type Logo = { url: string; alt: string; width?: number; height?: number }
-type CTA = { label: string; href: string }
 
 type HeaderProps = {
   menus: Menu[]
@@ -21,6 +30,13 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
   const { lang: language, setLang: setLanguage } = useLanguage()
   const [liveMessage, setLiveMessage] = useState('')
   const firstLangRender = useRef(true)
+  const hasSanityCredentials = Boolean(
+    process.env.NEXT_PUBLIC_SANITY_PROJECT_ID &&
+      process.env.NEXT_PUBLIC_SANITY_DATASET,
+  )
+  const [menuData, setMenuData] = useState<Menu[]>(menus)
+  const [logoData, setLogoData] = useState<Logo | null>(logo ?? null)
+  const [ctaData, setCtaData] = useState<CTA[]>(ctas ?? [])
   const [scrolled, setScrolled] = useState(false)
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -29,6 +45,47 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
   const mobileMenuRef = useRef<HTMLDivElement | null>(null)
   const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null)
   const homeHref = `/${language}`
+
+  // Keep menus/logo/ctas in sync with language switches
+  useEffect(() => {
+    let ignore = false
+
+    const loadMenus = async () => {
+      if (!language) return
+
+      if (!hasSanityCredentials) {
+        if (!ignore) {
+          setMenuData(buildFallbackMenus(language))
+          setLogoData(logo ?? null)
+          setCtaData(ctas ?? [])
+        }
+        return
+      }
+
+      try {
+        const siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery, { lang: language })
+        if (ignore) return
+
+        const sanityMenus = extractMenusFromSiteSettings(siteData, language)
+        setMenuData(sanityMenus.length > 0 ? sanityMenus : buildFallbackMenus(language))
+        setLogoData(extractLogoFromSiteSettings(siteData))
+        setCtaData(extractCtasFromSiteSettings(siteData))
+      } catch (err) {
+        console.error('Could not fetch site settings:', err)
+        if (!ignore) {
+          setMenuData(buildFallbackMenus(language))
+          setLogoData(logo ?? null)
+          setCtaData(ctas ?? [])
+        }
+      }
+    }
+
+    loadMenus()
+
+    return () => {
+      ignore = true
+    }
+  }, [language, hasSanityCredentials, ctas, logo, menus])
 
   // Persist dark mode
   useEffect(() => {
@@ -120,12 +177,12 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
           <div className="col-start-1 row-start-1 flex items-start min-w-0">
             <Link href={homeHref} className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
               <span className="sr-only">Digicampus homepage</span>
-              {logo ? (
+              {logoData ? (
                 <Image
-                  src={logo.url}
-                  alt={logo.alt}
-                  width={logo.width || 320}
-                  height={logo.height || 80}
+                  src={logoData.url}
+                  alt={logoData.alt}
+                  width={logoData.width || 320}
+                  height={logoData.height || 80}
                   className={[scrolled ? "h-12" : "h-16", "w-auto drop-shadow max-w-[60vw] sm:max-w-[320px]"].join(" ")}
                   style={{ maxWidth: "320px" }}
                 />
@@ -175,23 +232,23 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
 
           {/* Bottom-left: menus */}
           <div className="col-start-1 row-start-2 flex items-end gap-4 flex-wrap sm:flex-nowrap">
-            {menus.map(m => (
+            {menuData.map((m, idx) => (
               <div key={m.label} className="relative">
-                <button aria-expanded={openIndex === menus.indexOf(m)} aria-controls={`menu-${menus.indexOf(m)}`} onClick={() => setOpenIndex(openIndex === menus.indexOf(m) ? null : menus.indexOf(m))} className="inline-flex items-center gap-2 rounded-lg px-2 py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] whitespace-nowrap transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" aria-label={m.label}>
+                <button aria-expanded={openIndex === idx} aria-controls={`menu-${idx}`} onClick={() => setOpenIndex(openIndex === idx ? null : idx)} className="inline-flex items-center gap-2 rounded-lg px-2 py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] whitespace-nowrap transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" aria-label={m.label}>
                   <span className="no-wrap text-fluid-md" aria-hidden>{m.label}</span>
-                  <ChevronDownIcon aria-hidden focusable="false" className={`h-4 w-4 transition-transform duration-200 ${openIndex === menus.indexOf(m) ? 'rotate-180' : ''}`} />
+                  <ChevronDownIcon aria-hidden focusable="false" className={`h-4 w-4 transition-transform duration-200 ${openIndex === idx ? 'rotate-180' : ''}`} />
                 </button>
 
-                {openIndex === menus.indexOf(m) && (
-                  <div id={`menu-${menus.indexOf(m)}`} role="menu" className="absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 duration-200" style={{ backgroundColor: 'hsl(var(--dc-surface) / 0.98)', border: '1px solid hsl(var(--dc-border) / 0.1)', color: 'hsl(var(--dc-text))' }}>
+                {openIndex === idx && (
+                  <div id={`menu-${idx}`} role="menu" className="absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 duration-200" style={{ backgroundColor: 'hsl(var(--dc-surface) / 0.98)', border: '1px solid hsl(var(--dc-border) / 0.1)', color: 'hsl(var(--dc-text))' }}>
                     <ul className="py-2">
-                      {m.items.map((it, idx) => (
-                        <li key={`${m.label}-${idx}`}>
-                          <Link 
-                            href={it.href} 
-                            role="menuitem" 
-                            onClick={() => setOpenIndex(null)} 
-                            className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:pl-5" 
+                      {m.items.map((it, subIdx) => (
+                        <li key={`${m.label}-${subIdx}`}>
+                          <Link
+                            href={it.href}
+                            role="menuitem"
+                            onClick={() => setOpenIndex(null)}
+                            className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:pl-5"
                             style={{ color: 'hsl(var(--dc-text))' }}
                           >
                             {it.label}
@@ -207,8 +264,8 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
 
           {/* Bottom-right: Contact CTA */}
           <div className="col-start-2 row-start-2 flex items-end justify-end gap-2">
-            {ctas.length > 0 ? (
-              ctas.map((cta, idx) => (
+            {ctaData.length > 0 ? (
+              ctaData.map((cta, idx) => (
                 <Link
                   key={idx}
                   href={cta.href}
@@ -246,8 +303,8 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
           </button>
 
             <Link href={homeHref} className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
-            {logo ? (
-              <Image src={logo.url} alt={logo.alt} width={logo.width || 160} height={logo.height || 40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
+            {logoData ? (
+              <Image src={logoData.url} alt={logoData.alt} width={logoData.width || 160} height={logoData.height || 40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
             ) : (
               <Image src="/assets/images/logo-digicampus.svg" alt="Digicampus logo" width={160} height={40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
             )}
@@ -284,7 +341,7 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
         >
           <div className="rounded-2xl p-3 backdrop-blur" style={{ border: '1px solid hsl(var(--dc-border)/0.1)', backgroundColor: 'hsl(var(--dc-surface)/0.9)', color: 'hsl(var(--dc-text))' }}>
             <ul className="space-y-2">
-              {menus.map(m => (
+              {menuData.map(m => (
                 <li key={m.label}>
                   <details className="group">
                     <summary className="cursor-pointer list-none rounded-lg px-3 py-2 transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" style={{ color: 'hsl(var(--dc-text))' }}>{m.label}</summary>
@@ -301,8 +358,8 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
             <div className="mt-3 flex items-center gap-2 flex-wrap">
               <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors", language === "nl" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90 hover:bg-white/10"].join(" ")}>NL</button>
               <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors", language === "en" ? "bg-[--color-brand] text-black" : "border border-white/30 text-white/90 hover:bg-white/10"].join(" ")}>EN</button>
-              {ctas.length > 0 ? (
-                ctas.map((cta, idx) => (
+              {ctaData.length > 0 ? (
+                ctaData.map((cta, idx) => (
                   <Link
                     key={idx}
                     href={cta.href}
