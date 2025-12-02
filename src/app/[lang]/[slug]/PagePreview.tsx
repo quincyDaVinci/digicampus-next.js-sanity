@@ -44,10 +44,10 @@ export function PagePreview({initial, query, params}: PagePreviewProps) {
   }
   
   return (
-    <main id="main">
+    <section className="contents" aria-label="Page preview content">
       {data.modules?.map((module) => (
         <RenderSection key={module._key} section={module} />
       ))}
-    </main>
+    </section>
   )
 }

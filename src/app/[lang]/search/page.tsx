@@ -51,9 +51,9 @@ export default function SearchPage({params, searchParams}: PageProps) {
   const query = searchParams?.q?.trim()
 
   return (
-    <main className="container mx-auto px-4 py-12">
+    <section className="container mx-auto px-4 py-12" aria-labelledby="search-heading">
       <div className="max-w-3xl space-y-4">
-        <h1 className="text-4xl font-bold text-dc">{t.heading}</h1>
+        <h1 id="search-heading" className="text-4xl font-bold text-dc">{t.heading}</h1>
         <p className="text-lg text-dc-muted">{t.description}</p>
 
         {query ? (
@@ -79,6 +79,6 @@ export default function SearchPage({params, searchParams}: PageProps) {
           {t.backHome}
         </Link>
       </div>
-    </main>
+    </section>
   )
 }
