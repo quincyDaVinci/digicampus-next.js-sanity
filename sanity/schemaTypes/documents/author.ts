@@ -62,7 +62,7 @@ export default defineType({
       title: 'Email',
       type: 'string',
       description: 'Public contact email (optional).',
-      validation: (Rule) => Rule.uri({allowRelative: false}).custom((v) => (v && v.indexOf('@') === -1) ? 'Invalid email' : true),
+      validation: (Rule) => Rule.email(),
     }),
     defineField({
       name: 'linkedin',

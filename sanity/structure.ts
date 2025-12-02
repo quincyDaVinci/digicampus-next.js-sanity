@@ -1,5 +1,7 @@
 import {BookOpenIcon, FileTextIcon, HomeIcon, LayersIcon, UsersIcon, TagIcon, SettingsIcon, PackageIcon} from './lib/featherIcons'
 import TranslationFixer from './components/TranslationFixer'
+import WarningsPanel from './components/WarningsPanel'
+import LibraryManager from './components/LibraryManager'
 import type {StructureResolver} from 'sanity/structure'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
@@ -150,6 +152,23 @@ export const structure: StructureResolver = (S) =>
         ),
       
       S.divider(),
+      
+      // Library (opens Media tool directly)
+      S.listItem()
+        .title('Library')
+        .icon(PackageIcon)
+        .child(
+          S.component(LibraryManager).id('libraryManager').title('Library')
+        ),
+
+      // Warnings / Admin alerts
+      S.listItem()
+        .title('Warnings')
+        .icon(SettingsIcon)
+        .child(
+          S.component(WarningsPanel).id('warningsPanel').title('Warnings & Alerts')
+        ),
+
       
       // Tags
       S.documentTypeListItem('tag')
