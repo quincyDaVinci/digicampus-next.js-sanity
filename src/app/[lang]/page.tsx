@@ -34,6 +34,15 @@ const homePageQuery = `*[_type == "homePage"][0]{
   }
 }`
 
+const homePageMetadataQuery = `*[_type == "homePage"][0]{
+  title,
+  metadata,
+  "localized": translations[language == $lang][0]{
+    title,
+    metadataDescription,
+  }
+}`
+
 type HomeParams = { params: Promise<{ lang: string }> }
 
 export function generateStaticParams() {
@@ -42,25 +51,62 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: HomeParams): Promise<Metadata> {
   const { lang } = await params
-  const locale = lang === 'nl' ? 'nl_NL' : 'en_US'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://digicampus.example'
+  const safeLang = supportedLanguages.includes(lang) ? lang : defaultLanguage
+  const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(safeLang, key)
+  const locale = safeLang === 'nl' ? 'nl_NL' : 'en_US'
 
-  return {
-    title: 'DigiCampus - Digital Learning Platform',
-    description: 'Empowering education through digital innovation',
-    openGraph: {
-      title: 'DigiCampus - Digital Learning Platform',
-      description: 'Empowering education through digital innovation',
-      type: 'website',
-      locale,
-      url: `/${lang}`,
-    },
-    metadataBase: new URL('https://digicampus.example'),
-    alternates: {
-      languages: {
-        en: '/en',
-        nl: '/nl',
+  try {
+    const data = await client.fetch<{
+      title?: string
+      metadata?: { description?: string }
+      localized?: { title?: string; metadataDescription?: string }
+    } | null>(homePageMetadataQuery, { lang: safeLang })
+
+    const localizedTitle = data?.localized?.title ?? data?.title ?? t('welcomeTitle')
+    const localizedDescription =
+      data?.localized?.metadataDescription ?? data?.metadata?.description ?? t('welcomeMessage')
+
+    return {
+      metadataBase: new URL(baseUrl),
+      title: localizedTitle,
+      description: localizedDescription,
+      openGraph: {
+        title: localizedTitle,
+        description: localizedDescription,
+        type: 'website',
+        locale,
+        url: `/${safeLang}`,
       },
-    },
+      alternates: {
+        canonical: `/${safeLang}`,
+        languages: {
+          en: '/en',
+          nl: '/nl',
+        },
+      },
+    }
+  } catch (error) {
+    console.warn('Could not fetch metadata for home page:', error)
+    return {
+      metadataBase: new URL(baseUrl),
+      title: t('welcomeTitle'),
+      description: t('welcomeMessage'),
+      openGraph: {
+        title: t('welcomeTitle'),
+        description: t('welcomeMessage'),
+        type: 'website',
+        locale,
+        url: `/${safeLang}`,
+      },
+      alternates: {
+        canonical: `/${safeLang}`,
+        languages: {
+          en: '/en',
+          nl: '/nl',
+        },
+      },
+    }
   }
 }
 
