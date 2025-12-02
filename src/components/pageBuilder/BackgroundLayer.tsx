@@ -1,6 +1,7 @@
 import type {CSSProperties} from 'react'
 
 import {urlFor} from '@sanity/lib/image'
+import { buildSrc } from 'sanity-image'
 
 import type {BackgroundComponent} from '@/types/pageBuilder'
 
@@ -43,9 +44,27 @@ export default function BackgroundLayer({background, className}: BackgroundLayer
     if (tintColor) {
       layers.push(`linear-gradient(${tintColor}, ${tintColor})`)
     }
-    const imageUrl = urlFor(background.image).width(2400).fit('max').auto('format').url()
-    if (imageUrl) {
-      layers.push(`url(${imageUrl})`)
+    // Build a plugin-generated URL via `sanity-image` for better srcset/parameters
+    try {
+      const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+      const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+      const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+
+      // Resolve asset id from common shapes
+      const asset = background.image.asset
+      const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+
+      if (assetId && baseUrl) {
+        const srcObj = buildSrc({ id: assetId, baseUrl, width: 2400, mode: 'contain' })
+        if (srcObj && srcObj.src) layers.push(`url(${srcObj.src})`)
+      } else {
+        // Fallback to existing url builder
+        const imageUrl = urlFor(background.image).width(2400).fit('max').auto('format').url()
+        if (imageUrl) layers.push(`url(${imageUrl})`)
+      }
+    } catch (err) {
+      const imageUrl = urlFor(background.image).width(2400).fit('max').auto('format').url()
+      if (imageUrl) layers.push(`url(${imageUrl})`)
     }
   }
 
