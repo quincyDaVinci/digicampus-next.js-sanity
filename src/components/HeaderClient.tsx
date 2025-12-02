@@ -45,6 +45,8 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
   const mobileMenuRef = useRef<HTMLDivElement | null>(null)
   const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null)
   const homeHref = `/${language}`
+  const searchAction = `/${language || 'nl'}/search`
+  const searchLabel = language === 'nl' ? 'Zoeken' : 'Search'
 
   // Keep menus/logo/ctas in sync with language switches
   useEffect(() => {
@@ -221,13 +223,18 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
               <button type="button" onClick={() => changeLanguage("en")} aria-pressed={language === "en"} aria-label="Switch to English" className={["px-3 py-1 rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors text-fluid-sm", language === "en" ? "font-bold" : "hover:bg-[hsl(var(--dc-text)/0.06)]"].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'hsl(var(--dc-text) / 0.8)' }}>EN {language === "en" && <span className="sr-only">(active)</span>}</button>
             </div>
 
-              <form role="search" className="relative min-w-0">
-              <label htmlFor="q" className="sr-only">Zoeken</label>
-              <input id="q" name="q" type="search" placeholder="Search" className="w-28 sm:w-44 rounded-full outline-none px-4 py-2 pr-9 min-w-0 text-fluid-sm" style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', color: 'hsl(var(--dc-text))', border: '1px solid hsl(var(--dc-border) / 0.2)' }} onFocus={(e)=> { e.currentTarget.style.boxShadow = `0 0 0 4px hsl(var(--dc-focus))`; }} onBlur={(e)=> { e.currentTarget.style.boxShadow = ''; }} />
-              <span aria-hidden className="absolute right-3 top-1/2 -translate-y-1/2 text-[hsl(var(--dc-text)/0.75)]">
-                <SearchIcon aria-hidden focusable="false" />
-              </span>
-            </form>
+              <form role="search" className="relative min-w-0" action={searchAction} method="get">
+                <label htmlFor="q" className="sr-only">{searchLabel}</label>
+                <input id="q" name="q" type="search" placeholder={searchLabel} className="w-28 sm:w-44 rounded-full outline-none px-4 py-2 pr-24 min-w-0 text-fluid-sm" style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', color: 'hsl(var(--dc-text))', border: '1px solid hsl(var(--dc-border) / 0.2)' }} onFocus={(e)=> { e.currentTarget.style.boxShadow = `0 0 0 4px hsl(var(--dc-focus))`; }} onBlur={(e)=> { e.currentTarget.style.boxShadow = ''; }} />
+                <button
+                  type="submit"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 rounded-full px-4 py-1 text-fluid-sm text-[hsl(var(--dc-text))] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors hover:bg-[hsl(var(--dc-text)/0.08)]"
+                  style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', border: '1px solid hsl(var(--dc-border) / 0.2)' }}
+                >
+                  <SearchIcon aria-hidden focusable="false" />
+                  <span className="sr-only">{searchLabel}</span>
+                </button>
+              </form>
           </div>
 
           {/* Bottom-left: menus */}
@@ -382,9 +389,18 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
               )}
             </div>
 
-            <form role="search" className="mt-3">
-              <label htmlFor="q-m" className="sr-only">Zoeken</label>
-              <input id="q-m" name="q" type="search" placeholder="Search" className="w-full rounded-full bg-white/10 text-white placeholder-white/70 outline-none px-4 py-2 border border-white/20 focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm" />
+            <form role="search" className="mt-3 flex gap-2" action={searchAction} method="get">
+              <label htmlFor="q-m" className="sr-only">{searchLabel}</label>
+              <input id="q-m" name="q" type="search" placeholder={searchLabel} className="w-full rounded-full bg-white/10 text-white placeholder-white/70 outline-none px-4 py-2 border border-white/20 focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm" />
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold text-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
+                style={{ backgroundColor: 'hsl(var(--dc-brand))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
+              >
+                <SearchIcon aria-hidden focusable="false" />
+                <span className="sr-only">{searchLabel}</span>
+                <span aria-hidden>{language === 'nl' ? 'Zoek' : 'Search'}</span>
+              </button>
             </form>
           </div>
         </div>
