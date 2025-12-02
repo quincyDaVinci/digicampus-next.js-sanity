@@ -122,23 +122,23 @@ export default async function Page({ params }: HomeParams) {
   // If no home page exists yet, show a welcome message
   if (!page || !localizedModules?.length) {
     return (
-      <main id="main" className="flex flex-col gap-8 p-6 min-h-[60vh] items-center justify-center">
+      <div className="flex flex-col gap-8 p-6 min-h-[60vh] items-center justify-center" role="region" aria-labelledby="welcome-heading">
         <div className="max-w-2xl text-center">
-          <h1 className="text-4xl font-bold mb-4">{t('welcomeTitle')}</h1>
+          <h1 id="welcome-heading" className="text-4xl font-bold mb-4">{t('welcomeTitle')}</h1>
           <p className="text-lg mb-6 text-muted-foreground">
             {t('welcomeMessage')}
           </p>
         </div>
-      </main>
+      </div>
     )
   }
   // Render the home page modules. If we're showing a fallback (default language)
   // because the requested language has no translation, show a polite notice.
   return (
-    <main id="main">
+    <div role="region" aria-label={localizedTitle || 'Homepage content'}>
       <h1 className="sr-only">{localizedTitle}</h1>
       {isFallback && lang !== defaultLanguage && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-md text-sm text-yellow-800">
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-md text-sm text-yellow-800" role="status" aria-live="polite">
           <p>{lang === 'en' ? t('notTranslatedToEnglish') : t('notTranslatedToDutch')}</p>
         </div>
       )}
@@ -146,6 +146,6 @@ export default async function Page({ params }: HomeParams) {
       {localizedModules?.map((module: { _key: string; _type: string }) => (
         <RenderSection key={module._key} section={module} />
       ))}
-    </main>
+    </div>
   )
 }

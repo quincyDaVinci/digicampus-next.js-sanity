@@ -24,7 +24,8 @@ export default function ParallaxImage({
   const innerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    // Refs/locals to avoid triggering React renders on scroll
+    if (typeof window === 'undefined') return
+
     const targetOffsetRef = { current: 0 }
     let ticking = false
     let visible = true
@@ -34,6 +35,12 @@ export default function ParallaxImage({
         innerRef.current.style.transform = `translateY(${targetOffsetRef.current}px)`
       }
       ticking = false
+    }
+
+    const applyStaticTransform = () => {
+      if (innerRef.current) {
+        innerRef.current.style.transform = 'translateY(0)'
+      }
     }
 
     const handleScroll = () => {
@@ -51,20 +58,51 @@ export default function ParallaxImage({
       }
     }
 
-    // IntersectionObserver to avoid work when off-screen
-    const observer = new IntersectionObserver((entries) => {
-      const e = entries[0]
-      visible = !!e?.isIntersecting
-      if (visible) handleScroll()
-    }, { threshold: [0, 0.1, 0.5, 1] })
+    const setupParallax = () => {
+      const observer = new IntersectionObserver((entries) => {
+        const e = entries[0]
+        visible = !!e?.isIntersecting
+        if (visible) handleScroll()
+      }, { threshold: [0, 0.1, 0.5, 1] })
 
-    if (containerRef.current) observer.observe(containerRef.current)
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
+      if (containerRef.current) observer.observe(containerRef.current)
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      handleScroll()
+
+      return () => {
+        window.removeEventListener('scroll', handleScroll)
+        observer.disconnect()
+      }
+    }
+
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let teardown: (() => void) | undefined
+
+    const start = () => {
+      teardown?.()
+      if (mediaQuery.matches) {
+        applyStaticTransform()
+        return
+      }
+      teardown = setupParallax()
+    }
+
+    const handlePreferenceChange = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        teardown?.()
+        applyStaticTransform()
+        teardown = undefined
+      } else {
+        teardown = setupParallax()
+      }
+    }
+
+    mediaQuery.addEventListener('change', handlePreferenceChange)
+    start()
 
     return () => {
-      window.removeEventListener('scroll', handleScroll)
-      observer.disconnect()
+      teardown?.()
+      mediaQuery.removeEventListener('change', handlePreferenceChange)
     }
   }, [extraHeight])
 
