@@ -266,7 +266,7 @@ export default function BlogPageClient({
         {/* Main Blog Grid */}
         <div>
           {/* Sort and View Controls - Above Blog Grid */}
-          <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             {/* Sort Dropdown */}
             <div className="relative">
               <button
@@ -429,6 +429,7 @@ export default function BlogPageClient({
                 tone: 'surface',
                 ctaLabel: t('readMore'),
                 borderRadius: 'small',
+                gridMode: viewMode === 'list' ? 'list' : 'default',
                 resolvedPost: mappedPosts,
               }
               return <BlogCard component={cardComponent} />
@@ -539,7 +540,7 @@ export default function BlogPageClient({
 
         {/* Highlighted Posts Sidebar */}
         {highlightedPosts.length > 0 && (
-          <aside className="space-y-4 border-l pl-8" style={{ borderColor: 'hsl(var(--dc-border) / 0.15)' }} aria-label={t('highlightedPosts')}>
+          <aside className="space-y-4 lg:border-l lg:pl-8" style={{ borderColor: 'hsl(var(--dc-border) / 0.15)' }} aria-label={t('highlightedPosts')}>
             <h2 className="text-lg font-semibold text-dc">{t('highlightedPosts')}</h2>
             <BlogCard
               component={{
@@ -549,6 +550,7 @@ export default function BlogPageClient({
                 ctaLabel: t('readMore'),
                 gridMode: 'single',
                 showAuthor: false,
+                compact: true,
                 resolvedPost: highlightedPosts.map((post) => ({
                   _id: post._id,
                   title: post.title ?? 'Untitled',

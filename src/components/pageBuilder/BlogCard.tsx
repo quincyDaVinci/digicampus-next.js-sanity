@@ -58,7 +58,7 @@ function calculateReadTimeFromBody(body: unknown): number | undefined {
   return wordCount > 0 ? Math.max(1, Math.round(wordCount / 200)) : undefined
 }
 
-function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = 'default'}: {post: BlogCardResolvedPost; ctaLabel: string; tone: NonNullable<BlogCardComponent['tone']>; showAuthor?: boolean; borderRadius?: 'default' | 'small'}) {
+function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = 'default', layout = 'grid', compact = false}: {post: BlogCardResolvedPost; ctaLabel: string; tone: NonNullable<BlogCardComponent['tone']>; showAuthor?: boolean; borderRadius?: 'default' | 'small'; layout?: 'grid' | 'list'; compact?: boolean}) {
   const style = toneStyles[tone]
   const pathname = usePathname()
   const lang = pathname?.split('/')?.[1] || 'nl'
@@ -76,6 +76,99 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
   const ClockIconComponent = getFeatherIcon('clock')
 
   const roundedClass = borderRadius === 'small' ? 'rounded-xl' : 'rounded-3xl'
+  const CARD_MIN_HEIGHT = compact ? '420px' : '520px'
+
+  // Render different layouts for grid vs list
+  if (layout === 'list') {
+    // List layout: horizontal card with image on the left
+    const ImageColumn = hasMainImage ? (
+      <div className="flex-shrink-0 w-36 sm:w-40 md:w-48 overflow-hidden rounded-l-lg" style={{backgroundColor: '#ffffff'}}>
+        {(() => {
+          const mainImageBlur = (post.mainImage as unknown as { blurDataURL?: string })?.blurDataURL
+          return (
+            <SanityNextImage
+              image={post.mainImage}
+              alt={post.mainImage?.alt || ''}
+              width={ compact ? 360 : 480 }
+              height={ compact ? 220 : 300 }
+              className="h-full w-full object-cover"
+              priority={false}
+              placeholder={mainImageBlur ? 'blur' : undefined}
+            />
+          )
+        })()}
+      </div>
+    ) : null
+
+    const CardInnerList = (
+        <article
+          className={`group flex h-auto flex-row ${roundedClass} shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-within:ring-4 focus-within:ring-[hsl(var(--dc-focus))] overflow-hidden`}
+          style={{ background: style.background, border: `1px solid ${style.border}`, color: style.color }}
+        >
+          {ImageColumn}
+          <div className="flex flex-1 flex-col gap-4 p-6 min-w-0">
+            <div className="space-y-2 min-w-0">
+              <h3 className={`${compact ? 'text-base' : 'text-lg'} font-semibold leading-snug tracking-tight break-words whitespace-normal`}>{post.title}</h3>
+              {post.summary ? (
+                <p className="text-sm leading-relaxed text-[hsl(var(--dc-text)/0.85)] break-words whitespace-normal" style={{display: '-webkit-box', WebkitLineClamp: 8, WebkitBoxOrient: 'vertical', overflow: 'hidden'} as any}>{post.summary}</p>
+              ) : null}
+            </div>
+            <div className="mt-auto flex items-center justify-between gap-3 min-w-0">
+            {showAuthor && (post.author?.name || post.author?.role) && (
+              <div className="flex items-center gap-3">
+                {hasAuthorImage ? (
+                  <SanityNextImage
+                    image={post.author?.image}
+                    alt={post.author?.name || ''}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-full object-cover ring-2 ring-[hsl(var(--dc-border)/0.4)]"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--dc-brand)/0.15)] text-[hsl(var(--dc-brand))]" aria-hidden>
+                    {post.author?.name ? post.author.name.charAt(0) : 'A'}
+                  </div>
+                )}
+                <div className="flex flex-col min-w-0">
+                  {post.author?.name ? (
+                    <span className="text-sm font-medium leading-tight max-w-[10rem] sm:max-w-[12rem]" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{post.author.name}</span>
+                  ) : null}
+                  {post.author?.role ? (
+                    <span className="text-xs text-[hsl(var(--dc-text)/0.65)] max-w-[10rem] sm:max-w-[12rem]" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{post.author.role}</span>
+                  ) : null}
+                </div>
+              </div>
+            )}
+              <span className="flex-shrink-0">
+                <span className="sr-only">{ctaLabel}</span>
+                <span className="relative inline-flex items-center justify-center h-9 w-9 rounded-full bg-[hsl(var(--dc-surface-98))] text-[hsl(var(--dc-text))] shadow-sm overflow-hidden transition-all duration-200 transform group-hover:scale-[1.06] group-focus-within:scale-[1.06] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-brand)/0.28)]" aria-hidden>
+                  {/* colored pulse layer */}
+                  <span aria-hidden className="absolute inset-0 rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-30" style={{background: 'hsl(var(--dc-brand))'}} />
+                  <svg className="h-4 w-4 relative z-10 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
+                  </svg>
+                </span>
+              </span>
+          </div>
+        </div>
+      </article>
+    )
+
+    if (isInternal) {
+      return (
+        <Link href={href} aria-label={`${ctaLabel}: ${post.title}`} className="block focus-visible:outline-none">
+          {CardInnerList}
+        </Link>
+      )
+    }
+    return (
+      <a href={href} aria-label={`${ctaLabel}: ${post.title}`} className="block focus-visible:outline-none">
+        {CardInnerList}
+      </a>
+    )
+  }
+
+  // Default (grid) layout follows below
   const CardInner = (
     <article
       className={`group flex h-full flex-col ${roundedClass} shadow-md transition hover:-translate-y-1 hover:shadow-xl focus-within:ring-4 focus-within:ring-[hsl(var(--dc-focus))]`}
@@ -86,7 +179,7 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
       }}
     >
       {hasMainImage ? (
-        <div className={`relative overflow-hidden ${borderRadius === 'small' ? 'rounded-t-xl' : 'rounded-t-3xl'}`} style={{backgroundColor: '#ffffff', maxHeight: '220px'}}>
+        <div className={`relative overflow-hidden ${borderRadius === 'small' ? 'rounded-t-xl' : 'rounded-t-3xl'}`} style={{backgroundColor: '#ffffff', maxHeight: compact ? '160px' : '220px'}}>
             <div className="relative w-full transition-transform duration-300 group-hover:scale-[1.03]">
             {(() => {
               const mainImageBlur = (post.mainImage as unknown as { blurDataURL?: string })?.blurDataURL
@@ -94,9 +187,9 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
                 <SanityNextImage
                   image={post.mainImage}
                   alt={post.mainImage?.alt || ''}
-                  width={800}
-                  height={220}
-                  className="block h-[220px] w-full object-cover"
+                  width={ compact ? 640 : 800 }
+                  height={ compact ? 160 : 220 }
+                  className={ compact ? 'block h-[160px] w-full object-cover' : 'block h-[220px] w-full object-cover' }
                   priority={false}
                   style={{ display: 'block', width: '100%' }}
                   placeholder={mainImageBlur ? 'blur' : undefined}
@@ -168,14 +261,14 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
           </div>
         </div>
       ) : null}
-      <div className="flex flex-1 flex-col gap-4 p-6">
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold leading-snug tracking-tight">{post.title}</h3>
+      <div className="flex flex-1 flex-col gap-4 p-6 min-w-0">
+        <div className="space-y-3 min-w-0">
+          <h3 className={`${compact ? 'text-base' : 'text-lg'} font-semibold leading-snug tracking-tight break-words whitespace-normal`}>{post.title}</h3>
           {post.summary ? (
-            <p className="text-sm leading-relaxed text-[hsl(var(--dc-text)/0.85)]">{post.summary}</p>
+            <p className="text-sm leading-relaxed text-[hsl(var(--dc-text)/0.85)] break-words whitespace-normal" style={{display: '-webkit-box', WebkitLineClamp: 8, WebkitBoxOrient: 'vertical', overflow: 'hidden'} as any}>{post.summary}</p>
           ) : null}
         </div>
-        <div className="mt-auto flex items-center justify-between gap-3">
+        <div className="mt-auto flex items-center justify-between gap-3 min-w-0">
           {showAuthor && (post.author?.name || post.author?.role) && (
             <div className="flex items-center gap-3">
               {hasAuthorImage ? (
@@ -194,33 +287,27 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
                   {post.author?.name ? post.author.name.charAt(0) : 'A'}
                 </div>
               )}
-              <div className="flex flex-col">
+              <div className="flex flex-col min-w-0">
                 {post.author?.name ? (
-                  <span className="text-sm font-medium leading-tight">{post.author.name}</span>
+                  <span className="text-sm font-medium leading-tight max-w-[12rem]" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{post.author.name}</span>
                 ) : null}
                 {post.author?.role ? (
-                  <span className="text-xs text-[hsl(var(--dc-text)/0.65)]">{post.author.role}</span>
+                  <span className="text-xs text-[hsl(var(--dc-text)/0.65)] max-w-[12rem]" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{post.author.role}</span>
                 ) : null}
                 {post.author?.company ? (
-                  <span className="text-xs text-[hsl(var(--dc-text)/0.5)]">{post.author.company}</span>
+                  <span className="text-xs text-[hsl(var(--dc-text)/0.5)] max-w-[12rem]" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{post.author.company}</span>
                 ) : null}
               </div>
             </div>
           )}
-          <span
-            className="inline-flex items-center gap-2 text-sm font-semibold whitespace-nowrap relative transition-colors duration-200 group-hover:text-[hsl(var(--dc-brand))] group-focus-within:text-[hsl(var(--dc-brand))]"
-          >
-              <span className="relative">
-                {ctaLabel}
-                <span
-                  aria-hidden
-                  className="absolute left-0 -bottom-0.5 h-0.5 w-full origin-left scale-x-0 bg-[hsl(var(--dc-brand))] transition-transform duration-300 group-hover:scale-x-100 group-focus-within:scale-x-100"
-                  style={{ borderRadius: '2px', pointerEvents: 'none' }}
-                />
-              </span>
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+          <span className="flex-shrink-0">
+            <span className="sr-only">{ctaLabel}</span>
+            <span className="relative inline-flex items-center justify-center h-9 w-9 rounded-full bg-[hsl(var(--dc-surface-98))] text-[hsl(var(--dc-text))] shadow-sm overflow-hidden transition-all duration-200 transform group-hover:scale-[1.06] group-focus-within:scale-[1.06] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-brand)/0.28)]" aria-hidden>
+              <span aria-hidden className="absolute inset-0 rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-30" style={{background: 'hsl(var(--dc-brand))'}} />
+              <svg className="h-4 w-4 relative z-10 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
               </svg>
+            </span>
           </span>
         </div>
       </div>
@@ -261,14 +348,37 @@ export default function BlogCard({component}: BlogCardProps) {
     )
   }
 
-  const gridClass = gridMode === 'single' 
-    ? 'grid gap-6 grid-cols-1'
-    : 'grid gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3'
+  // Support 'list' gridMode which renders a stacked list of horizontal items
+  if (gridMode === 'list') {
+    return (
+      <div className="flex flex-col">
+        {posts.map((post) => (
+          <div key={post._id} className="py-4">
+            <BlogCardItem post={post} ctaLabel={ctaLabel} tone={tone} showAuthor={showAuthor} borderRadius={borderRadius} layout="list" compact={component.compact} />
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  // Use CSS Grid with clamp + minmax + fr units for fully responsive columns.
+  // The `auto-fit` behaviour collapses empty tracks so cards fill the
+  // available space. `clamp()` provides a sensible min/ideal/max width
+  // for each card — change the values if you want wider or narrower cards.
+  const gridStyle: React.CSSProperties = gridMode === 'single'
+    ? { display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', width: '100%' }
+    : {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(16rem, 20ch, 28rem), 1fr))',
+      gap: '1.5rem',
+      width: '100%',
+      alignItems: 'stretch',
+    }
 
   return (
-    <div className={gridClass}>
+    <div style={gridStyle}>
       {posts.map((post) => (
-        <BlogCardItem key={post._id} post={post} ctaLabel={ctaLabel} tone={tone} showAuthor={showAuthor} borderRadius={borderRadius} />
+        <BlogCardItem key={post._id} post={post} ctaLabel={ctaLabel} tone={tone} showAuthor={showAuthor} borderRadius={borderRadius} compact={component.compact} />
       ))}
     </div>
   )

@@ -128,9 +128,10 @@ export interface BlogCardComponent {
   limit?: number
   ctaLabel?: string
   tone?: 'surface' | 'accent' | 'contrast'
-  gridMode?: 'default' | 'single' // 'default' = 3 columns, 'single' = 1 column
+  gridMode?: 'default' | 'single' | 'list' // 'default' = 3 columns, 'single' = 1 column, 'list' = stacked list layout
   showAuthor?: boolean // Whether to show author info
   borderRadius?: 'default' | 'small' // 'default' = rounded-3xl, 'small' = rounded-xl
+  compact?: boolean // compact variant for smaller card sizing (e.g., sidebar highlights)
   resolvedPost?: BlogCardResolvedPost | BlogCardResolvedPost[] | null
 }
 
