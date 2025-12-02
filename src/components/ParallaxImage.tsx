@@ -24,6 +24,15 @@ export default function ParallaxImage({
   const innerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
+    // Respect prefers-reduced-motion by rendering a static image without scroll listeners
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (media.matches) {
+      if (innerRef.current) {
+        innerRef.current.style.transform = 'translateY(0)'
+      }
+      return
+    }
+
     // Refs/locals to avoid triggering React renders on scroll
     const targetOffsetRef = { current: 0 }
     let ticking = false
