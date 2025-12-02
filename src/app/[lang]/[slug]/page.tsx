@@ -6,6 +6,61 @@ import RenderSection from '@/components/sections/RenderSection'
 import {client, previewClient} from '@sanity/lib/client'
 import {defaultLanguage, supportedLanguages} from '@/lib/i18n'
 import {PagePreview} from './PagePreview'
+import {urlFor} from '@sanity/lib/image'
+
+// Helper: generate a tiny base64 LQIP for a Sanity image source
+async function generateBlurDataURL(source: any) {
+  try {
+    const tinyUrl = urlFor(source).width(24).height(16).auto('format').quality(20).url()
+    const res = await fetch(tinyUrl)
+    if (!res.ok) return null
+    const arrayBuffer = await res.arrayBuffer()
+    const mime = res.headers.get('content-type') || 'image/jpeg'
+    const base64 = Buffer.from(arrayBuffer).toString('base64')
+    return `data:${mime};base64,${base64}`
+  } catch (err) {
+    console.warn('Could not generate blurDataURL', err)
+    return null
+  }
+}
+
+async function attachBlurDataToModule(module: any) {
+  // Clone shallow
+  const m = {...module}
+
+  const tasks: Promise<void>[] = []
+
+  // helper to set blur on an image object path
+  const setBlur = (obj: any, key: string) => {
+    if (!obj || !obj[key] || !obj[key].asset) return
+    const src = obj[key]
+    tasks.push((async () => {
+      const blur = await generateBlurDataURL(src)
+      if (blur) {
+        obj[key] = {...src, blurDataURL: blur}
+      }
+    })())
+  }
+
+  setBlur(m, 'image')
+  setBlur(m, 'mainImage')
+  if (m.media && typeof m.media === 'object') setBlur(m.media, 'image')
+  if (m.author && typeof m.author === 'object') setBlur(m.author, 'image')
+  if (Array.isArray(m.gallery)) {
+    m.gallery = m.gallery.map((img: any) => ({...img}))
+    m.gallery.forEach((img: any, idx: number) => {
+      tasks.push((async () => {
+        if (img?.asset) {
+          const blur = await generateBlurDataURL(img)
+          if (blur) m.gallery[idx] = {...img, blurDataURL: blur}
+        }
+      })())
+    })
+  }
+
+  await Promise.all(tasks)
+  return m
+}
 
 // Query for a single page with locale fallbacks
 const pageQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$lang].current, metadata.slug.current) == $slug][0]{
@@ -124,8 +179,18 @@ export default async function Page({ params }: PageParams) {
     return <PagePreview initial={{ data: page, sourceMap: undefined }} query={pageQuery} params={{ slug, lang }} />
   }
 
-  const localizedModules = page.localized?.modules ?? page.modules
+  let localizedModules = page.localized?.modules ?? page.modules
   const localizedTitle = page.localized?.title ?? page.title
+
+  // Attach blurDataURL placeholders to images in modules (server-side)
+  try {
+    if (Array.isArray(localizedModules) && localizedModules.length > 0) {
+      const processed = await Promise.all(localizedModules.map((m: any) => attachBlurDataToModule(m)))
+      localizedModules = processed
+    }
+  } catch (err) {
+    console.warn('Error generating blurDataURLs for modules', err)
+  }
 
   // Render the page modules using the new system
   return (

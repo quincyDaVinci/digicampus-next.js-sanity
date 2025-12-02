@@ -67,6 +67,7 @@ export default defineType({
       name: 'image',
       title: 'Image',
       type: 'image',
+      components: { input: require('../../components/ImageWithOverlayInput').default },
       options: {hotspot: true},
       fields: [
         {
@@ -110,6 +111,7 @@ export default defineType({
           name: 'posterImage',
           title: 'Poster Image',
           type: 'image',
+          components: { input: require('../../components/ImageWithOverlayInput').default },
           description: 'Thumbnail shown before video plays',
           options: {hotspot: true},
           fields: [

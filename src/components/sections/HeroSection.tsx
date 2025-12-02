@@ -2,6 +2,7 @@
 
 import type { HeroSectionProps } from "@/types/sections";
 import { urlFor } from "@sanity/lib/image";
+import Image from 'next/image'
 
 /**
  * Hero Section Router
@@ -12,22 +13,62 @@ export default function HeroSection(props: HeroSectionProps) {
 
   // Build background image URL with hotspot/crop applied (also rasterize vectors)
   const bgUrl = media?.image
-    ? urlFor(media.image).width(2400).height(1200).fit('crop').url()
+    ? urlFor(media.image).width(2400).height(1200).fit('crop').auto('format').url()
     : null;
 
   // For now, render a simple hero section
   // TODO: Implement variants from sane-kit (buttonBanner, badgeBanner, gridGallery)
   return (
-    <div
-      className="w-full py-20 lg:py-40"
-      style={bgUrl ? {
-        backgroundImage: `url(${bgUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      } : undefined}
-    >
-      <div className="container mx-auto">
+    <div className="w-full py-20 lg:py-40 relative">
+      {bgUrl && media?.image?.asset && (
+        <div aria-hidden style={{position: 'absolute', inset: 0, zIndex: 0}}>
+          <Image
+            src={bgUrl}
+            alt={media.image.alt || ''}
+            fill
+            priority={true}
+            style={{objectFit: 'cover'}}
+            placeholder={media.image?.blurDataURL ? 'blur' : undefined}
+            blurDataURL={media.image?.blurDataURL}
+          />
+        </div>
+      )}
+      {/* Gradient overlay from image.overlay (absolutely positioned) */}
+      {media?.image?.overlay?.enabled && (() => {
+        const ov = media.image.overlay as any;
+        const overlayOpacity = typeof ov?.opacity === 'number' ? ov.opacity : 0.5;
+
+        // Black-only gradient: transparent black -> black with overlay opacity
+        const start = 'rgba(0,0,0,0)';
+        const end = `rgba(0,0,0,${Math.max(0, Math.min(1, overlayOpacity))})`;
+
+        // Map simple directions to CSS gradient directions
+        const dir = ov?.direction || 'down';
+        const dirToCss: Record<string, string> = {
+          up: 'to top',
+          down: 'to bottom',
+          left: 'to left',
+          right: 'to right',
+        };
+
+        const cssDir = dirToCss[dir] || 'to bottom';
+        const bgImage = `linear-gradient(${cssDir}, ${start}, ${end})`;
+
+        return (
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              pointerEvents: 'none',
+              zIndex: 1,
+              backgroundImage: bgImage,
+            }}
+          />
+        );
+      })()}
+
+      <div className="container mx-auto" style={{ position: 'relative', zIndex: 2 }}>
         <div className="flex gap-8 items-center justify-center flex-col text-center">
           {badgeText && (
             <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">

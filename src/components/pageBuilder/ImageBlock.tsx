@@ -83,6 +83,8 @@ export default function ImageBlock({component}: ImageBlockProps) {
             height={height}
             className="h-auto w-full object-cover"
           sizes="(max-width: 768px) 100vw, 70vw"
+          placeholder={component.image?.blurDataURL ? 'blur' : undefined}
+          blurDataURL={component.image?.blurDataURL}
         />
       </span>
       </WrapperComponent>

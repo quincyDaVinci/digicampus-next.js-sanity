@@ -90,7 +90,8 @@ export default function BackgroundLayer({background, className}: BackgroundLayer
     ...baseStyle,
     backgroundColor,
     backgroundImage: layers.length ? layers.join(',') : undefined,
-    backgroundBlendMode: layers.length > 1 ? 'overlay, normal' : undefined,
+    // Default to overlay blend when multiple layers are present so gradients/tints combine nicely
+    backgroundBlendMode: layers.length > 1 ? 'overlay' : undefined,
     borderRadius: 'inherit',
   }
 

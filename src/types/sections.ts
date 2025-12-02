@@ -27,7 +27,13 @@ export interface HeroSectionProps extends BaseSection {
   }>
   media?: {
     mediaType?: 'image' | 'video' | 'gallery'
-    image?: import('@sanity/image-url/lib/types/types').SanityImageSource
+    image?: import('@sanity/image-url/lib/types/types').SanityImageSource & {
+      overlay?: {
+        enabled?: boolean
+        direction?: 'up' | 'down' | 'left' | 'right'
+        opacity?: number
+      }
+    }
     videoUrl?: string
     gallery?: import('@sanity/image-url/lib/types/types').SanityImageSource[]
   }
@@ -154,12 +160,22 @@ export interface MediaSectionProps extends BaseSection {
     asset?: import('@sanity/image-url/lib/types/types').SanityImageSource
     alt?: string
     caption?: string
+    overlay?: {
+      enabled?: boolean
+      direction?: 'up' | 'down' | 'left' | 'right'
+      opacity?: number
+    }
   }
   video?: {
     videoUrl?: string
     posterImage?: {
       asset?: import('@sanity/image-url/lib/types/types').SanityImageSource
       alt?: string
+      overlay?: {
+        enabled?: boolean
+        direction?: 'up' | 'down' | 'left' | 'right'
+        opacity?: number
+      }
     }
     videoTitle?: string
     transcript?: string

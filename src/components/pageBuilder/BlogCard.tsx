@@ -95,6 +95,8 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
               className="block h-[220px] w-full object-cover"
               priority={false}
               style={{ display: 'block', width: '100%' }}
+              placeholder={post.mainImage?.blurDataURL ? 'blur' : undefined}
+              blurDataURL={post.mainImage?.blurDataURL}
             />
             {/* Base overlay - always visible with subtle gradient */}
             <div

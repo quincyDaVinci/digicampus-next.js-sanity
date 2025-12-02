@@ -166,6 +166,7 @@ export default defineType({
           name: 'image',
           title: 'Afbeelding',
           type: 'image',
+          components: { input: require('../../components/ImageWithOverlayInput').default },
           options: {hotspot: true},
           fields: [
             {
