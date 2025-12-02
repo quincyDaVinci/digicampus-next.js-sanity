@@ -43,11 +43,11 @@ export function HomePagePreview({initial, query, params}: HomePagePreviewProps) 
   }
   
   return (
-    <main id="main">
+    <section className="contents" aria-label="Home page preview">
       {data.modules.map((module) => (
         <RenderSection key={module._key} section={module} />
       ))}
-    </main>
+    </section>
   )
 }
 

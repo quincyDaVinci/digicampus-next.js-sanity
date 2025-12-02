@@ -235,11 +235,11 @@ export default async function Page({ params }: PageParams) {
 
   // Render the page modules using the new system
   return (
-    <main id="main">
+    <section aria-label={localizedTitle || undefined} className="contents">
       <h1 className="sr-only">{localizedTitle}</h1>
       {localizedModules?.map((module) => (
         <RenderSection key={module._key} section={module} />
       ))}
-    </main>
+    </section>
   )
 }

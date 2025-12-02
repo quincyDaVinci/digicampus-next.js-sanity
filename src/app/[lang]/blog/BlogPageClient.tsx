@@ -164,8 +164,11 @@ export default function BlogPageClient({
   const pageNumbers = totalPages > 0 ? getPageNumbers() : []
 
   return (
-    <main id="main" className="container mx-auto px-4 py-12">
-    <Breadcrumbs
+    <section
+      className="container mx-auto px-4 py-12"
+      aria-labelledby="blog-page-title"
+    >
+      <Breadcrumbs
         items={[
           {label: t('home'), href: '/'},
           {label: t('blog')},
@@ -174,7 +177,7 @@ export default function BlogPageClient({
       />
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-3 text-dc">{title}</h1>
+        <h1 id="blog-page-title" className="text-4xl font-bold mb-3 text-dc">{title}</h1>
         {description && (
           <p className="text-lg text-dc-muted max-w-3xl">{description}</p>
         )}
@@ -568,6 +571,6 @@ export default function BlogPageClient({
           </aside>
         )}
       </div>
-    </main>
+    </section>
   )
 }
