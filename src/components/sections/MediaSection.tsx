@@ -38,9 +38,28 @@ export default function MediaSection(props: MediaSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const effectiveAutoplay = !!(video?.autoplay && !prefersReducedMotion)
 
-  // Debug logging
-  console.log('MediaSection props:', { mediaType, video, image });
+  // Respect prefers-reduced-motion for autoplaying videos
+  useEffect(() => {
+    if (typeof window === 'undefined' || mediaType !== 'video') return;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const listener = (event: MediaQueryListEvent) => setPrefersReducedMotion(event.matches);
+    mediaQuery.addEventListener('change', listener);
+    return () => mediaQuery.removeEventListener('change', listener);
+  }, [mediaType]);
+
+  useEffect(() => {
+    if (!prefersReducedMotion && !effectiveAutoplay) return;
+    const vid = videoRef.current;
+    if (!vid) return;
+    if (prefersReducedMotion && !vid.paused) {
+      vid.pause();
+    }
+  }, [prefersReducedMotion, effectiveAutoplay]);
 
   // Generate unique IDs for ARIA relationships
   const mediaId = `media-${props._key}`;
@@ -293,6 +312,7 @@ export default function MediaSection(props: MediaSectionProps) {
                     title={video.videoTitle || "Video content"}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    loading="lazy"
                     className="absolute inset-0 w-full h-full"
                     aria-label={video.videoTitle || "Video content"}
                     aria-describedby={
@@ -307,9 +327,10 @@ export default function MediaSection(props: MediaSectionProps) {
                     ref={videoRef}
                     id={mediaId}
                     controls={video.controls !== false}
-                    autoPlay={video.autoplay || false}
+                    autoPlay={effectiveAutoplay}
                     loop={video.loop || false}
-                    muted={video.autoplay || false} // Must be muted if autoplay
+                    muted={effectiveAutoplay || video.loop || false} // Must be muted if autoplay
+                    playsInline
                     poster={posterUrl || undefined}
                     className="w-full h-full"
                     aria-label={video.videoTitle || "Video content"}
