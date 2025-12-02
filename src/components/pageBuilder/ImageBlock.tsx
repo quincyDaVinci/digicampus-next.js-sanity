@@ -1,7 +1,6 @@
 import SanityNextImage from '@/components/SanityNextImage'
 import Link from 'next/link'
 
-import {urlFor} from '@sanity/lib/image'
 import { buildSrc } from 'sanity-image'
 
 import type {ImageComponent} from '@/types/pageBuilder'
@@ -37,7 +36,13 @@ export default function ImageBlock({component}: ImageBlockProps) {
     const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
     const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
     const asset = component.image.asset
-    const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+    let assetId: string | undefined
+    if (typeof asset === 'string') {
+      assetId = asset
+    } else if (asset && typeof asset === 'object') {
+      const maybe = asset as { _ref?: string; _id?: string }
+      assetId = maybe._ref || ((asset as Record<string, unknown>)._id as string | undefined)
+    }
     if (assetId && baseUrl) {
       const srcObj = buildSrc({ id: assetId, baseUrl, width: 1600, height: 900, mode: 'cover' })
       imageUrl = srcObj?.src ?? null
@@ -45,7 +50,7 @@ export default function ImageBlock({component}: ImageBlockProps) {
   } catch (err) {
     imageUrl = null
   }
-  if (!imageUrl) imageUrl = urlFor(component.image).auto('format').quality(90).width(1600).height(900).fit('crop').url()
+  // Plugin-only: if we could not build a plugin URL, leave `imageUrl` null
   const rounded = component.rounded ?? true
   
   // Determine wrapper type and props properly
@@ -90,15 +95,20 @@ export default function ImageBlock({component}: ImageBlockProps) {
             boxShadow: '0 20px 40px hsl(var(--dc-text)/0.12)',
           }}
         >
-          <SanityNextImage
-            image={component.image}
-            alt={component.image.alt || ''}
-            width={width}
-            height={height}
-            className="h-auto w-full object-cover"
-            sizes="(max-width: 768px) 100vw, 70vw"
-            placeholder={component.image?.blurDataURL ? 'blur' : undefined}
-          />
+          {(() => {
+            const imgBlur = (component.image as unknown as { blurDataURL?: string })?.blurDataURL
+            return (
+              <SanityNextImage
+                image={component.image}
+                alt={component.image.alt || ''}
+                width={width}
+                height={height}
+                className="h-auto w-full object-cover"
+                sizes="(max-width: 768px) 100vw, 70vw"
+                placeholder={imgBlur ? 'blur' : undefined}
+              />
+            )
+          })()}
       </span>
       </WrapperComponent>
       {component.image.caption ? (

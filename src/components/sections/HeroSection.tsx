@@ -1,8 +1,7 @@
 "use client";
 
 import type { HeroSectionProps } from "@/types/sections";
-import { urlFor } from "@sanity/lib/image";
-import SanityNextImage from '@/components/SanityNextImage'
+// plugin-only URL building
 import { buildSrc } from 'sanity-image'
 
 /**
@@ -14,19 +13,25 @@ export default function HeroSection(props: HeroSectionProps) {
 
   // Prefer plugin-generated background URL when possible
   const bgUrl = (() => {
-    if (!media?.image?.asset) return null
+    if (!media?.image || (typeof media.image === 'object' && !(media.image as { asset?: unknown }).asset)) return null
     try {
       const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
       const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
       const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
-      const asset = media.image.asset
-      const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+      const asset = (media.image as { asset?: unknown }).asset
+      let assetId: string | undefined
+      if (typeof asset === 'string') {
+        assetId = asset
+      } else if (asset && typeof asset === 'object') {
+        const maybe = asset as { _ref?: string; _id?: string }
+        assetId = maybe._ref || ((asset as Record<string, unknown>)._id as string | undefined)
+      }
       if (assetId && baseUrl) {
         const srcObj = buildSrc({ id: assetId, baseUrl, width: 2400, height: 1200, mode: 'cover' })
         return srcObj?.src ?? null
       }
     } catch (err) {
-      return urlFor(media.image).width(2400).height(1200).fit('crop').auto('format').url()
+      return null
     }
     return null
   })()
@@ -35,21 +40,23 @@ export default function HeroSection(props: HeroSectionProps) {
   // TODO: Implement variants from sane-kit (buttonBanner, badgeBanner, gridGallery)
   return (
     <div className="w-full py-20 lg:py-40 relative">
-      {bgUrl && media?.image?.asset && (
-        <div aria-hidden style={{position: 'absolute', inset: 0, zIndex: 0}}>
-          <SanityNextImage
-            image={media.image}
-            alt={media.image.alt || ''}
-            fill
-            priority={true}
-            style={{objectFit: 'cover'}}
-            placeholder={media.image?.blurDataURL ? 'blur' : undefined}
-          />
-        </div>
+      {bgUrl && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+            backgroundImage: `url(${bgUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
       )}
       {/* Gradient overlay from image.overlay (absolutely positioned) */}
       {media?.image?.overlay?.enabled && (() => {
-        const ov = media.image.overlay as any;
+        const ov = media.image.overlay as unknown as { enabled?: boolean; opacity?: number; direction?: string }
         const overlayOpacity = typeof ov?.opacity === 'number' ? ov.opacity : 0.5;
 
         // Black-only gradient: transparent black -> black with overlay opacity

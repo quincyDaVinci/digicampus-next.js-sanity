@@ -6,19 +6,29 @@ import RenderSection from '@/components/sections/RenderSection'
 import {client, previewClient} from '@sanity/lib/client'
 import {defaultLanguage, supportedLanguages} from '@/lib/i18n'
 import {PagePreview} from './PagePreview'
-import {urlFor} from '@sanity/lib/image'
 import { buildSrc } from 'sanity-image'
 
+// Lightweight types for Sanity image-like shapes we handle here
+type SanityImageLike = { asset?: { _ref?: string; _id?: string } } | string | null | undefined
+
 // Helper: generate a tiny base64 LQIP for a Sanity image source
-async function generateBlurDataURL(source: any) {
+async function generateBlurDataURL(source: SanityImageLike) {
   try {
     let tinyUrl: string | null = null
     try {
       const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
       const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
       const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
-      const asset = source?.asset
-      const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+      let assetId: string | undefined
+      if (typeof source === 'string') {
+        assetId = source
+      } else if (source && typeof source === 'object') {
+        const maybeAsset = (source as { asset?: unknown }).asset as unknown
+        if (maybeAsset && typeof maybeAsset === 'object') {
+          const a = maybeAsset as { _ref?: string; _id?: string }
+          assetId = a._ref || a._id
+        }
+      }
       if (baseUrl && assetId) {
         const srcObj = buildSrc({ id: assetId, baseUrl, width: 24, height: 16, mode: 'contain', queryParams: { q: 20 } })
         tinyUrl = srcObj?.src ?? null
@@ -26,7 +36,10 @@ async function generateBlurDataURL(source: any) {
     } catch (err) {
       tinyUrl = null
     }
-    if (!tinyUrl) tinyUrl = urlFor(source).width(24).height(16).auto('format').quality(20).url()
+    if (!tinyUrl) {
+      // Plugin-only: if we couldn't build a plugin URL, abort LQIP generation
+      return null
+    }
     const res = await fetch(tinyUrl)
     if (!res.ok) return null
     const arrayBuffer = await res.arrayBuffer()
@@ -39,41 +52,47 @@ async function generateBlurDataURL(source: any) {
   }
 }
 
-async function attachBlurDataToModule(module: any) {
+async function attachBlurDataToModule(module: Record<string, unknown>) {
   // Clone shallow
-  const m = {...module}
+  const m = {...module} as Record<string, unknown>
 
   const tasks: Promise<void>[] = []
 
   // helper to set blur on an image object path
-  const setBlur = (obj: any, key: string) => {
-    if (!obj || !obj[key] || !obj[key].asset) return
-    const src = obj[key]
+  const setBlur = (obj: Record<string, unknown> | undefined, key: string) => {
+    if (!obj) return
+    const val = obj[key] as unknown
+    if (!val || typeof val !== 'object') return
+    const maybeImage = val as { asset?: unknown }
+    if (!maybeImage.asset) return
+
     tasks.push((async () => {
-      const blur = await generateBlurDataURL(src)
+      const blur = await generateBlurDataURL(maybeImage as unknown as SanityImageLike)
       if (blur) {
-        obj[key] = {...src, blurDataURL: blur}
+        ;(obj as Record<string, unknown>)[key] = ({...(maybeImage as Record<string, unknown>), blurDataURL: blur} as unknown) as unknown
       }
     })())
   }
 
   setBlur(m, 'image')
   setBlur(m, 'mainImage')
-  if (m.media && typeof m.media === 'object') setBlur(m.media, 'image')
-  if (m.author && typeof m.author === 'object') setBlur(m.author, 'image')
+  if (m.media && typeof m.media === 'object') setBlur(m.media as Record<string, unknown>, 'image')
+  if (m.author && typeof m.author === 'object') setBlur(m.author as Record<string, unknown>, 'image')
   if (Array.isArray(m.allTeamMembers)) {
-    m.allTeamMembers.forEach((member: any) => setBlur(member, 'image'))
+    ;(m.allTeamMembers as unknown[]).forEach((member) => setBlur(member as Record<string, unknown>, 'image'))
   }
   if (Array.isArray(m.gallery)) {
-    m.gallery = m.gallery.map((img: any) => ({...img}))
-    m.gallery.forEach((img: any, idx: number) => {
+    const gallery = (m.gallery as unknown[]).map((img) => ({...(img as Record<string, unknown>)}))
+    gallery.forEach((img, idx) => {
       tasks.push((async () => {
-        if (img?.asset) {
-          const blur = await generateBlurDataURL(img)
-          if (blur) m.gallery[idx] = {...img, blurDataURL: blur}
+        const maybeImg = img as Record<string, unknown>
+        if (maybeImg?.asset) {
+          const blur = await generateBlurDataURL(maybeImg as unknown as SanityImageLike)
+          if (blur) gallery[idx] = ({...maybeImg, blurDataURL: blur})
         }
       })())
     })
+    ;(m as Record<string, unknown>).gallery = gallery as unknown
   }
 
   await Promise.all(tasks)
@@ -207,8 +226,8 @@ export default async function Page({ params }: PageParams) {
   // Attach blurDataURL placeholders to images in modules (server-side)
   try {
     if (Array.isArray(localizedModules) && localizedModules.length > 0) {
-      const processed = await Promise.all(localizedModules.map((m: any) => attachBlurDataToModule(m)))
-      localizedModules = processed
+      const processed = await Promise.all(localizedModules.map((m: unknown) => attachBlurDataToModule(m as Record<string, unknown>)))
+      localizedModules = processed as unknown as typeof localizedModules
     }
   } catch (err) {
     console.warn('Error generating blurDataURLs for modules', err)

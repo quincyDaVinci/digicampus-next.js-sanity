@@ -1,7 +1,7 @@
 "use client";
 
 import type { MediaSectionProps } from "@/types/sections";
-import { urlFor } from "@sanity/lib/image";
+// plugin-only URL building
 import { buildSrc } from 'sanity-image'
 import SanityNextImage from '@/components/SanityNextImage'
 import { useRef, useState, useEffect } from "react";
@@ -119,23 +119,30 @@ export default function MediaSection(props: MediaSectionProps) {
 
   const aspectRatioStyle = getAspectRatioStyle();
 
-  // Build image URL with plugin when possible, fallback to urlFor
-  const makeSrc = (img: any, w?: number, h?: number, mode: 'cover'|'contain' = 'contain') => {
-    if (!img?.asset) return null
+  type SanityImageLike = unknown
+
+  // Build image URL with plugin when possible
+  const makeSrc = (img: SanityImageLike, w?: number, h?: number, mode: 'cover'|'contain' = 'contain') => {
+    if (!img) return null
     try {
       const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
       const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
       const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
-      const asset = img.asset
-      const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+      let assetId: string | undefined
+      if (typeof img === 'string') assetId = img
+      else if (img && typeof img === 'object') {
+        const maybeAsset = (img as { asset?: unknown }).asset
+        if (typeof maybeAsset === 'string') assetId = maybeAsset
+        else if (maybeAsset && typeof maybeAsset === 'object') assetId = (maybeAsset as { _ref?: string; _id?: string })._ref || (maybeAsset as { _ref?: string; _id?: string })._id
+      }
       if (assetId && baseUrl) {
         const srcObj = buildSrc({ id: assetId, baseUrl, width: w, height: h, mode })
         return srcObj?.src ?? null
       }
     } catch (err) {
-      // fall through to urlFor fallback
+      // fall through
     }
-    return img?.asset ? urlFor(img).width(w || 1920).height(h || 1080).fit('max').auto('format').quality(90).url() : null
+    return null
   }
 
   const imageUrl = makeSrc(image, 1920, 1080, 'contain')
@@ -217,18 +224,25 @@ export default function MediaSection(props: MediaSectionProps) {
           {mediaType === "image" && imageUrl && image?.alt ? (
             <figure className={mediaClasses} style={aspectRatioStyle}>
               <div id={mediaId} aria-describedby={image.caption ? captionId : undefined} className="relative block w-full h-full">
-                <SanityNextImage
-                  image={image}
-                  alt={image.alt}
-                  width={(image.asset?.metadata?.dimensions?.width) || 1600}
-                  height={(image.asset?.metadata?.dimensions?.height) || 900}
-                  className="w-full h-full object-cover"
+                {(() => {
+                  const asset = (image as unknown as { asset?: unknown })?.asset
+                  const imgWidth = asset && typeof asset === 'object' ? (asset as { metadata?: { dimensions?: { width?: number } } }).metadata?.dimensions?.width : undefined
+                  const imgHeight = asset && typeof asset === 'object' ? (asset as { metadata?: { dimensions?: { height?: number } } }).metadata?.dimensions?.height : undefined
+                  return (
+                    <SanityNextImage
+                      image={image}
+                      alt={(image as unknown as { alt?: string })?.alt}
+                      width={imgWidth || 1600}
+                      height={imgHeight || 900}
+                      className="w-full h-full object-cover"
                   sizes="(max-width: 768px) 100vw, 70vw"
-                  placeholder={image?.blurDataURL ? 'blur' : undefined}
+                   placeholder={(image as unknown as { blurDataURL?: string })?.blurDataURL ? 'blur' : undefined}
                 />
+                  )
+                })()}
                 {/* Gradient overlay from image.overlay */}
                 {image?.overlay?.enabled && (() => {
-                  const ov = image.overlay as any;
+                  const ov = image.overlay as unknown as { enabled?: boolean; opacity?: number; direction?: string }
                   const overlayOpacity = typeof ov?.opacity === 'number' ? ov.opacity : 0.5;
                   const start = 'rgba(0,0,0,0)';
                   const end = `rgba(0,0,0,${Math.max(0, Math.min(1, overlayOpacity))})`;

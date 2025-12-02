@@ -3,7 +3,7 @@ import {notFound} from 'next/navigation'
 import {client} from '@sanity/lib/client'
 import {groq} from 'next-sanity'
 import Link from 'next/link'
-import {urlFor} from '@sanity/lib/image'
+// url building now handled via `sanity-image` plugin
 import { buildSrc } from 'sanity-image'
 import {CalendarIcon, ClockIcon, ChevronLeftIcon} from '@/components/icons/FeatherIcons'
 import Breadcrumbs from '@/components/Breadcrumbs'
@@ -177,22 +177,32 @@ export default async function BlogPostPage({params}: PageProps) {
         })
       : null
 
-    const makeSrc = (img: any, w?: number, h?: number, mode: 'cover'|'contain' = 'cover') => {
-      if (!img?.asset) return null
+    type SanityImageLike = { asset?: { _ref?: string; _id?: string } } | string | null | undefined
+
+    const makeSrc = (img: SanityImageLike, w?: number, h?: number, mode: 'cover'|'contain' = 'cover') => {
+      if (!img) return null
       try {
         const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
         const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
         const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
-        const asset = img.asset
-        const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+        let assetId: string | undefined
+        if (typeof img === 'string') {
+          assetId = img
+        } else if (img && typeof img === 'object') {
+          const maybeAsset = (img as { asset?: unknown }).asset as unknown
+          if (maybeAsset && typeof maybeAsset === 'object') {
+            const a = maybeAsset as { _ref?: string; _id?: string }
+            assetId = a._ref || a._id
+          }
+        }
         if (assetId && baseUrl) {
           const srcObj = buildSrc({ id: assetId, baseUrl, width: w, height: h, mode })
           return srcObj?.src ?? null
         }
       } catch (err) {
-        // fall through to urlFor fallback
+        // fall through; plugin couldn't build URL
       }
-      return img?.asset ? urlFor(img).width(w || 1200).height(h || 630).fit('crop').auto('format').url() : null
+      return null
     }
 
     const imageUrl = makeSrc(post.mainImage, 1200, 630, 'cover')
@@ -325,7 +335,21 @@ export default async function BlogPostPage({params}: PageProps) {
                         } catch (err) {
                           // fallback
                         }
-                        return value?.asset ? urlFor(value).width(1200).height(675).fit('crop').auto('format').url() : null
+                          if (!value?.asset) return null
+                          try {
+                            const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+                            const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+                            const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+                            const asset = value.asset
+                            const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+                            if (assetId && baseUrl) {
+                              const srcObj = buildSrc({ id: assetId, baseUrl, width: 1200, height: 675, mode: 'cover' })
+                              return srcObj?.src ?? null
+                            }
+                          } catch (err) {
+                            return null
+                          }
+                          return null
                       })()
                     if (!imageUrl) return null
                     

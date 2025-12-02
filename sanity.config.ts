@@ -60,22 +60,14 @@ export default defineConfig({
       // not installed — no-op
     }
     try {
-      // Sanity AI Assist — official package: `@sanity/ai`
-      // install with `npm install --save-dev @sanity/ai`
+      // Sanity AI Assist — prefer the installed `@sanity/assist` package
+      // install with `npm install --save-dev @sanity/assist`
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       // @ts-ignore
-      const aiPlugin = require('@sanity/ai')
+      const aiPlugin = require('@sanity/assist')
       if (aiPlugin) optional.push(aiPlugin)
     } catch (err) {
-      try {
-        // Fallback community package name
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        // @ts-ignore
-        const aiPlugin2 = require('sanity-plugin-ai-assist')
-        if (aiPlugin2) optional.push(aiPlugin2)
-      } catch (err2) {
-        // not installed — no-op
-      }
+      // not installed — no-op
     }
     return [
       structureTool({structure}),

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
@@ -34,7 +35,10 @@ export default function TeamSection({ heading, subheading, autoIncludeAll, allTe
 
   // Build ordered list of category keys based on teamSettings if provided
   const settingsOrder = (teamSettings && Array.isArray(teamSettings.categoriesOrder))
-    ? teamSettings.categoriesOrder.map((c: any) => c._id || (c.slug && c.slug.current) || (c.title || '').toString().toLowerCase())
+    ? teamSettings.categoriesOrder.map((c: unknown) => {
+      const cc = c as { _id?: string; slug?: { current?: string }; title?: string }
+      return cc._id || (cc.slug && cc.slug.current) || (cc.title || '').toString().toLowerCase()
+    })
     : [];
   const remainingKeys = Object.keys(groups).filter(k => !settingsOrder.includes(k));
   const renderOrder = [...settingsOrder.filter(k => groups[k]), ...remainingKeys];

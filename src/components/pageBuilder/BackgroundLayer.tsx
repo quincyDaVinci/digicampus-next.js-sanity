@@ -1,6 +1,5 @@
 import type {CSSProperties} from 'react'
 
-import {urlFor} from '@sanity/lib/image'
 import { buildSrc } from 'sanity-image'
 
 import type {BackgroundComponent} from '@/types/pageBuilder'
@@ -50,21 +49,23 @@ export default function BackgroundLayer({background, className}: BackgroundLayer
       const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
       const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
 
-      // Resolve asset id from common shapes
+      // Resolve asset id
       const asset = background.image.asset
-      const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+      let assetId: string | undefined
+      if (typeof asset === 'string') {
+        assetId = asset
+      } else if (asset && typeof asset === 'object') {
+        const maybe = asset as { _ref?: string; _id?: string }
+        assetId = maybe._ref || ((asset as Record<string, unknown>)._id as string | undefined)
+      }
 
       if (assetId && baseUrl) {
         const srcObj = buildSrc({ id: assetId, baseUrl, width: 2400, mode: 'contain' })
         if (srcObj && srcObj.src) layers.push(`url(${srcObj.src})`)
-      } else {
-        // Fallback to existing url builder
-        const imageUrl = urlFor(background.image).width(2400).fit('max').auto('format').url()
-        if (imageUrl) layers.push(`url(${imageUrl})`)
       }
+      // Plugin-only: do not fallback to legacy url builder
     } catch (err) {
-      const imageUrl = urlFor(background.image).width(2400).fit('max').auto('format').url()
-      if (imageUrl) layers.push(`url(${imageUrl})`)
+      // If plugin fails, do not inject a background image
     }
   }
 

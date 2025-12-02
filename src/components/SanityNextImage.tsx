@@ -1,11 +1,16 @@
 import Image from 'next/image'
-import {urlFor} from '@sanity/lib/image'
 import { buildSrc } from 'sanity-image'
 import { SanityImage } from 'sanity-image'
 import type {CSSProperties} from 'react'
 
+type SanityImageType = {
+  asset?: { _ref?: string; _id?: string; metadata?: { dimensions?: { width?: number; height?: number } } }
+  alt?: string
+  blurDataURL?: string | null
+}
+
 interface SanityNextImageProps {
-  image?: any // Sanity image object
+  image?: unknown
   src?: string
   alt?: string
   width?: number
@@ -26,10 +31,16 @@ export default function SanityNextImage(props: SanityNextImageProps) {
   let resolvedSrc = src
 
   // If a Sanity image object is provided, prefer rendering with the `sanity-image` plugin
-  if (image && image.asset) {
+  if (image && typeof image === 'object' && (image as { asset?: unknown }).asset) {
     // Determine asset id/ref
-    const asset = image.asset
-    const assetId = asset._ref || asset._id || (typeof asset === 'string' ? asset : undefined)
+    const asset = (image as { asset?: unknown }).asset
+    let assetId: string | undefined
+    if (typeof asset === 'string') {
+      assetId = asset
+    } else if (asset && typeof asset === 'object') {
+      const a = asset as { _ref?: string; _id?: string }
+      assetId = a._ref || a._id
+    }
 
     if (assetId) {
       // Use the SanityImage component from the plugin. It will build srcSet and support preview LQIP.
@@ -42,9 +53,9 @@ export default function SanityNextImage(props: SanityNextImageProps) {
           height={height}
           className={className}
           style={style}
-          // supply a tiny preview if available
-          preview={blurDataURL ?? image?.blurDataURL}
-          alt={alt ?? image?.alt ?? ''}
+          // supply a tiny preview if available (ensure undefined, not null)
+          preview={(blurDataURL ?? ((image as unknown as { blurDataURL?: string })?.blurDataURL)) ?? undefined}
+          alt={(alt ?? (image as unknown as { alt?: string })?.alt) ?? ''}
         />
       )
     }
@@ -53,21 +64,22 @@ export default function SanityNextImage(props: SanityNextImageProps) {
       const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
       const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
       const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
-      const asset = image.asset
-      const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
-      if (assetId && baseUrl) {
-        const srcObj = buildSrc({ id: assetId, baseUrl, width, height, mode: fill ? 'cover' : 'contain' })
+      const assetVal = (image as { asset?: unknown }).asset
+      let maybeAssetId: string | undefined
+      if (typeof assetVal === 'string') maybeAssetId = assetVal
+      else if (assetVal && typeof assetVal === 'object') maybeAssetId = (assetVal as { _ref?: string; _id?: string })._ref || (assetVal as { _ref?: string; _id?: string })._id
+      if (maybeAssetId && baseUrl) {
+        const srcObj = buildSrc({ id: maybeAssetId, baseUrl, width, height, mode: fill ? 'cover' : 'contain' })
         resolvedSrc = srcObj?.src ?? undefined
       }
     } catch (err) {
       resolvedSrc = undefined
     }
-    // Fallback to urlFor if plugin did not return a URL
+    // Plugin-only: if plugin did not return a URL, do not fallback to legacy builder
     if (!resolvedSrc) {
-      const builder = urlFor(image).auto('format')
-      if (width) builder.width(width)
-      if (height) builder.height(height)
-      resolvedSrc = builder.url()
+      return null
+    }
+
   }
 
   // Fallback: if no resolved src, render nothing
@@ -85,7 +97,7 @@ export default function SanityNextImage(props: SanityNextImageProps) {
         sizes={sizes}
         priority={priority}
         placeholder={placeholder}
-        blurDataURL={blurDataURL ?? (image?.blurDataURL ?? undefined)}
+        blurDataURL={blurDataURL ?? ((image as unknown as { blurDataURL?: string })?.blurDataURL ?? undefined)}
       />
     )
   }
@@ -101,7 +113,7 @@ export default function SanityNextImage(props: SanityNextImageProps) {
       sizes={sizes}
       priority={priority}
       placeholder={placeholder}
-      blurDataURL={blurDataURL ?? (image?.blurDataURL ?? undefined)}
+      blurDataURL={blurDataURL ?? ((image as unknown as { blurDataURL?: string })?.blurDataURL ?? undefined)}
     />
   )
 }

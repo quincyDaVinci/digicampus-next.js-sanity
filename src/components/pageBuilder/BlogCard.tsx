@@ -1,7 +1,7 @@
 import SanityNextImage from '@/components/SanityNextImage'
 import Link from 'next/link'
 import {usePathname} from 'next/navigation'
-import {urlFor} from '@sanity/lib/image'
+// plugin URL handling done in SanityNextImage
 import type {BlogCardComponent, BlogCardResolvedPost} from '@/types/pageBuilder'
 import {CalendarIcon, getFeatherIcon} from '@/components/icons/FeatherIcons'
 import {getBlogTranslation} from '@/lib/blogTranslations'
@@ -87,17 +87,22 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
     >
       {hasMainImage ? (
         <div className={`relative overflow-hidden ${borderRadius === 'small' ? 'rounded-t-xl' : 'rounded-t-3xl'}`} style={{backgroundColor: '#ffffff', maxHeight: '220px'}}>
-          <div className="relative w-full transition-transform duration-300 group-hover:scale-[1.03]">
-            <SanityNextImage
-              image={post.mainImage}
-              alt={post.mainImage?.alt || ''}
-              width={800}
-              height={220}
-              className="block h-[220px] w-full object-cover"
-              priority={false}
-              style={{ display: 'block', width: '100%' }}
-              placeholder={post.mainImage?.blurDataURL ? 'blur' : undefined}
-            />
+            <div className="relative w-full transition-transform duration-300 group-hover:scale-[1.03]">
+            {(() => {
+              const mainImageBlur = (post.mainImage as unknown as { blurDataURL?: string })?.blurDataURL
+              return (
+                <SanityNextImage
+                  image={post.mainImage}
+                  alt={post.mainImage?.alt || ''}
+                  width={800}
+                  height={220}
+                  className="block h-[220px] w-full object-cover"
+                  priority={false}
+                  style={{ display: 'block', width: '100%' }}
+                  placeholder={mainImageBlur ? 'blur' : undefined}
+                />
+              )
+            })()}
             {/* Base overlay - always visible with subtle gradient */}
             <div
               className="pointer-events-none absolute"

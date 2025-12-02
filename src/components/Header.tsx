@@ -1,6 +1,5 @@
 import {client} from '@sanity/lib/client'
 import {siteSettingsQuery} from '@sanity/lib/queries/site'
-import {urlFor} from '@sanity/lib/image'
 import { buildSrc } from 'sanity-image'
 import HeaderClient from './HeaderClient'
 
@@ -78,8 +77,9 @@ export default async function Header({ lang }: { lang: string }) {
             const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
             const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
             const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
-            const asset = (siteData.logo as any)?.asset
-            const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+            const logoObj = siteData.logo as unknown as { asset?: { _ref?: string; _id?: string } }
+            const asset = logoObj?.asset
+            const assetId = asset?._ref || asset?._id || undefined
             if (assetId && baseUrl) {
               const srcObj = buildSrc({ id: assetId, baseUrl, width: targetWidth, height: targetHeight, mode: targetHeight ? 'cover' : 'contain' })
               imgUrl = srcObj?.src ?? null
@@ -89,15 +89,17 @@ export default async function Header({ lang }: { lang: string }) {
           }
 
           if (!imgUrl) {
-            const builder = urlFor(siteData.logo).width(targetWidth)
-            imgUrl = targetHeight ? builder.height(targetHeight).fit('crop').auto('format').url() : builder.auto('format').url()
+            // Plugin-only: do not fallback to legacy url builder; leave logo null
+            imgUrl = null
           }
 
-          logo = {
-            url: imgUrl,
-            alt: siteData.logoAlt || siteData.title || 'Site logo',
-            width: assetDims?.width,
-            height: assetDims?.height,
+          if (imgUrl) {
+            logo = {
+              url: imgUrl,
+              alt: siteData.logoAlt || siteData.title || 'Site logo',
+              width: assetDims?.width,
+              height: assetDims?.height,
+            }
           }
         } catch (err) {
           // fallback if image builder fails
