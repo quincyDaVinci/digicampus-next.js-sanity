@@ -16,41 +16,46 @@ export function LanguageProvider({ children, initialLang }: { children: React.Re
   const router = useRouter()
   const pathname = usePathname()
   // Start as null to avoid SSR hydration mismatch / flicker. Populate on first client render.
-  const [lang, setLang] = useState<Lang | null>(initialLang ?? null)
+  const [lang, setLangState] = useState<Lang | null>(initialLang ?? null)
+
+  const updateDocumentLang = useCallback((nextLang: Lang) => {
+    if (typeof document === 'undefined') return
+    document.documentElement.lang = nextLang
+    document.documentElement.setAttribute('data-lang', nextLang)
+  }, [])
 
   useEffect(() => {
     // Client-only initialization: prefer stored setting, fall back to navigator.
     try {
       const stored = localStorage.getItem('dc_lang')
       if (stored === 'nl' || stored === 'en') {
-        setLang(stored)
+        setLangState(stored)
+        updateDocumentLang(stored)
         return
       }
     } catch {
       // ignore
     }
     if (initialLang && isSupportedLang(initialLang)) {
-      setLang(initialLang)
+      setLangState(initialLang)
+      updateDocumentLang(initialLang)
       return
     }
 
     if (typeof navigator !== 'undefined') {
       const n = navigator.language?.toLowerCase()
-      if (n?.startsWith('nl')) setLang('nl')
-      else setLang('en')
+      if (n?.startsWith('nl')) setLangState('nl')
+      else setLangState('en')
     } else {
-      setLang('nl')
+      setLangState('nl')
     }
-  }, [initialLang])
+  }, [initialLang, updateDocumentLang])
 
   useEffect(() => {
     if (lang == null) return
     try { localStorage.setItem('dc_lang', lang) } catch {}
-    if (typeof document !== 'undefined') {
-      document.documentElement.lang = lang === 'nl' ? 'nl' : 'en'
-      document.documentElement.setAttribute('data-lang', lang)
-    }
-  }, [lang])
+    updateDocumentLang(lang)
+  }, [lang, updateDocumentLang])
 
   const navigateWithLang = useCallback((nextLang: Lang) => {
     if (!pathname) return
@@ -87,11 +92,12 @@ export function LanguageProvider({ children, initialLang }: { children: React.Re
     () => ({
       lang: (lang ?? defaultLanguage) as Lang,
       setLang: (next: Lang) => {
-        setLang(next)
+        setLangState(next)
+        updateDocumentLang(next)
         navigateWithLang(next)
       },
     }),
-    [lang, navigateWithLang]
+    [lang, navigateWithLang, updateDocumentLang]
   )
 
   return (
