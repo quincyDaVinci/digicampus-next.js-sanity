@@ -123,6 +123,32 @@ export const structure: StructureResolver = (S) =>
         .title('Teamleden')
         .icon(UsersIcon),
       
+      // Team settings (categories + ordering)
+      S.listItem()
+        .title('Team instellingen')
+        .icon(SettingsIcon)
+        .child(
+          S.list()
+            .title('Team instellingen')
+            .items([
+              S.listItem()
+                .title('Categorieën')
+                .icon(TagIcon)
+                .child(
+                  S.documentTypeList('teamCategory')
+                    .title('Team categorieën')
+                ),
+              S.listItem()
+                .title('Categorie volgorde')
+                .icon(LayersIcon)
+                .child(
+                  S.document()
+                    .schemaType('teamSettings')
+                    .documentId('teamSettings')
+                ),
+            ])
+        ),
+      
       S.divider(),
       
       // Tags

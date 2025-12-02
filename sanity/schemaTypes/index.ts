@@ -9,6 +9,8 @@ import blogPost from './documents/blogPost'
 import blogCategory from './documents/blogCategory'
 import navigation from './documents/navigation'
 import author from './documents/author'
+import teamCategory from './documents/teamCategory'
+import teamSettings from './documents/teamSettings'
 import tag from './documents/tag'
 import siteSettings from './documents/siteSettings'
 
@@ -36,6 +38,7 @@ import contactSection from './modules/contactSection'
 import newsletterSection from './modules/newsletterSection'
 import mediaSection from './modules/mediaSection'
 import documentAsset from './modules/documentAsset'
+import teamSection from './modules/teamSection'
 
 export const schema: SchemaPluginOptions = {
   types: [
@@ -48,6 +51,8 @@ export const schema: SchemaPluginOptions = {
     blogCategory,
     navigation,
     author,
+    teamCategory,
+    teamSettings,
     tag,
     siteSettings,
 
@@ -62,6 +67,7 @@ export const schema: SchemaPluginOptions = {
     blogPostTranslationInline,
     siteTranslation,
     siteSettingsTranslation,
+    
 
     // Modules (Sections)
     heroSection,
@@ -75,6 +81,7 @@ export const schema: SchemaPluginOptions = {
     newsletterSection,
     mediaSection,
     documentAsset,
+    teamSection,
   ],
 }
 

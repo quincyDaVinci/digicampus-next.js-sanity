@@ -46,6 +46,9 @@ async function attachBlurDataToModule(module: any) {
   setBlur(m, 'mainImage')
   if (m.media && typeof m.media === 'object') setBlur(m.media, 'image')
   if (m.author && typeof m.author === 'object') setBlur(m.author, 'image')
+  if (Array.isArray(m.allTeamMembers)) {
+    m.allTeamMembers.forEach((member: any) => setBlur(member, 'image'))
+  }
   if (Array.isArray(m.gallery)) {
     m.gallery = m.gallery.map((img: any) => ({...img}))
     m.gallery.forEach((img: any, idx: number) => {
@@ -70,7 +73,11 @@ const pageQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$la
   modules[]{
     ...,
     _type,
-    _key
+    _key,
+    // If module is a teamSection, include the autoIncludeAll flag and a complete list of authors
+    autoIncludeAll,
+    "allTeamMembers": *[_type == "author"]{ _id, _type, name, "position": role, "category": category->{ _id, title, "slug": slug.current }, image, slug, includeInTeam, email, linkedin },
+    "teamSettings": *[_type == "teamSettings"][0]{ "categoriesOrder": categoriesOrder[]->{ _id, title, "slug": slug.current }, defaultCategoryTitle }
   },
   "localized": translations[$lang]{
     title,

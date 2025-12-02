@@ -217,6 +217,31 @@ export interface DocumentAssetProps extends BaseSection {
   language?: string
 }
 
+export interface TeamSectionProps extends BaseSection {
+  _type: 'teamSection'
+  heading?: string
+  subheading?: string
+  autoIncludeAll?: boolean
+  // When autoIncludeAll is true, `allTeamMembers` will contain the resolved list of all teamMember docs
+  allTeamMembers?: Array<{
+    _id?: string
+    _type?: string
+    name?: string
+    position?: string
+    // category may be a referenced document after Studio change
+    category?: { _id?: string; title?: string; slug?: { current?: string } } | string
+    image?: { asset?: import('@sanity/image-url/lib/types/types').SanityImageSource; alt?: string }
+    includeInTeam?: boolean
+    email?: string
+    linkedin?: string
+  }>
+  teamSettings?: {
+    categoriesOrder?: Array<{ _id?: string; title?: string; slug?: { current?: string } }>
+    defaultCategoryTitle?: string
+  }
+  // When autoIncludeAll is false the section will not show any members (manual selection removed)
+}
+
 export type SectionProps =
   | HeroSectionProps
   | FeatureSectionProps
@@ -229,4 +254,5 @@ export type SectionProps =
   | NewsletterSectionProps
   | MediaSectionProps
   | DocumentAssetProps
+  | TeamSectionProps
 

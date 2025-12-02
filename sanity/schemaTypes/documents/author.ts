@@ -29,10 +29,18 @@ export default defineType({
       description: 'Bijvoorbeeld: Content Marketeer, Senior Developer, etc.',
     }),
     defineField({
-      name: 'company',
-      title: 'Bedrijf',
-      type: 'string',
-      description: 'De organisatie waar de auteur werkt',
+      name: 'category',
+      title: 'Team category',
+      type: 'reference',
+      to: [{ type: 'teamCategory' }],
+      description: 'Link this author to a team category. Create categories in the "Team category" document type.',
+    }),
+    defineField({
+      name: 'includeInTeam',
+      title: 'Include in team listings',
+      type: 'boolean',
+      description: 'Toggle to include or exclude this author from auto-included team sections',
+      initialValue: true,
     }),
     defineField({
       name: 'image',
@@ -48,6 +56,19 @@ export default defineType({
           title: 'Alternatieve tekst',
         },
       ],
+    }),
+    defineField({
+      name: 'email',
+      title: 'Email',
+      type: 'string',
+      description: 'Public contact email (optional).',
+      validation: (Rule) => Rule.uri({allowRelative: false}).custom((v) => (v && v.indexOf('@') === -1) ? 'Invalid email' : true),
+    }),
+    defineField({
+      name: 'linkedin',
+      title: 'LinkedIn URL',
+      type: 'url',
+      description: 'Link to LinkedIn profile (optional).',
     }),
     defineField({
       name: 'bio',
