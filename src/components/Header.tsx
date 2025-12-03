@@ -1,5 +1,5 @@
 import {client} from '@sanity/lib/client'
-import {siteSettingsQuery} from '@sanity/lib/queries/site'
+import {siteSettingsQuery, navigationByLangQuery} from '@sanity/lib/queries/site'
 import { buildSrc } from 'sanity-image'
 import HeaderClient from './HeaderClient'
 
@@ -50,9 +50,24 @@ export default async function Header({ lang }: { lang: string }) {
   if (hasSanityCredentials) {
     type LogoAsset = { asset?: { metadata?: { dimensions?: { width?: number; height?: number } }, url?: string } }
     try {
-      const siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery, { lang })
-      
-      // Process navigation items
+      let siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery, { lang })
+
+      // If the referenced header navigation has a language and it doesn't match the
+      // current `lang`, try to fetch a navigation document that matches `lang` so
+      // English and Dutch get their own menus instead of falling back to the hardcoded menus.
+      if (siteData?.header?.language && siteData.header.language !== lang) {
+        try {
+          const altHeader = await client.fetch(navigationByLangQuery, { lang })
+          if (altHeader) {
+            // attach the alt header to the siteData.header shape so downstream logic can reuse it
+            siteData = { ...(siteData as SiteSettings), header: altHeader as SiteSettings['header'] }
+          }
+        } catch (err) {
+          // if alt fetch fails, we'll fall back to existing siteData.header behavior
+          console.warn('Could not fetch language-specific navigation:', err)
+        }
+      }
+
       if (siteData?.header?.items && siteData.header.items.length > 0 && (!siteData.header.language || siteData.header.language === lang)) {
         menus = siteData.header.items
           .filter(item => item._type === 'link.list' && item.items)

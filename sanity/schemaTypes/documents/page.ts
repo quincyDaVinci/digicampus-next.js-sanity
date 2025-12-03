@@ -61,6 +61,40 @@ export default defineType({
       description: 'SEO-instellingen en URL-configuratie',
       group: 'metadata',
     }),
+    defineField({
+      name: 'navigation',
+      title: 'Navigatie-instellingen',
+      type: 'object',
+      group: 'metadata',
+      description: 'Opties voor automatische opname in navigatiemenu\'s (gebruik \"Toon in navigatie\" om deze pagina in menus op te nemen).',
+      fields: [
+        defineField({
+          name: 'showInNav',
+          title: 'Toon in navigatie',
+          type: 'boolean',
+          initialValue: false,
+          description: 'Vink aan om deze pagina automatisch op te nemen in navigatiemenu\'s die auto-populatie ondersteunen.',
+        }),
+        defineField({
+          name: 'label',
+          title: 'Navigatielabel (optioneel)',
+          type: 'string',
+          description: 'Optionele tekst die in het menu getoond wordt; valt terug op de paginatitel als leeg.',
+        }),
+        defineField({
+          name: 'group',
+          title: 'Navigatie groep',
+          type: 'string',
+          description: 'Groep of menu waarin deze pagina moet verschijnen (bijv. "Wie we zijn" of "Wat we doen"). Laat leeg voor hoofdmenu.',
+        }),
+        defineField({
+          name: 'order',
+          title: 'Volgorde in navigatie',
+          type: 'number',
+          description: 'Kleinere getallen verschijnen eerst. Gebruik dit om de volgorde van automatisch opgenomen pagina\'s te bepalen.',
+        }),
+      ],
+    }),
   ],
   preview: {
     select: {

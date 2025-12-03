@@ -86,4 +86,4 @@ export const schema: SchemaPluginOptions = {
 }
 
 // Document types that should only have one instance
-const singletonTypes = ['site', 'homePage', 'blogPage', 'navigation']
+const singletonTypes = ['site', 'homePage', 'blogPage']

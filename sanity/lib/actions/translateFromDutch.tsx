@@ -78,6 +78,44 @@ function buildSiteSettingsTranslation(doc: TranslatableDocument) {
   }
 }
 
+function buildNavigationTranslation(doc: TranslatableDocument) {
+  // Build a minimal payload containing only the labels to translate for each item
+  const itemsPayload = (doc as any).items?.map((it: any) => {
+    if (!it) return null
+    // Normalize to the navigationItemTranslation shape so the translations
+    // array stores items that match the `navigationTranslation.items` schema.
+    if (it._type === 'link') {
+      return {
+        _type: 'navigationItemTranslation',
+        itemType: 'link',
+        label: it.label || '',
+      }
+    }
+    if (it._type === 'link.list') {
+      return {
+        _type: 'navigationItemTranslation',
+        itemType: 'link.list',
+        label: it.link?.label || '',
+        link: { label: it.link?.label || '' },
+        links: (it.links || []).map((l: any) => ({ label: l.label || '' })),
+      }
+    }
+
+    // Fallback for unknown item types
+    return {
+      _type: 'navigationItemTranslation',
+      itemType: it._type || 'unknown',
+      label: it.label || '',
+    }
+  }).filter(Boolean)
+
+  return {
+    _type: 'navigationTranslation',
+    language: 'en',
+    items: itemsPayload || [],
+  }
+}
+
 async function translatePayload(payload: Record<string, unknown>, sourceLanguage: string, targetLanguage: string) {
   return translateDeepObject(payload, sourceLanguage, targetLanguage)
 }
@@ -115,6 +153,8 @@ export function createTranslateFromDutchAction(
           translationPayload = buildSiteTranslation(draft)
         } else if (docType === 'siteSettings') {
           translationPayload = buildSiteSettingsTranslation(draft)
+        } else if (docType === 'navigation') {
+          translationPayload = buildNavigationTranslation(draft)
         } else {
           throw new Error('Vertaalactie is niet beschikbaar voor dit documenttype')
         }
@@ -304,6 +344,64 @@ export function createTranslateFromDutchAction(
           // Inline object keyed by language
           tx.patch(targetId, {unset: [`translations.${langKey}`]})
           tx.patch(targetId, {set: {[`translations.${langKey}`]: translatedObj}})
+        } else if (docType === 'navigation') {
+          // For navigations: translate per-item labels and write per-link translations
+          const originalItems = (draft as any).items || []
+          const translatedItems = (translatedObj as any).items || []
+          const updatedItems = originalItems.map((origItem: any, idx: number) => {
+            const tItem = translatedItems[idx] || {}
+            if (!origItem) return origItem
+            if (origItem._type === 'link') {
+              const translatedLabel = (tItem.label as string) || origItem.label || ''
+              const existing = origItem.translations || []
+              const withLang = ensureArrayWithLanguage(existing as any, {
+                _type: 'linkLabelTranslation',
+                language: langKey,
+                label: translatedLabel,
+              } as any)
+              return {...origItem, translations: withLang}
+            }
+            if (origItem._type === 'link.list') {
+              // parent link
+              const parent = origItem.link || {}
+              const tParent = tItem.link || {}
+              const parentTranslated = (tParent.label as string) || parent.label || ''
+              const parentExisting = parent.translations || []
+              const parentWithLang = ensureArrayWithLanguage(parentExisting as any, {
+                _type: 'linkLabelTranslation',
+                language: langKey,
+                label: parentTranslated,
+              } as any)
+
+              // sub links
+              const origLinks = origItem.links || []
+              const tLinks = tItem.links || []
+              const updatedLinks = origLinks.map((ol: any, j: number) => {
+                const tSub = tLinks[j] || {}
+                const subTranslated = (tSub.label as string) || ol.label || ''
+                const subExisting = ol.translations || []
+                const subWithLang = ensureArrayWithLanguage(subExisting as any, {
+                  _type: 'linkLabelTranslation',
+                  language: langKey,
+                  label: subTranslated,
+                } as any)
+                return {...ol, translations: subWithLang}
+              })
+
+              return {...origItem, link: {...parent, translations: parentWithLang}, links: updatedLinks}
+            }
+            return origItem
+          })
+
+          // Also write a top-level translations entry (like blog posts do) so editors
+          // can view the translated navigation under the "Vertalingen" tab.
+          const existingNavTrans = (draft?.translations || []) as any[]
+          const withLangNav = ensureArrayWithLanguage(existingNavTrans as any, {
+            ...(translatedObj as any),
+            language: langKey,
+          })
+
+          tx.patch(targetId, {set: {items: updatedItems, translations: withLangNav}})
         } else if (docType === 'page' || docType === 'homePage' || docType === 'site' || docType === 'siteSettings') {
           // Array-based translations with language field
           const existing = (draft?.translations || []) as any[]

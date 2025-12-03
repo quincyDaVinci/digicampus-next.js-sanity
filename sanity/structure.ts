@@ -106,14 +106,28 @@ export const structure: StructureResolver = (S) =>
       
       S.divider(),
       
-      // Navigatie (Singleton)
+      // Navigatie (multiple menus)
       S.listItem()
         .title('Navigatie')
         .icon(LayersIcon)
         .child(
-          S.document()
-            .schemaType('navigation')
-            .documentId('navigation')
+          S.list()
+            .title('Navigatie')
+            .items([
+              S.listItem()
+                .title('Alle menu\'s')
+                .icon(LayersIcon)
+                .child(
+                  S.documentTypeList('navigation')
+                    .title('Alle menu\'s')
+                ),
+              S.listItem()
+                .title('Translate menus')
+                .icon(LayersIcon)
+                .child(
+                  S.component(TranslationFixer).id('translateMenus').title('Translate menus')
+                ),
+            ])
         ),
       
       S.divider(),

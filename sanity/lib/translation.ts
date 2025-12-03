@@ -148,7 +148,7 @@ export function ensureArrayWithLanguage<T extends {_type?: string; language?: st
   return [...filtered, withKey]
 }
 
-export const translationSupportedTypes = ['page', 'homePage', 'blogPost', 'site', 'siteSettings'] as const
+export const translationSupportedTypes = ['page', 'homePage', 'blogPost', 'site', 'siteSettings', 'navigation'] as const
 export type TranslationSupportedType = (typeof translationSupportedTypes)[number]
 
 export function isTranslationSupported(type: string): type is TranslationSupportedType {

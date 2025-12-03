@@ -2,7 +2,7 @@ import RenderSection from '@/components/sections/RenderSection'
 import { client } from '@sanity/lib/client'
 // Revalidate this page every 300 seconds (ISR). Sanity webhook can call /api/revalidate to update immediately.
 export const revalidate = 300
-import { defaultLanguage, supportedLanguages } from '@/lib/i18n'
+import { defaultLanguage, supportedLanguages, isSupportedLang } from '@/lib/i18n'
 import { draftMode } from 'next/headers'
 import type { Metadata } from 'next'
 import { getTranslation } from '@/lib/translations'
@@ -52,7 +52,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: HomeParams): Promise<Metadata> {
   const { lang } = await params
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://digicampus.example'
-  const safeLang = supportedLanguages.includes(lang) ? lang : defaultLanguage
+  const safeLang = isSupportedLang(lang) ? lang : defaultLanguage
   const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(safeLang, key)
   const locale = safeLang === 'nl' ? 'nl_NL' : 'en_US'
 

@@ -15,14 +15,15 @@ export default defineType({
       name: 'link',
       title: 'Bovenliggende link',
       type: 'link',
-      description: 'Hoofdnavigatie-item',
+      description: 'Hoofdnavigatie-item (zichtbare label en URL).',
     }),
     defineField({
       name: 'links',
       title: 'Dropdown-links',
       type: 'array',
       of: [{type: 'link'}],
-      description: 'Links die in het dropdownmenu worden getoond',
+      description: 'Sub-items; klik + om een nieuw subitem toe te voegen.',
+      options: { collapsible: true, collapsed: false },
     }),
   ],
   preview: {

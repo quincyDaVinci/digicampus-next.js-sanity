@@ -26,8 +26,8 @@ type SearchParams = {
 }
 
 type PageProps = {
-  params: {lang: string}
-  searchParams?: SearchParams
+  params?: Promise<{lang: string}>
+  searchParams?: Promise<SearchParams>
 }
 
 export function generateStaticParams() {
@@ -35,9 +35,10 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({params, searchParams}: PageProps): Promise<Metadata> {
-  const lang = isSupportedLang(params.lang) ? params.lang : defaultLanguage
+  const resolvedParams = params ? await params : { lang: defaultLanguage }
+  const lang = isSupportedLang(resolvedParams.lang) ? resolvedParams.lang : defaultLanguage
   const t = translations[lang]
-  const query = searchParams?.q?.trim()
+  const query = (searchParams ? await searchParams : undefined)?.q?.trim()
 
   return {
     title: query ? `${t.title}: ${query}` : t.title,
@@ -45,10 +46,11 @@ export async function generateMetadata({params, searchParams}: PageProps): Promi
   }
 }
 
-export default function SearchPage({params, searchParams}: PageProps) {
-  const lang = isSupportedLang(params.lang) ? params.lang : defaultLanguage
+export default async function SearchPage({params, searchParams}: PageProps) {
+  const resolvedParams = params ? await params : { lang: defaultLanguage }
+  const lang = isSupportedLang(resolvedParams.lang) ? resolvedParams.lang : defaultLanguage
   const t = translations[lang]
-  const query = searchParams?.q?.trim()
+  const query = (searchParams ? await searchParams : undefined)?.q?.trim()
 
   return (
     <section className="container mx-auto px-4 py-12" aria-labelledby="search-heading">

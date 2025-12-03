@@ -10,12 +10,33 @@ export default defineType({
   title: 'Link',
   type: 'object',
   icon: FileTextIcon,
+  fieldsets: [
+    { name: 'translations', title: 'Vertalingen', options: { collapsible: true, collapsed: true } },
+  ],
   fields: [
     defineField({
       name: 'label',
       title: 'Label',
       type: 'string',
       description: 'Tekst die voor de link getoond wordt',
+    }),
+    defineField({
+      name: 'translations',
+      title: 'Vertalingen (label)',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          name: 'linkLabelTranslation',
+          title: 'Vertaling',
+          fields: [
+            defineField({ name: 'language', title: 'Taal', type: 'string', options: { list: [{ title: 'Nederlands', value: 'nl' }, { title: 'English', value: 'en' }] } }),
+            defineField({ name: 'label', title: 'Label', type: 'string' }),
+          ],
+        },
+      ],
+      description: 'Kleine, optionele set vertalingen voor de linktekst.',
+      fieldset: 'translations',
     }),
     defineField({
       name: 'type',
@@ -51,29 +72,28 @@ export default defineType({
     }),
     defineField({
       name: 'params',
-      title: 'URL-parameters',
+      title: 'URL-parameters (optioneel)',
       type: 'string',
       placeholder: 'bijv. #sectie-id of ?utm_source=campagne',
-      description: 'Voeg hash-links of queryparameters toe',
+      description: 'Hash/fragment of querystring to append to the URL (only for internal links).',
       hidden: ({parent}) => parent?.type !== 'internal',
     }),
   ],
   preview: {
     select: {
       label: 'label',
+      translations: 'translations',
       type: 'type',
       internalTitle: 'internal.title',
       internalSlug: 'internal.metadata.slug.current',
       external: 'external',
       params: 'params',
     },
-    prepare: ({label, type, internalTitle, internalSlug, external, params}) => {
-      const href =
-        type === 'internal'
-          ? `/${internalSlug || ''}${params || ''}`
-          : external
+    prepare: ({label, translations, type, internalTitle, internalSlug, external, params}) => {
+      const translatedLabel = Array.isArray(translations) && translations.length > 0 ? translations[0].label : null
+      const href = type === 'internal' ? `/${(internalSlug || '').replace(/^\//, '')}${params || ''}` : external
       return {
-        title: label || internalTitle || 'Naamloze link',
+        title: translatedLabel || label || internalTitle || 'Naamloze link',
         subtitle: href || 'Geen URL ingesteld',
       }
     },

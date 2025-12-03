@@ -82,3 +82,5 @@ export const extractLogoFromSiteSettings = (
 
 export const extractCtasFromSiteSettings = (siteData: SiteSettings | null): CTA[] =>
   siteData?.ctas?.filter(cta => Boolean(cta.href && cta.label)) || []
+
+

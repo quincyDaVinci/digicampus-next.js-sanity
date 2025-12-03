@@ -5,6 +5,7 @@ import {usePathname} from 'next/navigation'
 import type {BlogCardComponent, BlogCardResolvedPost} from '@/types/pageBuilder'
 import {CalendarIcon, getFeatherIcon} from '@/components/icons/FeatherIcons'
 import {getBlogTranslation} from '@/lib/blogTranslations'
+import type { CSSProperties } from 'react'
 
 interface BlogCardProps {
   component: BlogCardComponent
@@ -110,7 +111,7 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
             <div className="space-y-2 min-w-0">
               <h3 className={`${compact ? 'text-base' : 'text-lg'} font-semibold leading-snug tracking-tight break-words whitespace-normal`}>{post.title}</h3>
               {post.summary ? (
-                <p className="text-sm leading-relaxed text-[hsl(var(--dc-text)/0.85)] break-words whitespace-normal" style={{display: '-webkit-box', WebkitLineClamp: 8, WebkitBoxOrient: 'vertical', overflow: 'hidden'} as any}>{post.summary}</p>
+                <p className="text-sm leading-relaxed text-[hsl(var(--dc-text)/0.85)] break-words whitespace-normal" style={{display: '-webkit-box', WebkitLineClamp: 8, WebkitBoxOrient: 'vertical', overflow: 'hidden'} as CSSProperties}>{post.summary}</p>
               ) : null}
             </div>
             <div className="mt-auto flex items-center justify-between gap-3 min-w-0">
@@ -265,7 +266,7 @@ function BlogCardItem({post, ctaLabel, tone, showAuthor = true, borderRadius = '
         <div className="space-y-3 min-w-0">
           <h3 className={`${compact ? 'text-base' : 'text-lg'} font-semibold leading-snug tracking-tight break-words whitespace-normal`}>{post.title}</h3>
           {post.summary ? (
-            <p className="text-sm leading-relaxed text-[hsl(var(--dc-text)/0.85)] break-words whitespace-normal" style={{display: '-webkit-box', WebkitLineClamp: 8, WebkitBoxOrient: 'vertical', overflow: 'hidden'} as any}>{post.summary}</p>
+            <p className="text-sm leading-relaxed text-[hsl(var(--dc-text)/0.85)] break-words whitespace-normal" style={{display: '-webkit-box', WebkitLineClamp: 8, WebkitBoxOrient: 'vertical', overflow: 'hidden'} as CSSProperties}>{post.summary}</p>
           ) : null}
         </div>
         <div className="mt-auto flex items-center justify-between gap-3 min-w-0">
