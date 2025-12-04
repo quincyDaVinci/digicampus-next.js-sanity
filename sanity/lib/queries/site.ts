@@ -68,7 +68,7 @@ export const siteSettingsQuery = groq`
       items[]{
         _type,
         _type == "link" => {
-          label: coalesce(translations[language == $lang][0].label, label),
+          label: coalesce(translations[$lang].label, label),
           type,
           type == "internal" => {
             "internalType": internal->_type,
