@@ -61,8 +61,6 @@ export const schema: SchemaPluginOptions = {
     moduleAttributes,
     blogPostTranslation,
     moduleTextOverride,
-    
-
     // Modules (Sections)
     heroSection,
     featureSection,
