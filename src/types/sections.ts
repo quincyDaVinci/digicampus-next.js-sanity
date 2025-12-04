@@ -27,7 +27,7 @@ export interface HeroSectionProps extends BaseSection {
   }>
   media?: {
     mediaType?: 'image' | 'video' | 'gallery'
-    image?: import('@sanity/image-url/lib/types/types').SanityImageSource & {
+    image?: import('@sanity/image-url').SanityImageSource & {
       overlay?: {
         enabled?: boolean
         direction?: 'up' | 'down' | 'left' | 'right'
@@ -35,7 +35,7 @@ export interface HeroSectionProps extends BaseSection {
       }
     }
     videoUrl?: string
-    gallery?: import('@sanity/image-url/lib/types/types').SanityImageSource[]
+    gallery?: import('@sanity/image-url').SanityImageSource[]
   }
 }
 
@@ -157,7 +157,7 @@ export interface MediaSectionProps extends BaseSection {
   description?: string
   mediaType?: 'image' | 'video'
   image?: {
-    asset?: import('@sanity/image-url/lib/types/types').SanityImageSource
+    asset?: import('@sanity/image-url').SanityImageSource
     alt?: string
     caption?: string
     overlay?: {
@@ -169,7 +169,7 @@ export interface MediaSectionProps extends BaseSection {
   video?: {
     videoUrl?: string
     posterImage?: {
-      asset?: import('@sanity/image-url/lib/types/types').SanityImageSource
+      asset?: import('@sanity/image-url').SanityImageSource
       alt?: string
       overlay?: {
         enabled?: boolean
@@ -230,7 +230,7 @@ export interface TeamSectionProps extends BaseSection {
     position?: string
     // category may be a referenced document after Studio change
     category?: { _id?: string; title?: string; slug?: { current?: string } } | string
-    image?: { asset?: import('@sanity/image-url/lib/types/types').SanityImageSource; alt?: string }
+    image?: { asset?: import('@sanity/image-url').SanityImageSource; alt?: string }
     includeInTeam?: boolean
     email?: string
     linkedin?: string

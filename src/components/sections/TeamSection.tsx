@@ -4,7 +4,7 @@
 import React from "react";
 import Image from "next/image";
 import type { TeamSectionProps } from "@/types/sections";
-import type { SanityImageSource } from '@sanity/image-url/lib/types/types'
+import type { SanityImageSource } from '@sanity/image-url'
 import { buildImageUrl } from "@/lib/sanityImage";
 
 export default function TeamSection({ heading, subheading, autoIncludeAll, allTeamMembers = [], teamSettings }: TeamSectionProps) {

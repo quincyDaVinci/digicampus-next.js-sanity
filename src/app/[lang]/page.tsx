@@ -23,7 +23,7 @@ const homePageQuery = `*[_type == "homePage"][0]{
     // if module is a documentAsset, include resolved URL
     documentFile{asset-> { _id, url }},
   },
-  "localized": translations[$lang]{
+  "localized": translations[language == $lang][0]{
     title,
     metadataDescription,
     modules
@@ -33,7 +33,7 @@ const homePageQuery = `*[_type == "homePage"][0]{
 const homePageMetadataQuery = `*[_type == "homePage"][0]{
   title,
   metadata,
-  "localized": translations[$lang]{
+  "localized": translations[language == $lang][0]{
     title,
     metadataDescription,
   }

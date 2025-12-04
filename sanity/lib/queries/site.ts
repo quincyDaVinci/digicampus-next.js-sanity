@@ -5,7 +5,8 @@ import {groq} from 'next-sanity'
  */
 export const siteSettingsQuery = groq`
   *[_type == "site" && _id == "site"][0]{
-    title: coalesce(translations[$lang].title, title),
+    title,
+    "translations": translations,
     "logo": logo,
     "logoAlt": logo.alt,
     header->{
@@ -13,7 +14,8 @@ export const siteSettingsQuery = groq`
       items[]{
         _type,
         _type == "link" => {
-          label: coalesce(translations[language == $lang][0].label, label),
+          label,
+          "translations": translations,
           type,
           type == "internal" => {
             "internalType": internal->_type,
@@ -28,9 +30,11 @@ export const siteSettingsQuery = groq`
           }
         },
         _type == "link.list" => {
-          "label": coalesce(link.translations[language == $lang][0].label, link.label),
+          "label": link.label,
+          "translations": link.translations,
           "items": links[]{
-            label: coalesce(translations[language == $lang][0].label, label),
+            label,
+            "translations": translations,
             type,
             type == "internal" => {
               "internalType": internal->_type,
@@ -68,10 +72,11 @@ export const siteSettingsQuery = groq`
       items[]{
         _type,
         _type == "link" => {
-          label: coalesce(translations[$lang].label, label),
-          type,
-          type == "internal" => {
-            "internalType": internal->_type,
+          label,
+          "translations": translations,
+          _type,
+          _type == "link" => {
+            label,
             "href": select(
               internal->_type == "blogPage" => "/" + $lang + "/blog",
               internal->_type == "homePage" => "/" + $lang,
@@ -83,9 +88,11 @@ export const siteSettingsQuery = groq`
           }
         },
         _type == "link.list" => {
-          "label": coalesce(link.translations[language == $lang][0].label, link.label),
+          "label": link.label,
+          "translations": link.translations,
           "items": links[]{
-            label: coalesce(translations[language == $lang][0].label, label),
+            label,
+            "translations": translations,
             type,
             type == "internal" => {
               "internalType": internal->_type,
@@ -102,8 +109,8 @@ export const siteSettingsQuery = groq`
         }
       }
     },
-    footerContent: coalesce(translations[$lang].footerContent, footerContent),
-    copyright: coalesce(translations[$lang].copyright, copyright)
+    footerContent,
+    copyright
   }
 `
 

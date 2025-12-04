@@ -23,7 +23,6 @@ export default defineType({
       type: 'array',
       of: [{type: 'link'}],
       description: 'Sub-items; klik + om een nieuw subitem toe te voegen.',
-      options: { collapsible: true, collapsed: false },
     }),
   ],
   preview: {

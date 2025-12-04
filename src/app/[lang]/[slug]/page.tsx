@@ -114,14 +114,14 @@ const pageQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$la
     "allTeamMembers": *[_type == "author"]{ _id, _type, name, "position": role, "category": category->{ _id, title, "slug": slug.current }, image, slug, includeInTeam, email, linkedin },
     "teamSettings": *[_type == "teamSettings"][0]{ "categoriesOrder": categoriesOrder[]->{ _id, title, "slug": slug.current }, defaultCategoryTitle }
   },
-  "localized": translations[$lang]{
+  "localized": translations[language == $lang][0]{
     title,
     metadataDescription,
     modules
   }
 }`
 
-const metadataQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$lang].current, metadata.slug.current) == $slug][0]{title, metadata, "localized": translations[$lang]{ title, metadataDescription }}`
+const metadataQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$lang].current, metadata.slug.current) == $slug][0]{title, metadata, "localized": translations[language == $lang][0]{ title, metadataDescription }}`
 
 const hasSanityCredentials = Boolean(
   process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && process.env.NEXT_PUBLIC_SANITY_DATASET,
