@@ -138,9 +138,34 @@ export default defineType({
     defineField({
       name: 'translations',
       title: 'Vertalingen',
-      type: 'array',
-      of: [{type: 'siteTranslation'}],
-      description: 'Synchroon gekopieerde Engelse varianten van sitevelden.',
+      type: 'object',
+      description:
+        'Alleen tekstuele overschrijvingen. Laat leeg om canonieke waarden te gebruiken.',
+      options: {collapsible: true, collapsed: true},
+      fields: [
+        defineField({
+          name: 'en',
+          title: 'English',
+          type: 'object',
+          fields: [
+            defineField({name: 'title', title: 'Sitetitel (EN)', type: 'string'}),
+            defineField({
+              name: 'footerContent',
+              title: 'Footer-tekst (EN)',
+              type: 'array',
+              of: [{type: 'block'}],
+              description: 'Alleen tekstblokken. Afbeeldingen blijven uit de canonieke taal komen.',
+            }),
+            defineField({
+              name: 'copyright',
+              title: 'Copyright-tekst (EN)',
+              type: 'array',
+              of: [{type: 'block'}],
+              description: 'Alleen tekstblokken voor toegankelijkheid en eenvoud.',
+            }),
+          ],
+        }),
+      ],
       group: 'translations',
     }),
   ],

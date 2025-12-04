@@ -49,11 +49,37 @@ export default defineType({
     defineField({
       name: 'translations',
       title: 'Vertalingen',
-      type: 'array',
-      of: [{type: 'pageTranslation'}],
-      group: 'translations',
+      type: 'object',
+      options: {collapsible: true, collapsed: true},
       description:
-        'Vertaalde titels, metabeschrijving en module-overschrijvingen voor deze startpagina.',
+        'Groep alle vertaalde tekst op één plek. Laat leeg als je de Nederlandse canonieke tekst wilt gebruiken.',
+      fields: [
+        defineField({
+          name: 'en',
+          title: 'English',
+          type: 'object',
+          options: {columns: 1},
+          fields: [
+            defineField({name: 'title', title: 'Titel (EN)', type: 'string'}),
+            defineField({name: 'metadataTitle', title: 'Metatitel (EN)', type: 'string'}),
+            defineField({
+              name: 'metadataDescription',
+              title: 'Metabeschrijving (EN)',
+              type: 'text',
+              rows: 3,
+            }),
+            defineField({
+              name: 'modules',
+              title: 'Module-tekst overschrijvingen',
+              type: 'array',
+              of: [{type: 'moduleTextOverride'}],
+              description:
+                'Alleen tekst. Gebruik de module _key en veldnaam (bijv. heading of buttons.0.label) om copy te vertalen.',
+            }),
+          ],
+        }),
+      ],
+      group: 'translations',
     }),
     defineField({
       name: 'metadata',

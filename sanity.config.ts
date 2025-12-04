@@ -69,6 +69,28 @@ export default defineConfig({
     } catch (err) {
       // not installed — no-op
     }
+    try {
+      // Language filter plugin for single-language editing view
+      // install with `npm install @sanity/language-filter`
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      // @ts-ignore
+      const languageFilterMod = require('@sanity/language-filter')
+      const languageFilter = languageFilterMod?.languageFilter
+      if (typeof languageFilter === 'function') {
+        optional.push(
+          languageFilter({
+            supportedLanguages: [
+              {id: 'nl', title: 'Nederlands'},
+              {id: 'en', title: 'English'},
+            ],
+            defaultLanguages: ['nl'],
+            documentTypes: ['page', 'homePage', 'blogPost', 'site'],
+          })
+        )
+      }
+    } catch (err) {
+      // optional plugin not installed
+    }
     return [
       structureTool({structure}),
       presentationTool({

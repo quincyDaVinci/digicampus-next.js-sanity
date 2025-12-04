@@ -5,6 +5,7 @@ import {draftMode} from 'next/headers'
 import RenderSection from '@/components/sections/RenderSection'
 import {client, previewClient} from '@sanity/lib/client'
 import {defaultLanguage, supportedLanguages} from '@/lib/i18n'
+import {applyModuleTextOverrides} from '@/lib/applyModuleTranslations'
 import {PagePreview} from './PagePreview'
 import { buildSrc } from 'sanity-image'
 
@@ -105,7 +106,7 @@ const pageQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$la
   title,
   metadata,
   modules[]{
-    ...,
+    ..., 
     _type,
     _key,
     // If module is a teamSection, include the autoIncludeAll flag and a complete list of authors
@@ -116,11 +117,7 @@ const pageQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$la
   "localized": translations[$lang]{
     title,
     metadataDescription,
-    modules[]{
-      ...,
-      _type,
-      _key
-    }
+    modules
   }
 }`
 
@@ -206,7 +203,7 @@ export default async function Page({ params }: PageParams) {
         modules?: Array<{_key: string; _type: string}>
         localized?: {
           title?: string
-          modules?: Array<{_key: string; _type: string}>
+          modules?: Array<{moduleKey?: string; fieldPath?: string; text?: string}>
         }
       }
     | null
@@ -220,7 +217,8 @@ export default async function Page({ params }: PageParams) {
     return <PagePreview initial={{ data: page, sourceMap: undefined }} query={pageQuery} params={{ slug, lang }} />
   }
 
-  let localizedModules = page.localized?.modules ?? page.modules
+  const overrides = page.localized?.modules
+  let localizedModules = applyModuleTextOverrides(page.modules, overrides)
   const localizedTitle = page.localized?.title ?? page.title
 
   // Attach blurDataURL placeholders to images in modules (server-side)

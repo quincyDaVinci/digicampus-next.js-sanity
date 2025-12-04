@@ -19,19 +19,6 @@ export default defineType({
   },
   fields: [
     defineField({
-      name: 'language',
-      title: 'Taal',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Nederlands', value: 'nl'},
-          {title: 'English', value: 'en'},
-        ],
-        layout: 'radio',
-      },
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
       name: 'title',
       title: 'Vertaalde titel',
       type: 'string',
@@ -46,7 +33,8 @@ export default defineType({
       name: 'body',
       title: 'Vertaalde inhoud',
       type: 'array',
-      of: [{type: 'block'}, {type: 'image'}],
+      of: [{type: 'block'}],
+      description: 'Alleen tekstuele blokken. Afbeeldingen blijven uit de canonieke taal komen.',
     }),
   ],
 })
