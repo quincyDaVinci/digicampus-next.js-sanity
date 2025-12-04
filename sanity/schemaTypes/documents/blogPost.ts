@@ -329,17 +329,15 @@ export default defineType({
       title: 'Vertalingen',
       type: 'object',
       description:
-        'Originele velden bevatten de Nederlandse (canonieke) tekst. Bewerk geen originele Nederlandse velden hier — plaats Engelse vertalingen onder Vertalingen → English.',
+        'Alleen tekstuele overschrijvingen. Laat leeg om de Nederlandse canonieke tekst te gebruiken.',
+      options: {collapsible: true, collapsed: true},
       fields: [
         defineField({
           name: 'en',
           title: 'English',
-          type: 'blogPostTranslationInline',
+          type: 'blogPostTranslation',
         }),
       ],
-      options: {
-        collapsible: false,
-      },
       group: 'translations',
     }),
   ],

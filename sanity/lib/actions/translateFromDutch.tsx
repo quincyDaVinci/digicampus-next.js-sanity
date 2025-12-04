@@ -6,27 +6,7 @@ import {
   SanityDocument,
 } from 'sanity'
 import {useToast} from '@sanity/ui'
-import {translateDeepObject, isTranslationSupported, ensureArrayWithLanguage} from '../translation'
-
-function ensureTranslationsObject(existing: any, translation: any, lang = 'en') {
-  // If existing is an array (legacy), convert to object keyed by language
-  if (Array.isArray(existing)) {
-    const obj: Record<string, any> = {}
-    for (const item of existing) {
-      if (item && item.language) obj[item.language] = item
-    }
-    obj[lang] = translation
-    return obj
-  }
-
-  if (existing && typeof existing === 'object' && !Array.isArray(existing)) {
-    return {...existing, [lang]: translation}
-  }
-
-  return {[lang]: translation}
-}
-
-type TranslationEntry = {_key?: string; language?: string}
+import {translateDeepObject, isTranslationSupported} from '../translation'
 
 type TranslatableDocument = SanityDocument & {
   title?: string
@@ -37,82 +17,43 @@ type TranslatableDocument = SanityDocument & {
   excerpt?: string
   footerContent?: unknown[]
   copyright?: unknown[]
-  translations?: TranslationEntry[]
+  translations?: Record<string, unknown>
 }
 
 function buildPageTranslation(doc: TranslatableDocument) {
   return {
-    _type: 'pageTranslation',
-    language: 'en',
     title: doc?.title || '',
     metadataTitle: doc?.metadata?.title || doc?.title || '',
     metadataDescription: doc?.metadata?.description || '',
-    modules: doc?.modules || [],
+    modules: [],
   }
 }
 
 function buildBlogTranslation(doc: TranslatableDocument) {
+  const onlyBlocks = Array.isArray(doc?.body)
+    ? (doc.body as any[]).filter((item) => item && typeof item === 'object' && (item as any)._type === 'block')
+    : []
   return {
     // Inline translation object — copy only textual fields as starting point.
     title: doc?.title || '',
     excerpt: doc?.excerpt || '',
-    body: doc?.body || [],
+    body: onlyBlocks,
   }
 }
 
 function buildSiteTranslation(doc: TranslatableDocument) {
+  const onlyBlocks = (value?: unknown[]) =>
+    Array.isArray(value) ? (value as any[]).filter((item) => item?._type === 'block') : undefined
   return {
-    _type: 'siteTranslation',
-    language: 'en',
     title: doc?.title || '',
-    footerContent: doc?.footerContent || [],
-    copyright: doc?.copyright || [],
+    footerContent: onlyBlocks(doc?.footerContent) || [],
+    copyright: onlyBlocks(doc?.copyright) || [],
   }
 }
 
 function buildSiteSettingsTranslation(doc: TranslatableDocument) {
   return {
-    _type: 'siteSettingsTranslation',
-    language: 'en',
     title: doc?.title || '',
-  }
-}
-
-function buildNavigationTranslation(doc: TranslatableDocument) {
-  // Build a minimal payload containing only the labels to translate for each item
-  const itemsPayload = (doc as any).items?.map((it: any) => {
-    if (!it) return null
-    // Normalize to the navigationItemTranslation shape so the translations
-    // array stores items that match the `navigationTranslation.items` schema.
-    if (it._type === 'link') {
-      return {
-        _type: 'navigationItemTranslation',
-        itemType: 'link',
-        label: it.label || '',
-      }
-    }
-    if (it._type === 'link.list') {
-      return {
-        _type: 'navigationItemTranslation',
-        itemType: 'link.list',
-        label: it.link?.label || '',
-        link: { label: it.link?.label || '' },
-        links: (it.links || []).map((l: any) => ({ label: l.label || '' })),
-      }
-    }
-
-    // Fallback for unknown item types
-    return {
-      _type: 'navigationItemTranslation',
-      itemType: it._type || 'unknown',
-      label: it.label || '',
-    }
-  }).filter(Boolean)
-
-  return {
-    _type: 'navigationTranslation',
-    language: 'en',
-    items: itemsPayload || [],
   }
 }
 
@@ -153,8 +94,6 @@ export function createTranslateFromDutchAction(
           translationPayload = buildSiteTranslation(draft)
         } else if (docType === 'siteSettings') {
           translationPayload = buildSiteSettingsTranslation(draft)
-        } else if (docType === 'navigation') {
-          translationPayload = buildNavigationTranslation(draft)
         } else {
           throw new Error('Vertaalactie is niet beschikbaar voor dit documenttype')
         }
@@ -181,27 +120,26 @@ export function createTranslateFromDutchAction(
             }
             translated = cleaned
           } else if (docType === 'page' || docType === 'homePage') {
-            // Page translation object shape
-            if (!t._type) t._type = 'pageTranslation'
-            t.language = 'en'
-            if (!Array.isArray(t.modules) && Array.isArray(proto?.modules)) t.modules = []
-            if (typeof t.title !== 'string') t.title = typeof proto?.title === 'string' ? proto.title : ''
-            if (typeof t.metadataTitle !== 'string') t.metadataTitle = typeof proto?.metadataTitle === 'string' ? proto.metadataTitle : ''
-            if (typeof t.metadataDescription !== 'string') t.metadataDescription = typeof proto?.metadataDescription === 'string' ? proto.metadataDescription : ''
-            translated = t
+            translated = {
+              title: typeof t.title === 'string' ? t.title : (typeof proto?.title === 'string' ? proto.title : ''),
+              metadataTitle:
+                typeof t.metadataTitle === 'string'
+                  ? t.metadataTitle
+                  : (typeof proto?.metadataTitle === 'string' ? proto.metadataTitle : ''),
+              metadataDescription:
+                typeof t.metadataDescription === 'string'
+                  ? t.metadataDescription
+                  : (typeof proto?.metadataDescription === 'string' ? proto.metadataDescription : ''),
+              modules: Array.isArray(t.modules) ? t.modules : [],
+            }
           } else if (docType === 'site') {
-            // Site translation object shape
-            if (!t._type) t._type = 'siteTranslation'
-            t.language = 'en'
-            if (!Array.isArray(t.footerContent) && Array.isArray(proto?.footerContent)) t.footerContent = []
-            if (!Array.isArray(t.copyright) && Array.isArray(proto?.copyright)) t.copyright = []
-            if (typeof t.title !== 'string') t.title = typeof proto?.title === 'string' ? proto.title : ''
-            translated = t
+            translated = {
+              title: typeof t.title === 'string' ? t.title : (typeof proto?.title === 'string' ? proto.title : ''),
+              footerContent: Array.isArray(t.footerContent) ? t.footerContent : [],
+              copyright: Array.isArray(t.copyright) ? t.copyright : [],
+            }
           } else if (docType === 'siteSettings') {
-            if (!t._type) t._type = 'siteSettingsTranslation'
-            t.language = 'en'
-            if (typeof t.title !== 'string') t.title = typeof proto?.title === 'string' ? proto.title : ''
-            translated = t
+            translated = {title: typeof t.title === 'string' ? t.title : (typeof proto?.title === 'string' ? proto.title : '')}
           }
         }
 
@@ -240,72 +178,74 @@ export function createTranslateFromDutchAction(
         const translatedObj = translated as Record<string, unknown>
 
         // Sanitize structural fields in portable text so we don't write translated structural keys
-        const protoBody = (translationPayload as Record<string, any>)?.body
-        const translatedBody = (translatedObj as Record<string, any>)?.body
+        const protoBody = docType === 'blogPost' ? (translationPayload as Record<string, any>)?.body : undefined
+        const translatedBody = docType === 'blogPost' ? (translatedObj as Record<string, any>)?.body : undefined
 
         let structuralChangeDetected = false
         let sanitizedBody: any[] | undefined = undefined
 
-        try {
-          if (Array.isArray(protoBody) && Array.isArray(translatedBody)) {
-            const allowedListItems = new Set(['bullet', 'number'])
-            sanitizedBody = translatedBody.map((tItem: any, i: number) => {
-              const pItem = protoBody[i]
-              if (!tItem || typeof tItem !== 'object') return tItem
-              const copy: Record<string, any> = {...tItem}
+        if (docType === 'blogPost') {
+          try {
+            if (Array.isArray(protoBody) && Array.isArray(translatedBody)) {
+              const allowedListItems = new Set(['bullet', 'number'])
+              sanitizedBody = translatedBody.map((tItem: any, i: number) => {
+                const pItem = protoBody[i]
+                if (!tItem || typeof tItem !== 'object') return tItem
+                const copy: Record<string, any> = {...tItem}
 
-              // Preserve block type
-              if (pItem && typeof pItem === 'object' && pItem._type && copy._type !== pItem._type) {
-                copy._type = pItem._type
-              }
-
-              // Preserve or repair listItem
-              if (pItem && typeof pItem === 'object' && pItem.listItem) {
-                if (copy.listItem !== pItem.listItem) {
-                  copy.listItem = pItem.listItem
+                // Preserve block type
+                if (pItem && typeof pItem === 'object' && pItem._type && copy._type !== pItem._type) {
+                  copy._type = pItem._type
                 }
-              } else if (copy.listItem && !allowedListItems.has(copy.listItem)) {
-                delete copy.listItem
-              }
 
-              // Preserve style; if invalid or missing, default to original or 'normal'
-              if (pItem && typeof pItem === 'object') {
-                const originalStyle = (pItem as any).style
-                if (originalStyle && copy.style !== originalStyle) {
-                  copy.style = originalStyle
-                } else if (!copy.style && originalStyle) {
-                  copy.style = originalStyle
-                } else if (copy.style && typeof copy.style !== 'string') {
-                  copy.style = originalStyle || 'normal'
+                // Preserve or repair listItem
+                if (pItem && typeof pItem === 'object' && pItem.listItem) {
+                  if (copy.listItem !== pItem.listItem) {
+                    copy.listItem = pItem.listItem
+                  }
+                } else if (copy.listItem && !allowedListItems.has(copy.listItem)) {
+                  delete copy.listItem
                 }
-              } else if (copy && copy._type === 'block' && !copy.style) {
-                copy.style = 'normal'
-              }
 
-              // Preserve marks and markDefs from original
-              if (pItem && typeof pItem === 'object') {
-                if (pItem.markDefs && JSON.stringify(copy.markDefs) !== JSON.stringify(pItem.markDefs)) {
-                  copy.markDefs = pItem.markDefs
+                // Preserve style; if invalid or missing, default to original or 'normal'
+                if (pItem && typeof pItem === 'object') {
+                  const originalStyle = (pItem as any).style
+                  if (originalStyle && copy.style !== originalStyle) {
+                    copy.style = originalStyle
+                  } else if (!copy.style && originalStyle) {
+                    copy.style = originalStyle
+                  } else if (copy.style && typeof copy.style !== 'string') {
+                    copy.style = originalStyle || 'normal'
+                  }
+                } else if (copy && copy._type === 'block' && !copy.style) {
+                  copy.style = 'normal'
                 }
-                if (pItem.marks && JSON.stringify(copy.marks) !== JSON.stringify(pItem.marks)) {
-                  copy.marks = pItem.marks
+
+                // Preserve marks and markDefs from original
+                if (pItem && typeof pItem === 'object') {
+                  if (pItem.markDefs && JSON.stringify(copy.markDefs) !== JSON.stringify(pItem.markDefs)) {
+                    copy.markDefs = pItem.markDefs
+                  }
+                  if (pItem.marks && JSON.stringify(copy.marks) !== JSON.stringify(pItem.marks)) {
+                    copy.marks = pItem.marks
+                  }
                 }
-              }
 
-              // Detect if we've made structural edits by comparing JSON
-              try {
-                const before = JSON.stringify(tItem)
-                const after = JSON.stringify(copy)
-                if (before !== after) structuralChangeDetected = true
-              } catch (e) {
-                structuralChangeDetected = true
-              }
+                // Detect if we've made structural edits by comparing JSON
+                try {
+                  const before = JSON.stringify(tItem)
+                  const after = JSON.stringify(copy)
+                  if (before !== after) structuralChangeDetected = true
+                } catch (e) {
+                  structuralChangeDetected = true
+                }
 
-              return copy
-            })
+                return copy
+              })
+            }
+          } catch (sanErr) {
+            console.warn('[translate] sanitization failed', sanErr)
           }
-        } catch (sanErr) {
-          console.warn('[translate] sanitization failed', sanErr)
         }
 
         // If structural changes were detected, let editor choose to force-apply or save as preview
@@ -341,75 +281,11 @@ export function createTranslateFromDutchAction(
         const tx = client.transaction()
         const targetId = draft?._id || documentId
         if (docType === 'blogPost') {
-          // Inline object keyed by language
           tx.patch(targetId, {unset: [`translations.${langKey}`]})
           tx.patch(targetId, {set: {[`translations.${langKey}`]: translatedObj}})
-        } else if (docType === 'navigation') {
-          // For navigations: translate per-item labels and write per-link translations
-          const originalItems = (draft as any).items || []
-          const translatedItems = (translatedObj as any).items || []
-          const updatedItems = originalItems.map((origItem: any, idx: number) => {
-            const tItem = translatedItems[idx] || {}
-            if (!origItem) return origItem
-            if (origItem._type === 'link') {
-              const translatedLabel = (tItem.label as string) || origItem.label || ''
-              const existing = origItem.translations || []
-              const withLang = ensureArrayWithLanguage(existing as any, {
-                _type: 'linkLabelTranslation',
-                language: langKey,
-                label: translatedLabel,
-              } as any)
-              return {...origItem, translations: withLang}
-            }
-            if (origItem._type === 'link.list') {
-              // parent link
-              const parent = origItem.link || {}
-              const tParent = tItem.link || {}
-              const parentTranslated = (tParent.label as string) || parent.label || ''
-              const parentExisting = parent.translations || []
-              const parentWithLang = ensureArrayWithLanguage(parentExisting as any, {
-                _type: 'linkLabelTranslation',
-                language: langKey,
-                label: parentTranslated,
-              } as any)
-
-              // sub links
-              const origLinks = origItem.links || []
-              const tLinks = tItem.links || []
-              const updatedLinks = origLinks.map((ol: any, j: number) => {
-                const tSub = tLinks[j] || {}
-                const subTranslated = (tSub.label as string) || ol.label || ''
-                const subExisting = ol.translations || []
-                const subWithLang = ensureArrayWithLanguage(subExisting as any, {
-                  _type: 'linkLabelTranslation',
-                  language: langKey,
-                  label: subTranslated,
-                } as any)
-                return {...ol, translations: subWithLang}
-              })
-
-              return {...origItem, link: {...parent, translations: parentWithLang}, links: updatedLinks}
-            }
-            return origItem
-          })
-
-          // Also write a top-level translations entry (like blog posts do) so editors
-          // can view the translated navigation under the "Vertalingen" tab.
-          const existingNavTrans = (draft?.translations || []) as any[]
-          const withLangNav = ensureArrayWithLanguage(existingNavTrans as any, {
-            ...(translatedObj as any),
-            language: langKey,
-          })
-
-          tx.patch(targetId, {set: {items: updatedItems, translations: withLangNav}})
         } else if (docType === 'page' || docType === 'homePage' || docType === 'site' || docType === 'siteSettings') {
-          // Array-based translations with language field
-          const existing = (draft?.translations || []) as any[]
-          const withLang = ensureArrayWithLanguage(existing as any, {
-            ...(translatedObj as any),
-            language: langKey,
-          })
-          tx.patch(targetId, {set: {translations: withLang}})
+          tx.patch(targetId, {unset: [`translations.${langKey}`]})
+          tx.patch(targetId, {set: {[`translations.${langKey}`]: translatedObj}})
         }
         const commitResult = await tx.commit({autoGenerateArrayKeys: true})
 

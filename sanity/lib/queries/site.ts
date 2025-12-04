@@ -5,7 +5,7 @@ import {groq} from 'next-sanity'
  */
 export const siteSettingsQuery = groq`
   *[_type == "site" && _id == "site"][0]{
-    title,
+    title: coalesce(translations[$lang].title, title),
     "logo": logo,
     "logoAlt": logo.alt,
     header->{
@@ -68,7 +68,7 @@ export const siteSettingsQuery = groq`
       items[]{
         _type,
         _type == "link" => {
-          label,
+          label: coalesce(translations[$lang].label, label),
           type,
           type == "internal" => {
             "internalType": internal->_type,
@@ -83,9 +83,9 @@ export const siteSettingsQuery = groq`
           }
         },
         _type == "link.list" => {
-          "label": link.label,
+          "label": coalesce(link.translations[language == $lang][0].label, link.label),
           "items": links[]{
-            label,
+            label: coalesce(translations[language == $lang][0].label, label),
             type,
             type == "internal" => {
               "internalType": internal->_type,
@@ -102,8 +102,8 @@ export const siteSettingsQuery = groq`
         }
       }
     },
-    footerContent,
-    copyright
+    footerContent: coalesce(translations[$lang].footerContent, footerContent),
+    copyright: coalesce(translations[$lang].copyright, copyright)
   }
 `
 
@@ -112,7 +112,7 @@ export const siteSettingsQuery = groq`
  * Returns the same projection shape used for the header in `siteSettingsQuery`.
  */
 export const navigationByLangQuery = groq`
-  *[_type == "navigation" && translations[language == $lang][0]][0]{
+  *[_type == "navigation"][0]{
     title,
       items[]{
         _type,

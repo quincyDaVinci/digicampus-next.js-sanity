@@ -20,9 +20,12 @@ export default defineType({
     defineField({
       name: 'translations',
       title: 'Vertalingen',
-      type: 'array',
-      of: [{type: 'siteSettingsTranslation'}],
-      description: 'Kopie van de Nederlandse velden om een Engelse variant bij te houden.',
+      type: 'object',
+      description: 'Alleen tekst. Gebruik dit om oude Engelse koppen bij te houden.',
+      options: {collapsible: true, collapsed: true},
+      fields: [
+        defineField({name: 'en', title: 'English title', type: 'string'}),
+      ],
       group: 'translations',
     }),
   ],

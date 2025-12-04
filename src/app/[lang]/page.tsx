@@ -1,5 +1,6 @@
 import RenderSection from '@/components/sections/RenderSection'
 import { client } from '@sanity/lib/client'
+import { applyModuleTextOverrides } from '@/lib/applyModuleTranslations'
 // Revalidate this page every 300 seconds (ISR). Sanity webhook can call /api/revalidate to update immediately.
 export const revalidate = 300
 import { defaultLanguage, supportedLanguages, isSupportedLang } from '@/lib/i18n'
@@ -22,22 +23,17 @@ const homePageQuery = `*[_type == "homePage"][0]{
     // if module is a documentAsset, include resolved URL
     documentFile{asset-> { _id, url }},
   },
-  "localized": translations[language == $lang][0]{
+  "localized": translations[$lang]{
     title,
     metadataDescription,
-    modules[]{
-      _type,
-      _key,
-      ...,
-      documentFile{asset-> { _id, url }},
-    }
+    modules
   }
 }`
 
 const homePageMetadataQuery = `*[_type == "homePage"][0]{
   title,
   metadata,
-  "localized": translations[language == $lang][0]{
+  "localized": translations[$lang]{
     title,
     metadataDescription,
   }
@@ -118,7 +114,7 @@ type HomePageData = {
   localized?: {
     title?: string
     metadataDescription?: string
-    modules?: Array<{_key: string; _type: string}>
+    modules?: Array<{moduleKey?: string; fieldPath?: string; text?: string}>
   }
 }
 
@@ -157,8 +153,9 @@ export default async function Page({ params }: HomeParams) {
   const t = (key: Parameters<typeof getTranslation>[1]) => getTranslation(lang, key)
   const draft = await draftMode()
   const { page, isFallback } = await getHomePage(lang)
+  const overrides = !isFallback ? page?.localized?.modules : undefined
   const localizedTitle = !isFallback ? page?.localized?.title ?? page?.title : page?.title
-  const localizedModules = !isFallback ? page?.localized?.modules ?? page?.modules : page?.modules
+  const localizedModules = applyModuleTextOverrides(page?.modules, overrides)
 
   // If in draft mode, use the live preview component
   if (draft.isEnabled && page) {

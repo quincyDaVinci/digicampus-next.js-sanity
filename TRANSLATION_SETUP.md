@@ -111,3 +111,10 @@ For programmatic translations in custom actions, use Google Translate or DeepL.
 | Sanity AI Assist | N/A | Included in Growth+ | Studio UI workflows |
 
 **Recommendation:** Start with Google Translate API - generous free tier and production-ready.
+
+## Editor/Dev test checklist
+- Restart Studio after pulling changes to ensure the language filter plugin (if installed) loads correctly.
+- Open a page/home/blog document and confirm the **Vertalingen** group is collapsed by default and only contains text fields plus module text overrides.
+- Update a link label translation inside a link; verify navigation uses the localized label without duplicating menu-level translations.
+- View the site in English and Dutch to confirm text falls back to the canonieke velden when no override exists.
+- Run a quick WCAG AA spot-check: keyboard focus states on the language toggle, ARIA labels on translation hints, and sufficient contrast for badges.
