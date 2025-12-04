@@ -5,23 +5,17 @@ import {groq} from 'next-sanity'
  */
 
 // Blog post fields commonly used across queries
-// For English, use translations.en fields; for Dutch, use root fields
+// Uses language-filter plugin: fetches translations[], app selects by language
 const blogPostFields = groq`
   _id,
-  "title": select(
-    $lang == "en" && defined(translations.en.title) => translations.en.title,
-    title
-  ),
+  title,
+  "translations": translations[] { language, title },
   "slug": coalesce(slug.current),
   publishedAt,
-  "excerpt": select(
-    $lang == "en" && defined(translations.en.excerpt) => translations.en.excerpt,
-    excerpt
-  ),
-  "body": select(
-    $lang == "en" && defined(translations.en.body) => translations.en.body,
-    body
-  ),
+  excerpt,
+  "translations_excerpt": translations[] { language, excerpt },
+  body,
+  "translations_body": translations[] { language, body },
   estimatedReadTime,
   featured,
   viewCount,
@@ -65,12 +59,15 @@ const blogPostFields = groq`
 
 /**
  * Fetch blog page configuration (singleton)
+ * Uses language-filter plugin: fetches translations[], app selects by language
  */
 export const blogPageQuery = groq`
-  *[_type == "blogPage" && _id == "blogPage" && metadata.language == $lang][0]{
+  *[_type == "blogPage" && _id == "blogPage"][0]{
     _id,
     title,
+    "translations": translations[] { language, title },
     description,
+    "translations_description": translations[] { language, description },
     highlightCriteria,
     highlightCount,
     postsPerPage,
@@ -92,6 +89,7 @@ export const blogCategoriesQuery = groq`
 
 /**
  * Build a query for fetching paginated blog posts with filters and sorting
+ * Uses language-filter plugin: fetches all translations[], app selects by language
  * @param categorySlug - Optional category slug to filter by
  * @param sortBy - Sort option: 'newest' | 'oldest' | 'viewCount' | 'readTime'
  * @param page - Page number (1-indexed)
@@ -108,16 +106,12 @@ export function buildBlogPostsQuery(
   const skip = (page - 1) * limit
 
   // Build filter conditions
-  // Blog posts are authored in Dutch (nl) by default, with translations in translations.en
+  // Blog posts must have translations[] array with at least one entry
   const filters = [
     '_type == "blogPost"',
     'defined(publishedAt)',
+    'defined(translations)',
   ]
-  
-  // Only filter by translation availability if requesting English
-  if (lang === 'en') {
-    filters.push('defined(translations.en)')
-  }
 
   if (categorySlug) {
     filters.push(`"${categorySlug}" in categories[]->slug.current`)
@@ -152,17 +146,14 @@ export function buildBlogPostsQuery(
 
 /**
  * Build a query to get total count of posts (for pagination)
+ * Uses language-filter plugin: counts posts with translations[] array
  */
 export function buildBlogPostsCountQuery(lang: string, categorySlug?: string) {
   const filters = [
     '_type == "blogPost"',
     'defined(publishedAt)',
+    'defined(translations)',
   ]
-  
-  // Only filter by translation availability if requesting English
-  if (lang === 'en') {
-    filters.push('defined(translations.en)')
-  }
 
   if (categorySlug) {
     filters.push(`"${categorySlug}" in categories[]->slug.current`)
@@ -175,6 +166,7 @@ export function buildBlogPostsCountQuery(lang: string, categorySlug?: string) {
 
 /**
  * Build a query for fetching highlighted posts based on criteria
+ * Uses language-filter plugin: fetches posts with translations[] array
  * @param criteria - 'viewCount' | 'featured' | 'newest' | 'readTime'
  * @param limit - Number of posts to fetch
  */
@@ -183,14 +175,9 @@ export function buildHighlightedPostsQuery(
   criteria: string = 'viewCount',
   limit: number = 3
 ) {
-  // Blog posts are authored in Dutch (nl) by default, with translations in translations.en
-  let filter = '_type == "blogPost" && defined(publishedAt)'
-  
-  // Only filter by translation availability if requesting English
-  if (lang === 'en') {
-    filter += ' && defined(translations.en)'
-  }
-  
+  // Filter for published blog posts with translations available
+  let filter = '_type == "blogPost" && defined(publishedAt) && defined(translations)'
+
   let orderBy = 'publishedAt desc'
 
   switch (criteria) {
