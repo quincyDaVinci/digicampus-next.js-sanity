@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import Image from 'next/image'
 import { ArrowRightIcon, ChevronDownIcon, CloseIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from '@/components/icons/FeatherIcons'
+import MegaMenu from './navigation/MegaMenu'
 import { useLanguage } from "@/lib/language"
 
 import {client} from '@sanity/lib/client'
@@ -237,37 +238,8 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
               </form>
           </div>
 
-          {/* Bottom-left: menus */}
-          <div className="col-start-1 row-start-2 flex items-end gap-4 flex-wrap sm:flex-nowrap">
-            {menuData.map((m, idx) => (
-              <div key={m.label} className="relative">
-                <button aria-expanded={openIndex === idx} aria-controls={`menu-${idx}`} onClick={() => setOpenIndex(openIndex === idx ? null : idx)} className="inline-flex items-center gap-2 rounded-lg px-2 py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] whitespace-nowrap transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" aria-label={m.label}>
-                  <span className="no-wrap text-fluid-md" aria-hidden>{m.label}</span>
-                  <ChevronDownIcon aria-hidden focusable="false" className={`h-4 w-4 transition-transform duration-200 ${openIndex === idx ? 'rotate-180' : ''}`} />
-                </button>
-
-                {openIndex === idx && (
-                  <div id={`menu-${idx}`} role="menu" className="absolute left-0 mt-2 min-w-48 rounded-xl shadow-xl animate-in fade-in slide-in-from-top-2 duration-200" style={{ backgroundColor: 'hsl(var(--dc-surface) / 0.98)', border: '1px solid hsl(var(--dc-border) / 0.1)', color: 'hsl(var(--dc-text))' }}>
-                    <ul className="py-2">
-                      {m.items.map((it, subIdx) => (
-                        <li key={`${m.label}-${subIdx}`}>
-                          <Link
-                            href={it.href}
-                            role="menuitem"
-                            onClick={() => setOpenIndex(null)}
-                            className="block px-4 py-2 rounded-lg whitespace-nowrap text-fluid-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:pl-5"
-                            style={{ color: 'hsl(var(--dc-text))' }}
-                          >
-                            {it.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          {/* Bottom-left: menus (replaced by accessible MegaMenu) */}
+          <MegaMenu menus={menuData} language={language} />
 
           {/* Bottom-right: Contact CTA */}
           <div className="col-start-2 row-start-2 flex items-end justify-end gap-2">

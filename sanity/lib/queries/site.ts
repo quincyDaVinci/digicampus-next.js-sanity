@@ -26,7 +26,7 @@ export const siteSettingsQuery = groq`
             "href": select(
               internal->_type == "blogPage" => "/" + $lang + "/blog",
               internal->_type == "homePage" => "/" + $lang,
-              "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
+                "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.localizedSlugs.en.current, internal->metadata.localizedSlugs.nl.current)
             )
           },
           type == "external" => {
@@ -47,7 +47,7 @@ export const siteSettingsQuery = groq`
               "href": select(
                 internal->_type == "blogPage" => "/" + $lang + "/blog",
                 internal->_type == "homePage" => "/" + $lang,
-                "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
+                  "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.localizedSlugs.en.current, internal->metadata.localizedSlugs.nl.current)
               )
             },
             type == "external" => {
@@ -67,7 +67,7 @@ export const siteSettingsQuery = groq`
         "href": select(
           internal->_type == "blogPage" => "/" + $lang + "/blog",
           internal->_type == "homePage" => "/" + $lang,
-          "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
+              "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.localizedSlugs.en.current, internal->metadata.localizedSlugs.nl.current)
         )
       },
       type == "external" => {
@@ -90,7 +90,7 @@ export const siteSettingsQuery = groq`
             "href": select(
               internal->_type == "blogPage" => "/" + $lang + "/blog",
               internal->_type == "homePage" => "/" + $lang,
-              "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
+                "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.localizedSlugs.en.current, internal->metadata.localizedSlugs.nl.current)
             )
           },
           type == "external" => {
@@ -111,7 +111,7 @@ export const siteSettingsQuery = groq`
               "href": select(
                 internal->_type == "blogPage" => "/" + $lang + "/blog",
                 internal->_type == "homePage" => "/" + $lang,
-                "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
+                  "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.localizedSlugs.en.current, internal->metadata.localizedSlugs.nl.current)
               )
             },
             type == "external" => {
@@ -146,7 +146,7 @@ export const navigationByLangQuery = groq`
           "href": select(
             internal->_type == "blogPage" => "/" + $lang + "/blog",
             internal->_type == "homePage" => "/" + $lang,
-            "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
+              "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.localizedSlugs.en.current, internal->metadata.localizedSlugs.nl.current)
           )
         },
         type == "external" => { "href": external }
@@ -165,7 +165,7 @@ export const navigationByLangQuery = groq`
             "href": select(
               internal->_type == "blogPage" => "/" + $lang + "/blog",
               internal->_type == "homePage" => "/" + $lang,
-              "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.slug.current)
+              "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.localizedSlugs.en.current, internal->metadata.localizedSlugs.nl.current)
             )
           },
           type == "external" => { "href": external }

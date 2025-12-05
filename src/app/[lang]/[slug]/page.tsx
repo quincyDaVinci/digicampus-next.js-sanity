@@ -101,7 +101,7 @@ async function attachBlurDataToModule(module: Record<string, unknown>) {
 }
 
 // Query for a single page with locale fallbacks
-const pageQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$lang].current, metadata.slug.current) == $slug][0]{
+const pageQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$lang].current, metadata.localizedSlugs.en.current, metadata.localizedSlugs.nl.current) == $slug][0]{
   _id,
   title,
   metadata,
@@ -121,7 +121,7 @@ const pageQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$la
   }
 }`
 
-const metadataQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$lang].current, metadata.slug.current) == $slug][0]{title, metadata, "localized": translations[language == $lang][0]{ title, metadataDescription }}`
+const metadataQuery = groq`*[_type == "page" && coalesce(metadata.localizedSlugs[$lang].current, metadata.localizedSlugs.en.current, metadata.localizedSlugs.nl.current) == $slug][0]{title, metadata, "localized": translations[language == $lang][0]{ title, metadataDescription }}`
 
 const hasSanityCredentials = Boolean(
   process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && process.env.NEXT_PUBLIC_SANITY_DATASET,
@@ -133,16 +133,15 @@ export async function generateStaticParams() {
   if (!hasSanityCredentials) return []
   try {
     const pages = await client.fetch<
-      Array<{slug?: {current?: string}; localizedSlugs?: Record<string, {current?: string}>}>
-    >(groq`*[_type == "page" && defined(metadata.slug.current)]{
-      "slug": metadata.slug,
+      Array<{localizedSlugs?: Record<string, {current?: string}>}>
+    >(groq`*[_type == "page" && (defined(metadata.localizedSlugs.en.current) || defined(metadata.localizedSlugs.nl.current))]{
       "localizedSlugs": metadata.localizedSlugs
     }`)
 
-    return pages.flatMap(({slug, localizedSlugs}) =>
+    return pages.flatMap(({localizedSlugs}) =>
       supportedLanguages.map((lang) => ({
         lang,
-        slug: localizedSlugs?.[lang]?.current ?? slug?.current ?? '',
+        slug: localizedSlugs?.[lang]?.current ?? '',
       }))
     )
   } catch (error) {

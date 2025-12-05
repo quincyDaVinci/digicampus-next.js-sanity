@@ -8,6 +8,7 @@ export default defineType({
   name: 'metadata',
   title: 'Metadata',
   type: 'object',
+  components: { input: require('../../components/SeoGenerator').default },
   fields: [
     defineField({
       name: 'language',
@@ -66,32 +67,10 @@ export default defineType({
         }),
       ],
     }),
-    defineField({
-      name: 'slug',
-      type: 'slug',
-      title: 'URL-slug',
-      description: 'Het URL-pad voor deze pagina',
-      options: {
-        source: (doc: any) => doc.title || doc.metadata?.title,
-        maxLength: 96,
-      },
-      hidden: ({document}) => document?._type === 'homePage' || document?._type === 'blogPage',
-      validation: (Rule) => Rule.custom((slug, context) => {
-        // Homepage doesn't need a slug (always renders at /)
-        if (context.document?._type === 'homePage') {
-          return true
-        }
-        // BlogPage doesn't need a slug (fixed route at /blog)
-        if (context.document?._type === 'blogPage') {
-          return true
-        }
-        // For regular pages, slug is required
-        if (!slug?.current) {
-          return "Slug is vereist voor pagina-URL's"
-        }
-        return true
-      }),
-    }),
+    // Note: `slug` (single URL slug) intentionally removed in favour of `localizedSlugs`.
+    // Localized slugs allow editors to set language-specific URL segments and avoid
+    // having to keep a separate, global `slug` field. Use `localizedSlugs.nl` or
+    // `localizedSlugs.en` where appropriate.
     defineField({
       name: 'image',
       title: 'Sociale deelafbeelding',

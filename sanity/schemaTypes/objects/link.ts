@@ -79,18 +79,20 @@ export default defineType({
       hidden: ({parent}) => parent?.type !== 'internal',
     }),
   ],
-  preview: {
+    preview: {
     select: {
       label: 'label',
       translations: 'translations',
       type: 'type',
       internalTitle: 'internal.title',
-      internalSlug: 'internal.metadata.slug.current',
+      internalSlugEn: 'internal.metadata.localizedSlugs.en.current',
+      internalSlugNl: 'internal.metadata.localizedSlugs.nl.current',
       external: 'external',
       params: 'params',
     },
-    prepare: ({label, translations, type, internalTitle, internalSlug, external, params}) => {
+    prepare: ({label, translations, type, internalTitle, internalSlugEn, internalSlugNl, external, params}) => {
       const translatedLabel = Array.isArray(translations) && translations.length > 0 ? translations[0].label : null
+      const internalSlug = internalSlugEn || internalSlugNl || ''
       const href = type === 'internal' ? `/${(internalSlug || '').replace(/^\//, '')}${params || ''}` : external
       return {
         title: translatedLabel || label || internalTitle || 'Naamloze link',

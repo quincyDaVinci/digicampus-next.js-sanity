@@ -41,7 +41,7 @@ async function main() {
     process.exit(1)
   }
 
-  const query = `*[_type == "page" && defined(metadata.slug.current)]{_id, title, "slug": coalesce(metadata.localizedSlugs.en.current, metadata.slug.current), metadata.localizedSlugs}[0..200]`
+  const query = `*[_type == "page" && (defined(metadata.localizedSlugs.en.current) || defined(metadata.localizedSlugs.nl.current))]{_id, title, "slug": coalesce(metadata.localizedSlugs.en.current, metadata.localizedSlugs.nl.current), metadata.localizedSlugs}[0..200]`
 
   try {
     const pages = await client.fetch(query)
