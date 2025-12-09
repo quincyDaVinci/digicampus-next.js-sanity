@@ -10,10 +10,10 @@ import {structureTool} from 'sanity/structure'
 import {presentationTool, defineLocations} from 'sanity/presentation'
 
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
-import {apiVersion, dataset, projectId, studioBasePath} from './sanity/env'
-import {schema} from './sanity/schemaTypes'
-import {structure} from './sanity/structure'
-import {customDocumentActions} from './sanity/lib/documentActions'
+import {apiVersion, dataset, projectId, studioBasePath} from './env'
+import {customDocumentActions} from './lib/documentActions'
+import {schema} from './schemaTypes'
+import {structure} from './structure'
 
 // Determine the preview URL based on environment
 const getPreviewUrl = () => {
