@@ -7,8 +7,8 @@ import { ArrowRightIcon, ChevronDownIcon, CloseIcon, MenuIcon, MoonIcon, SearchI
 import MegaMenu from './navigation/MegaMenu'
 import { useLanguage } from "@/lib/language"
 
-import {client} from '@sanity/lib/client'
-import {siteSettingsQuery} from '@sanity/lib/queries/site'
+import { client } from '@sanity/lib/client'
+import { siteSettingsQuery, navigationByLangQuery } from '@sanity/lib/queries/site'
 import {
   buildFallbackMenus,
   extractCtasFromSiteSettings,
@@ -27,13 +27,13 @@ type HeaderProps = {
   ctas?: CTA[]
 }
 
-export default function Header({menus, logo, ctas = []}: HeaderProps): React.ReactElement {
+export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.ReactElement {
   const { lang: language, setLang: setLanguage } = useLanguage()
   const [liveMessage, setLiveMessage] = useState('')
   const firstLangRender = useRef(true)
   const hasSanityCredentials = Boolean(
     process.env.NEXT_PUBLIC_SANITY_PROJECT_ID &&
-      process.env.NEXT_PUBLIC_SANITY_DATASET,
+    process.env.NEXT_PUBLIC_SANITY_DATASET,
   )
   const [menuData, setMenuData] = useState<Menu[]>(menus)
   const [logoData, setLogoData] = useState<Logo | null>(logo ?? null)
@@ -58,7 +58,7 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
 
       if (!hasSanityCredentials) {
         if (!ignore) {
-          setMenuData(buildFallbackMenus(language))
+          setMenuData([])
           setLogoData(logo ?? null)
           setCtaData(ctas ?? [])
         }
@@ -66,17 +66,38 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
       }
 
       try {
+        // Fetch site settings for logo and CTAs
         const siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery, { lang: language })
         if (ignore) return
 
-        const sanityMenus = extractMenusFromSiteSettings(siteData, language)
-        setMenuData(sanityMenus.length > 0 ? sanityMenus : buildFallbackMenus(language))
+        // Extract logo and CTAs from site settings
         setLogoData(extractLogoFromSiteSettings(siteData))
         setCtaData(extractCtasFromSiteSettings(siteData))
+
+        // Fetch navigation directly
+        const navData = await client.fetch(navigationByLangQuery, { lang: language })
+        if (navData?.items && navData.items.length > 0) {
+          const transformedMenus = navData.items.map((item: any) => ({
+            label: item.label || '',
+            items: (item.links || [])
+              .filter((link: any) => link.href && link.label)
+              .map((link: any) => {
+                const translation = link.translations?.find((t: any) => t.language === language)
+                return {
+                  label: translation?.label || link.label,
+                  href: link.href
+                }
+              })
+          })).filter((menu: any) => menu.items.length > 0)
+
+          setMenuData(transformedMenus.length > 0 ? transformedMenus : [])
+        } else {
+          setMenuData([])
+        }
       } catch (err) {
         console.error('Could not fetch site settings:', err)
         if (!ignore) {
-          setMenuData(buildFallbackMenus(language))
+          setMenuData([])
           setLogoData(logo ?? null)
           setCtaData(ctas ?? [])
         }
@@ -95,10 +116,10 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
     try {
       const stored = localStorage.getItem("dc_dark")
       setDark(stored === "true")
-    } catch {}
+    } catch { }
   }, [])
   useEffect(() => {
-    try { localStorage.setItem("dc_dark", dark ? "true" : "false") } catch {}
+    try { localStorage.setItem("dc_dark", dark ? "true" : "false") } catch { }
     if (typeof document !== "undefined") document.body.classList.toggle("dark", dark)
   }, [dark])
 
@@ -112,8 +133,8 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
 
   // Close menus on outside click / escape
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { 
-      if (e.key === "Escape") { 
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
         if (mobileOpen) {
           setMobileOpen(false)
           setLiveMessage(language === 'nl' ? 'Menu gesloten' : 'Menu closed')
@@ -122,7 +143,7 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
           mobileMenuButtonRef.current?.focus()
         }
         setOpenIndex(null)
-      } 
+      }
     }
     const onClick = (e: MouseEvent) => { if (!navRef.current?.contains(e.target as Node)) setOpenIndex(null) }
     document.addEventListener("keydown", onKey)
@@ -131,13 +152,13 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
   }, [mobileOpen, language])
 
   // Keep focusable order logical when menu opens and trap focus
-  useEffect(() => { 
+  useEffect(() => {
     if (mobileOpen) {
       document.body.style.overflow = "hidden"
       // Announce menu opened
       setLiveMessage(language === 'nl' ? 'Menu geopend' : 'Menu opened')
       setTimeout(() => setLiveMessage(''), 2000)
-      
+
       // Focus first interactive element in mobile menu
       setTimeout(() => {
         const firstFocusable = mobileMenuRef.current?.querySelector(
@@ -173,7 +194,7 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
     >
       {/* polite live region for language changes (screen-reader only) */}
       <div aria-live="polite" className="sr-only" role="status">{liveMessage}</div>
-      <nav aria-label={language === 'nl' ? 'Hoofdnavigatie' : 'Main navigation'} className={["mx-auto max-w-7xl px-4 sm:px-6", scrolled ? "py-2" : "py-4"].join(" ")}> 
+      <nav aria-label={language === 'nl' ? 'Hoofdnavigatie' : 'Main navigation'} className={["mx-auto max-w-7xl px-4 sm:px-6", scrolled ? "py-2" : "py-4"].join(" ")}>
         {/* Desktop grid: 2x2 */}
         <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-4 items-start w-full" style={{ minHeight: "8rem" }}>
           {/* Top-left: Logo */}
@@ -224,18 +245,18 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
               <button type="button" onClick={() => changeLanguage("en")} aria-pressed={language === "en"} aria-label="Switch to English" className={["px-3 py-1 rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors text-fluid-sm", language === "en" ? "font-bold" : "hover:bg-[hsl(var(--dc-text)/0.06)]"].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'hsl(var(--dc-text) / 0.8)' }}>EN {language === "en" && <span className="sr-only">(active)</span>}</button>
             </div>
 
-              <form role="search" className="relative min-w-0" action={searchAction} method="get">
-                <label htmlFor="q" className="sr-only">{searchLabel}</label>
-                <input id="q" name="q" type="search" placeholder={searchLabel} className="w-28 sm:w-44 rounded-full outline-none px-4 py-2 pr-24 min-w-0 text-fluid-sm" style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', color: 'hsl(var(--dc-text))', border: '1px solid hsl(var(--dc-border) / 0.2)' }} onFocus={(e)=> { e.currentTarget.style.boxShadow = `0 0 0 4px hsl(var(--dc-focus))`; }} onBlur={(e)=> { e.currentTarget.style.boxShadow = ''; }} />
-                <button
-                  type="submit"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 rounded-full px-4 py-1 text-fluid-sm text-[hsl(var(--dc-text))] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors hover:bg-[hsl(var(--dc-text)/0.08)]"
-                  style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', border: '1px solid hsl(var(--dc-border) / 0.2)' }}
-                >
-                  <SearchIcon aria-hidden focusable="false" />
-                  <span className="sr-only">{searchLabel}</span>
-                </button>
-              </form>
+            <form role="search" className="relative min-w-0" action={searchAction} method="get">
+              <label htmlFor="q" className="sr-only">{searchLabel}</label>
+              <input id="q" name="q" type="search" placeholder={searchLabel} className="w-28 sm:w-44 rounded-full outline-none px-4 py-2 pr-24 min-w-0 text-fluid-sm" style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', color: 'hsl(var(--dc-text))', border: '1px solid hsl(var(--dc-border) / 0.2)' }} onFocus={(e) => { e.currentTarget.style.boxShadow = `0 0 0 4px hsl(var(--dc-focus))`; }} onBlur={(e) => { e.currentTarget.style.boxShadow = ''; }} />
+              <button
+                type="submit"
+                className="absolute right-1 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 rounded-full px-4 py-1 text-fluid-sm text-[hsl(var(--dc-text))] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors hover:bg-[hsl(var(--dc-text)/0.08)]"
+                style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', border: '1px solid hsl(var(--dc-border) / 0.2)' }}
+              >
+                <SearchIcon aria-hidden focusable="false" />
+                <span className="sr-only">{searchLabel}</span>
+              </button>
+            </form>
           </div>
 
           {/* Bottom-left: menus (replaced by accessible MegaMenu) */}
@@ -281,7 +302,7 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
             {mobileOpen ? <CloseIcon aria-hidden focusable="false" /> : <MenuIcon aria-hidden focusable="false" />}
           </button>
 
-            <Link href={homeHref} className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
+          <Link href={homeHref} className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
             {logoData ? (
               <Image src={logoData.url} alt={logoData.alt} width={logoData.width || 160} height={logoData.height || 40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
             ) : (
@@ -311,9 +332,9 @@ export default function Header({menus, logo, ctas = []}: HeaderProps): React.Rea
         </div>
 
         {/* Mobile panel */}
-        <div 
+        <div
           ref={mobileMenuRef}
-          id="mobile-menu" 
+          id="mobile-menu"
           role="navigation"
           aria-label={language === 'nl' ? 'Mobiel menu' : 'Mobile menu'}
           className={["md:hidden transition-all duration-300 overflow-hidden motion-reduce:transition-none", mobileOpen ? "max-h-[80vh] mt-3" : "max-h-0"].join(" ")}

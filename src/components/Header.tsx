@@ -1,5 +1,5 @@
-import {client} from '@sanity/lib/client'
-import {siteSettingsQuery, navigationByLangQuery} from '@sanity/lib/queries/site'
+import { client } from '@sanity/lib/client'
+import { siteSettingsQuery, navigationByLangQuery } from '@sanity/lib/queries/site'
 import { buildSrc } from 'sanity-image'
 import HeaderClient from './HeaderClient'
 
@@ -27,55 +27,48 @@ type SiteSettings = {
   }>
 }
 
-const fallbackMenus = [
-  { label: "Missies", items: [{ label: "Overzicht", href: "/missies" }, { label: "Publieke waarde", href: "/missies/waarde" }] },
-  { label: "Wat we doen", items: [{ label: "Projecten", href: "/projecten" }, { label: "Kennis", href: "/kennis" }] },
-  { label: "Hoe werken wij?", items: [{ label: "Aanpak", href: "/aanpak" }, { label: "Samenwerken", href: "/samenwerken" }] },
-  { label: "Wie we zijn", items: [{ label: "Team", href: "/team" }, { label: "Partners", href: "/partners" }] },
-]
-
 export default async function Header({ lang }: { lang: string }) {
   const hasSanityCredentials = Boolean(
     process.env.NEXT_PUBLIC_SANITY_PROJECT_ID &&
-      process.env.NEXT_PUBLIC_SANITY_DATASET,
+    process.env.NEXT_PUBLIC_SANITY_DATASET,
   )
 
-  let menus = fallbackMenus.map(menu => ({
-    ...menu,
-    items: menu.items.map(item => ({ ...item, href: `/${lang}${item.href}` })),
-  }))
+  // Initialize menus as empty - will be populated from Sanity Studio only
+  let menus: { label: string; items: MenuItem[] }[] = []
   let logo: { url: string; alt: string; width?: number; height?: number } | null = null
   let ctas: Array<{ label: string; href: string }> = []
 
   if (hasSanityCredentials) {
     type LogoAsset = { asset?: { metadata?: { dimensions?: { width?: number; height?: number } }, url?: string } }
     try {
+      // Fetch site settings for logo and CTAs
       let siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery, { lang })
 
-      // If the referenced header navigation has a language and it doesn't match the
-      // current `lang`, try to fetch a navigation document that matches `lang` so
-      // English and Dutch get their own menus instead of falling back to the hardcoded menus.
-      if (siteData?.header?.language && siteData.header.language !== lang) {
-        try {
-          const altHeader = await client.fetch(navigationByLangQuery, { lang })
-          if (altHeader) {
-            // attach the alt header to the siteData.header shape so downstream logic can reuse it
-            siteData = { ...(siteData as SiteSettings), header: altHeader as SiteSettings['header'] }
-          }
-        } catch (err) {
-          // if alt fetch fails, we'll fall back to existing siteData.header behavior
-          console.warn('Could not fetch language-specific navigation:', err)
+      // Fetch navigation directly by language
+      try {
+        const navData = await client.fetch(navigationByLangQuery, { lang })
+        if (navData?.items && navData.items.length > 0) {
+          // Transform navigation items to menu format
+          menus = navData.items.map((item: any) => {
+            const links = item.links || []
+            return {
+              label: item.label || '',
+              items: links
+                .filter((link: any) => link.href && link.label)
+                .map((link: any) => {
+                  // Find translated label
+                  const translation = link.translations?.find((t: any) => t.language === lang)
+                  return {
+                    label: translation?.label || link.label,
+                    href: link.href
+                  }
+                })
+            }
+          }).filter((menu: any) => menu.items.length > 0)
         }
-      }
-
-      if (siteData?.header?.items && siteData.header.items.length > 0 && (!siteData.header.language || siteData.header.language === lang)) {
-        menus = siteData.header.items
-          .filter(item => item._type === 'link.list' && item.items)
-          .map(item => ({
-            label: item.label || '',
-            items: (item.items || []).filter(subItem => subItem.href && subItem.label)
-          }))
-          .filter(menu => menu.items.length > 0)
+      } catch (err) {
+        console.warn('Could not fetch navigation:', err)
+        // Keep fallback menus
       }
 
       // Process logo (preserve hotspot/crop by using the full image object)

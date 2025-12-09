@@ -1,4 +1,4 @@
-import {urlFor} from '@sanity/lib/image'
+import { urlFor } from '@sanity/lib/image'
 
 export type MenuItem = { label: string; href: string }
 export type Menu = { label: string; items: MenuItem[] }
@@ -23,29 +23,38 @@ export type SiteSettings = {
   }>
 }
 
-const fallbackMenus = [
-  { label: 'Missies', items: [{ label: 'Overzicht', href: '/missies' }, { label: 'Publieke waarde', href: '/missies/waarde' }] },
-  { label: 'Wat we doen', items: [{ label: 'Projecten', href: '/projecten' }, { label: 'Kennis', href: '/kennis' }] },
-  { label: 'Hoe werken wij?', items: [{ label: 'Aanpak', href: '/aanpak' }, { label: 'Samenwerken', href: '/samenwerken' }] },
-  { label: 'Wie we zijn', items: [{ label: 'Team', href: '/team' }, { label: 'Partners', href: '/partners' }] },
-]
+// Fallback menus removed - navigation should be configured in Sanity Studio
+const fallbackMenus: Menu[] = []
 
-export const buildFallbackMenus = (lang: string): Menu[] =>
-  fallbackMenus.map(menu => ({
-    ...menu,
-    items: menu.items.map(item => ({...item, href: `/${lang}${item.href}`})),
-  }))
+export const buildFallbackMenus = (lang: string): Menu[] => []
 
 export const extractMenusFromSiteSettings = (siteData: SiteSettings | null, lang: string): Menu[] => {
   if (!siteData?.header?.items || siteData.header.items.length === 0) return []
-  if (siteData.header.language && siteData.header.language !== lang) return []
 
+  // For new navigationItem structure
   return siteData.header.items
-    .filter(item => item._type === 'link.list' && item.items)
-    .map(item => ({
-      label: item.label || '',
-      items: (item.items || []).filter(subItem => Boolean(subItem.href && subItem.label)) as MenuItem[],
-    }))
+    .map((item: any) => {
+      // Get the label based on language
+      const label = item.label || ''
+      const links = item.links || []
+
+      // Transform links to MenuItem format
+      const menuItems = links
+        .filter((link: any) => link.href && link.label)
+        .map((link: any) => {
+          // Find translated label if available
+          const translation = link.translations?.find((t: any) => t.language === lang)
+          return {
+            label: translation?.label || link.label || '',
+            href: link.href || ''
+          }
+        })
+
+      return {
+        label,
+        items: menuItems
+      }
+    })
     .filter(menu => menu.items.length > 0)
 }
 

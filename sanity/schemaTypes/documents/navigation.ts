@@ -1,9 +1,9 @@
-import {defineField, defineType} from 'sanity'
-import {LayersIcon} from '../../lib/featherIcons'
+import { defineField, defineType } from 'sanity'
+import { LayersIcon } from '../../lib/featherIcons'
 
 /**
  * Navigation - Menu system
- * Stores canonical menu structure; translations are provided in the `translations` array.
+ * Simplified structure with better UX for content editors
  */
 export default defineType({
   name: 'navigation',
@@ -15,28 +15,43 @@ export default defineType({
       name: 'title',
       title: 'Menutitel',
       type: 'string',
-      description: 'Interne naam voor dit menu (bijv. “Hoofdmenu”, “Footer-links”)',
+      description: 'Interne naam voor dit menu (bijv. "Hoofdmenu NL", "Main Menu EN")',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'language',
+      title: 'Taal',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Nederlands', value: 'nl' },
+          { title: 'English', value: 'en' },
+        ],
+        layout: 'radio',
+      },
+      description: 'Selecteer de taal voor dit menu',
+      validation: (Rule) => Rule.required(),
+      initialValue: 'nl',
+    }),
+    defineField({
       name: 'items',
-      title: 'Navigatie-items',
+      title: 'Menu-items',
       type: 'array',
-      description: 'Voeg links en dropdownmenu’s toe',
+      description: 'Voeg menu-items toe. Elk item kan eventueel een dropdown menu hebben.',
       of: [
-        {type: 'link'},
-        {type: 'link.list'}, // Dropdownmenu’s
+        { type: 'navigationItem' },
       ],
     }),
   ],
   preview: {
     select: {
       title: 'title',
+      language: 'language',
       count: 'items.length',
     },
-    prepare: ({title, count}) => ({
+    prepare: ({ title, language, count }) => ({
       title: title || 'Navigatiemenu',
-      subtitle: `${count || 0} items`,
+      subtitle: `${language?.toUpperCase() || '??'} • ${count || 0} items`,
       media: LayersIcon,
     }),
   },

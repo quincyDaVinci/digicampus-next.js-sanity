@@ -1,4 +1,4 @@
-import {groq} from 'next-sanity'
+import { groq } from 'next-sanity'
 
 /**
  * Query to fetch site settings including header and footer navigation
@@ -127,16 +127,17 @@ export const siteSettingsQuery = groq`
 `
 
 /**
- * Query to fetch a navigation document.
- * Uses language-filter plugin: fetches all translations, app selects by language
+ * Query to fetch a navigation document by language
+ * Simplified for new navigationItem structure
  */
 export const navigationByLangQuery = groq`
-  *[_type == "navigation"][0]{
+  *[_type == "navigation" && language == $lang][0]{
     _id,
     title,
+    language,
     items[]{
-      _type,
-      _type == "link" => {
+      "label": select($lang == "en" => labelEn, label),
+      links[]{
         _key,
         label,
         "translations": translations[] { language, label },
@@ -146,30 +147,10 @@ export const navigationByLangQuery = groq`
           "href": select(
             internal->_type == "blogPage" => "/" + $lang + "/blog",
             internal->_type == "homePage" => "/" + $lang,
-              "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.localizedSlugs.en.current, internal->metadata.localizedSlugs.nl.current)
+            "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.localizedSlugs.en.current, internal->metadata.localizedSlugs.nl.current)
           )
         },
         type == "external" => { "href": external }
-      },
-      _type == "link.list" => {
-        _key,
-        "label": link.label,
-        "translations": link.translations[] { language, label },
-        "items": links[]{
-          _key,
-          label,
-          "translations": translations[] { language, label },
-          type,
-          type == "internal" => {
-            "internalType": internal->_type,
-            "href": select(
-              internal->_type == "blogPage" => "/" + $lang + "/blog",
-              internal->_type == "homePage" => "/" + $lang,
-              "/" + $lang + "/" + coalesce(internal->metadata.localizedSlugs[$lang].current, internal->metadata.localizedSlugs.en.current, internal->metadata.localizedSlugs.nl.current)
-            )
-          },
-          type == "external" => { "href": external }
-        }
       }
     }
   }

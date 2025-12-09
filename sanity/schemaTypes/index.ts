@@ -1,4 +1,4 @@
-import type {SchemaPluginOptions} from 'sanity'
+import type { SchemaPluginOptions } from 'sanity'
 
 // Documents
 import site from './documents/site'
@@ -18,6 +18,7 @@ import siteSettings from './documents/siteSettings'
 import metadata from './objects/metadata'
 import link from './objects/link'
 import linkList from './objects/linkList'
+import navigationItem from './objects/navigationItem'
 import cta from './objects/cta'
 import moduleAttributes from './objects/moduleAttributes'
 import blogPostTranslation from './objects/blogPostTranslation'
@@ -57,6 +58,7 @@ export const schema: SchemaPluginOptions = {
     metadata,
     link,
     linkList,
+    navigationItem,
     cta,
     moduleAttributes,
     blogPostTranslation,
