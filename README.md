@@ -28,6 +28,8 @@ The Studio lives at `/geheimelocatie` in the Next.js app. When hosting the Studi
 - `NEXT_PUBLIC_SANITY_STUDIO_BASEPATH`: Optional override for the Studio base path (defaults to `/geheimelocatie`).
 - `NEXT_PUBLIC_SANITY_STUDIO_HOST`: Optional `studioHost` value if you use a custom domain on Sanity hosting.
 
+When `NEXT_PUBLIC_SANITY_STUDIO_URL` points to a hosted Studio, the `/geheimelocatie` route will redirect to that URL so the Next.js app and Studio remain on separate dependency trees in production while keeping the local Studio running for development.
+
 ## ♿ Accessibility
 
 This project maintains **WCAG 2.1 Level AA compliance**. Key features:
