@@ -8,7 +8,7 @@
  */
 import dynamic from 'next/dynamic'
 import {useEffect} from 'react'
-import config from '../../../../sanity.config'
+import config from '../../../../sanity/sanity.config'
 
 const NextStudioClient = dynamic(
   // load the NextStudio export from next-sanity/studio on the client only

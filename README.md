@@ -123,3 +123,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Sanity Studio
+
+The Studio now lives in the `sanity` workspace with its own dependency tree pinned to React 18 to avoid runtime crashes in production. Use the workspace scripts to work on the Studio:
+
+- `npm run studio:dev` to run `sanity dev`
+- `npm run studio:deploy` to deploy the hosted Studio
+- `npm run typegen` to refresh schema types from the Studio workspace
+
