@@ -28,6 +28,8 @@ The Studio lives at `/geheimelocatie` in the Next.js app. When hosting the Studi
 - `NEXT_PUBLIC_SANITY_STUDIO_BASEPATH`: Optional override for the Studio base path (defaults to `/geheimelocatie`).
 - `NEXT_PUBLIC_SANITY_STUDIO_HOST`: Optional `studioHost` value if you use a custom domain on Sanity hosting.
 
+When `NEXT_PUBLIC_SANITY_STUDIO_URL` points to a hosted Studio, the `/geheimelocatie` route will redirect to that URL so the Next.js app and Studio remain on separate dependency trees in production while keeping the local Studio running for development.
+
 ## ♿ Accessibility
 
 This project maintains **WCAG 2.1 Level AA compliance**. Key features:
@@ -123,3 +125,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Sanity Studio
+
+The Studio now lives in the `sanity` workspace with its own dependency tree pinned to React 18 to avoid runtime crashes in production. Use the workspace scripts to work on the Studio:
+
+- `npm run studio:dev` to run `sanity dev`
+- `npm run studio:deploy` to deploy the hosted Studio
+- `npm run typegen` to refresh schema types from the Studio workspace
+

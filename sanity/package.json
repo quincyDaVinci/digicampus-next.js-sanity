@@ -1,0 +1,22 @@
+{
+  "name": "sanity-studio",
+  "version": "0.0.0",
+  "private": true,
+  "main": "sanity.config.ts",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "typegen": "sanity schema extract && sanity typegen generate"
+  },
+  "dependencies": {
+    "@sanity/assist": "^5.0.2",
+    "@sanity/language-filter": "^4.0.5",
+    "@sanity/vision": "^4.20.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "sanity": "^4.20.0",
+    "sanity-plugin-media": "^4.0.0",
+    "styled-components": "^6.1.19"
+  }
+}
