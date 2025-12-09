@@ -13,6 +13,7 @@ import teamCategory from './documents/teamCategory'
 import teamSettings from './documents/teamSettings'
 import tag from './documents/tag'
 import siteSettings from './documents/siteSettings'
+import devSettings from './documents/devSettings'
 
 // Objects
 import metadata from './objects/metadata'
@@ -53,6 +54,7 @@ export const schema: SchemaPluginOptions = {
     teamSettings,
     tag,
     siteSettings,
+    devSettings,
 
     // Objects
     metadata,
@@ -80,4 +82,4 @@ export const schema: SchemaPluginOptions = {
 }
 
 // Document types that should only have one instance
-const singletonTypes = ['site', 'homePage', 'blogPage']
+const singletonTypes = ['site', 'homePage', 'blogPage', 'devSettings']

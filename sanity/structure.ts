@@ -1,8 +1,8 @@
-import {BookOpenIcon, FileTextIcon, HomeIcon, LayersIcon, UsersIcon, TagIcon, SettingsIcon, PackageIcon} from './lib/featherIcons'
+import { BookOpenIcon, FileTextIcon, HomeIcon, LayersIcon, UsersIcon, TagIcon, SettingsIcon, PackageIcon } from './lib/featherIcons'
 import TranslationFixer from './components/TranslationFixer'
 import WarningsPanel from './components/WarningsPanel'
 import LibraryManager from './components/LibraryManager'
-import type {StructureResolver} from 'sanity/structure'
+import type { StructureResolver } from 'sanity/structure'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
@@ -33,9 +33,9 @@ export const structure: StructureResolver = (S) =>
                 ),
             ])
         ),
-      
+
       S.divider(),
-      
+
       // Pagina's met geneste structuur
       S.listItem()
         .title('Pagina’s')
@@ -61,13 +61,13 @@ export const structure: StructureResolver = (S) =>
                 .child(
                   S.documentTypeList('page')
                     .title('Alle pagina’s')
-                    .defaultOrdering([{field: 'title', direction: 'asc'}])
+                    .defaultOrdering([{ field: 'title', direction: 'asc' }])
                 ),
             ])
         ),
-      
+
       S.divider(),
-      
+
       // Blogsectie
       S.listItem()
         .title('Blog')
@@ -92,7 +92,7 @@ export const structure: StructureResolver = (S) =>
                 .child(
                   S.documentTypeList('blogPost')
                     .title('Blogberichten')
-                    .defaultOrdering([{field: 'publishedAt', direction: 'desc'}])
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
                 ),
               S.listItem()
                 .title('Categorieën')
@@ -103,9 +103,9 @@ export const structure: StructureResolver = (S) =>
                 ),
             ])
         ),
-      
+
       S.divider(),
-      
+
       // Navigatie (multiple menus)
       S.listItem()
         .title('Navigatie')
@@ -129,16 +129,16 @@ export const structure: StructureResolver = (S) =>
                 ),
             ])
         ),
-      
+
       S.divider(),
 
       // Legacy content cleanup helpers were temporary and have been removed
-      
+
       // Auteurs / Teamleden
       S.documentTypeListItem('author')
         .title('Teamleden')
         .icon(UsersIcon),
-      
+
       // Team settings (categories + ordering)
       S.listItem()
         .title('Team instellingen')
@@ -164,9 +164,21 @@ export const structure: StructureResolver = (S) =>
                 ),
             ])
         ),
-      
+
       S.divider(),
-      
+
+      // Developer Opties (Singleton)
+      S.listItem()
+        .title('Developer Opties')
+        .icon(SettingsIcon)
+        .child(
+          S.document()
+            .schemaType('devSettings')
+            .documentId('devSettings')
+        ),
+
+      S.divider(),
+
       // Library (opens Media tool directly)
       S.listItem()
         .title('Library')
@@ -183,7 +195,7 @@ export const structure: StructureResolver = (S) =>
           S.component(WarningsPanel).id('warningsPanel').title('Warnings & Alerts')
         ),
 
-      
+
       // Tags
       S.documentTypeListItem('tag')
         .title('Tags')

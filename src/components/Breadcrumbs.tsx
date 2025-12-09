@@ -10,7 +10,7 @@ type BreadcrumbsProps = {
   className?: string
 }
 
-export default function Breadcrumbs({items, className}: BreadcrumbsProps) {
+export default function Breadcrumbs({ items, className }: BreadcrumbsProps) {
   if (!items.length) return null
 
   return (
@@ -28,7 +28,7 @@ export default function Breadcrumbs({items, className}: BreadcrumbsProps) {
               ) : (
                 <Link
                   href={item.href}
-                  className="transition-colors hover:text-[hsl(var(--dc-brand))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--dc-focus))] rounded"
+                  className="transition-colors hover:text-[hsl(var(--dc-brand))] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded"
                 >
                   {item.label}
                 </Link>

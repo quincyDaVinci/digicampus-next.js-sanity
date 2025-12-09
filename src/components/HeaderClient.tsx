@@ -3,12 +3,14 @@
 import React, { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { ArrowRightIcon, ChevronDownIcon, CloseIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from '@/components/icons/FeatherIcons'
 import MegaMenu from './navigation/MegaMenu'
+import LanguageDropdown from './navigation/LanguageDropdown'
 import { useLanguage } from "@/lib/language"
 
 import { client } from '@sanity/lib/client'
-import { siteSettingsQuery, navigationByLangQuery } from '@sanity/lib/queries/site'
+import { siteSettingsQuery, navigationByLangQuery, devSettingsQuery } from '@sanity/lib/queries/site'
 import {
   buildFallbackMenus,
   extractCtasFromSiteSettings,
@@ -29,6 +31,7 @@ type HeaderProps = {
 
 export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.ReactElement {
   const { lang: language, setLang: setLanguage } = useLanguage()
+  const pathname = usePathname()
   const [liveMessage, setLiveMessage] = useState('')
   const firstLangRender = useRef(true)
   const hasSanityCredentials = Boolean(
@@ -66,6 +69,10 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
       }
 
       try {
+        // Fetch dev settings
+        const devSettings = await client.fetch<{ showIncompleteNavItems?: boolean } | null>(devSettingsQuery)
+        const showIncompleteNavItems = devSettings?.showIncompleteNavItems ?? false
+
         // Fetch site settings for logo and CTAs
         const siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery, { lang: language })
         if (ignore) return
@@ -77,18 +84,31 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
         // Fetch navigation directly
         const navData = await client.fetch(navigationByLangQuery, { lang: language })
         if (navData?.items && navData.items.length > 0) {
-          const transformedMenus = navData.items.map((item: any) => ({
-            label: item.label || '',
-            items: (item.links || [])
-              .filter((link: any) => link.href && link.label)
-              .map((link: any) => {
-                const translation = link.translations?.find((t: any) => t.language === language)
-                return {
-                  label: translation?.label || link.label,
-                  href: link.href
-                }
-              })
-          })).filter((menu: any) => menu.items.length > 0)
+          const transformedMenus = navData.items.map((item: any) => {
+            // Extract href from top-level menu item
+            const topLevelHref = item.href || null
+
+            return {
+              label: item.label || '',
+              href: topLevelHref, // Top-level link
+              items: (item.links || [])
+                .filter((link: any) => {
+                  // If showIncompleteNavItems is true, only require label
+                  // Otherwise, require both label and href
+                  if (showIncompleteNavItems) {
+                    return link.label
+                  }
+                  return link.href && link.label
+                })
+                .map((link: any) => {
+                  const translation = link.translations?.find((t: any) => t.language === language)
+                  return {
+                    label: translation?.label || link.label,
+                    href: link.href || '#'  // Ensure href is always a string
+                  }
+                })
+            }
+          })
 
           setMenuData(transformedMenus.length > 0 ? transformedMenus : [])
         } else {
@@ -239,11 +259,7 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
               <span className="sr-only">{dark ? (language === 'nl' ? 'Donkere modus actief' : 'Dark mode active') : (language === 'nl' ? 'Lichtmodus actief' : 'Light mode active')}</span>
             </button>
 
-            <div role="group" aria-label="Taal switch" className="flex items-center gap-0">
-              <button type="button" onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} aria-label="Schakel naar Nederlands" className={["px-3 py-1 rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors text-fluid-sm", language === "nl" ? "font-bold" : "hover:bg-[hsl(var(--dc-text)/0.06)]"].join(" ")} style={language === "nl" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'hsl(var(--dc-text) / 0.8)' }}>NL {language === "nl" && <span className="sr-only">(actief)</span>}</button>
-              <span aria-hidden className="w-px h-5 mx-2 divider-dc" />
-              <button type="button" onClick={() => changeLanguage("en")} aria-pressed={language === "en"} aria-label="Switch to English" className={["px-3 py-1 rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors text-fluid-sm", language === "en" ? "font-bold" : "hover:bg-[hsl(var(--dc-text)/0.06)]"].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { backgroundColor: 'transparent', color: 'hsl(var(--dc-text) / 0.8)' }}>EN {language === "en" && <span className="sr-only">(active)</span>}</button>
-            </div>
+            <LanguageDropdown currentLang={language} onChangeLang={changeLanguage} />
 
             <form role="search" className="relative min-w-0" action={searchAction} method="get">
               <label htmlFor="q" className="sr-only">{searchLabel}</label>
@@ -260,7 +276,7 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
           </div>
 
           {/* Bottom-left: menus (replaced by accessible MegaMenu) */}
-          <MegaMenu menus={menuData} language={language} />
+          <MegaMenu menus={menuData} language={language} currentPath={pathname} />
 
           {/* Bottom-right: Contact CTA */}
           <div className="col-start-2 row-start-2 flex items-end justify-end gap-2">

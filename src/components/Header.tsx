@@ -1,5 +1,5 @@
 import { client } from '@sanity/lib/client'
-import { siteSettingsQuery, navigationByLangQuery } from '@sanity/lib/queries/site'
+import { siteSettingsQuery, navigationByLangQuery, devSettingsQuery } from '@sanity/lib/queries/site'
 import { buildSrc } from 'sanity-image'
 import HeaderClient from './HeaderClient'
 
@@ -41,6 +41,10 @@ export default async function Header({ lang }: { lang: string }) {
   if (hasSanityCredentials) {
     type LogoAsset = { asset?: { metadata?: { dimensions?: { width?: number; height?: number } }, url?: string } }
     try {
+      // Fetch dev settings
+      const devSettings = await client.fetch<{ showIncompleteNavItems?: boolean } | null>(devSettingsQuery)
+      const showIncompleteNavItems = devSettings?.showIncompleteNavItems ?? false
+
       // Fetch site settings for logo and CTAs
       let siteData = await client.fetch<SiteSettings | null>(siteSettingsQuery, { lang })
 
@@ -51,20 +55,32 @@ export default async function Header({ lang }: { lang: string }) {
           // Transform navigation items to menu format
           menus = navData.items.map((item: any) => {
             const links = item.links || []
+
+            // Extract href from top-level menu item (from internalPage or externalUrl)
+            const topLevelHref = item.href || null
+
             return {
               label: item.label || '',
+              href: topLevelHref, // Top-level link
               items: links
-                .filter((link: any) => link.href && link.label)
+                .filter((link: any) => {
+                  // If showIncompleteNavItems is true, only require label
+                  // Otherwise, require both label and href
+                  if (showIncompleteNavItems) {
+                    return link.label
+                  }
+                  return link.href && link.label
+                })
                 .map((link: any) => {
                   // Find translated label
                   const translation = link.translations?.find((t: any) => t.language === lang)
                   return {
                     label: translation?.label || link.label,
-                    href: link.href
+                    href: link.href || '#'  // Ensure href is always a string
                   }
                 })
             }
-          }).filter((menu: any) => menu.items.length > 0)
+          })
         }
       } catch (err) {
         console.warn('Could not fetch navigation:', err)
