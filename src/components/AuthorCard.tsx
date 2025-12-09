@@ -8,6 +8,7 @@ type AuthorCardProps = {
   author: {
     _id: string
     name: string
+    slug?: string
     role?: string
     company?: string
   }
@@ -19,7 +20,7 @@ export default function AuthorCard({ author, authorImageUrl }: AuthorCardProps) 
 
   return (
     <Link
-      href={`/auteur/${author._id}`}
+      href={`/auteur/${author.slug || author._id}`}
       className="group mb-8 flex items-center gap-4 rounded-2xl p-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--dc-focus))] focus-visible:ring-offset-2"
       style={{
         backgroundColor: isHovered ? 'hsl(var(--dc-brand) / 0.08)' : 'hsl(var(--dc-surface-98))',
@@ -50,14 +51,14 @@ export default function AuthorCard({ author, authorImageUrl }: AuthorCardProps) 
         </div>
       )}
       <div>
-        <div 
-          className="font-semibold transition-colors duration-300" 
-          style={{color: isHovered ? 'hsl(var(--dc-brand))' : 'hsl(var(--dc-text))'}}
+        <div
+          className="font-semibold transition-colors duration-300"
+          style={{ color: isHovered ? 'hsl(var(--dc-brand))' : 'hsl(var(--dc-text))' }}
         >
           {author.name}
         </div>
         {author.role && (
-          <div className="text-sm" style={{color: 'hsl(var(--dc-text) / 0.7)'}}>
+          <div className="text-sm" style={{ color: 'hsl(var(--dc-text) / 0.7)' }}>
             {author.role}
             {author.company && ` bij ${author.company}`}
           </div>

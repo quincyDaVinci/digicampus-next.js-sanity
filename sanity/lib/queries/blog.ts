@@ -1,4 +1,4 @@
-import {groq} from 'next-sanity'
+import { groq } from 'next-sanity'
 
 /**
  * Blog query helpers for fetching posts with filtering, sorting, and pagination
@@ -34,6 +34,7 @@ const blogPostFields = groq`
   author->{
     _id,
     name,
+    "slug": slug.current,
     role,
     company,
     bio,
@@ -205,3 +206,102 @@ export function buildHighlightedPostsQuery(
     }
   `
 }
+
+/**
+ * Fetch a single author by slug
+ */
+export const authorBySlugQuery = groq`
+  *[_type == "author" && slug.current == $slug][0]{
+    _id,
+    name,
+    "slug": slug.current,
+    role,
+    category->{
+      _id,
+      title,
+      "slug": slug.current
+    },
+    image{
+      asset->{
+        _id,
+        url,
+        metadata {
+          dimensions,
+          lqip
+        }
+      },
+      hotspot,
+      alt
+    },
+    email,
+    linkedin,
+    bio
+  }
+`
+
+/**
+ * Build a query for fetching blog posts by a specific author
+ * @param authorId - Author's _id to filter by
+ * @param lang - Language code
+ * @param sortBy - Sort option: 'newest' | 'oldest' | 'viewCount' | 'readTime'
+ * @param page - Page number (1-indexed)
+ * @param limit - Number of posts per page
+ */
+export function buildBlogPostsByAuthorQuery(
+  authorId: string,
+  lang: string,
+  sortBy: string = 'newest',
+  page: number = 1,
+  limit: number = 12
+) {
+  const skip = (page - 1) * limit
+
+  const filters = [
+    '_type == "blogPost"',
+    'defined(publishedAt)',
+    'defined(translations)',
+    `author._ref == "${authorId}"`,
+  ]
+
+  const filterString = filters.join(' && ')
+
+  let orderBy = 'publishedAt desc'
+  switch (sortBy) {
+    case 'oldest':
+      orderBy = 'publishedAt asc'
+      break
+    case 'viewCount':
+      orderBy = 'viewCount desc'
+      break
+    case 'readTime':
+      orderBy = 'estimatedReadTime asc'
+      break
+    case 'newest':
+    default:
+      orderBy = 'publishedAt desc'
+      break
+  }
+
+  return groq`
+    *[${filterString}] | order(${orderBy}) [${skip}...${skip + limit}] {
+      ${blogPostFields}
+    }
+  `
+}
+
+/**
+ * Build a query to get total count of posts by author
+ */
+export function buildBlogPostsByAuthorCountQuery(authorId: string) {
+  const filters = [
+    '_type == "blogPost"',
+    'defined(publishedAt)',
+    'defined(translations)',
+    `author._ref == "${authorId}"`,
+  ]
+
+  const filterString = filters.join(' && ')
+
+  return groq`count(*[${filterString}])`
+}
+
