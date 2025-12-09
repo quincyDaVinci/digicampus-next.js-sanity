@@ -1,6 +1,6 @@
 import { createClient } from 'next-sanity'
 
-import { apiVersion, dataset, projectId } from '../env'
+import { apiVersion, dataset, projectId, studioUrl } from '../env'
 
 export const client = createClient({
   projectId,
@@ -10,7 +10,7 @@ export const client = createClient({
   perspective: 'published',
   stega: {
     enabled: false,
-    studioUrl: '/geheimelocatie',
+    studioUrl,
   },
 })
 
@@ -24,7 +24,7 @@ export const previewClient = createClient({
   token: process.env.SANITY_API_READ_TOKEN,
   stega: {
     enabled: true,
-    studioUrl: '/geheimelocatie',
+    studioUrl,
   },
 })
 

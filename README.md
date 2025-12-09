@@ -20,6 +20,14 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+### Sanity Studio hosting
+
+The Studio lives at `/geheimelocatie` in the Next.js app. When hosting the Studio on Sanity-managed hosting, set the following env vars so previews and stega links keep working:
+
+- `NEXT_PUBLIC_SANITY_STUDIO_URL`: Full URL of the hosted Studio (e.g. `https://<project>.sanity.studio`).
+- `NEXT_PUBLIC_SANITY_STUDIO_BASEPATH`: Optional override for the Studio base path (defaults to `/geheimelocatie`).
+- `NEXT_PUBLIC_SANITY_STUDIO_HOST`: Optional `studioHost` value if you use a custom domain on Sanity hosting.
+
 ## ♿ Accessibility
 
 This project maintains **WCAG 2.1 Level AA compliance**. Key features:
