@@ -39,6 +39,11 @@ import mediaSection from './modules/mediaSection'
 import documentAsset from './modules/documentAsset'
 import teamSection from './modules/teamSection'
 
+// SchemaUI Components
+import splitSection from './modules/splitSection'
+import sectionHeader from './modules/sectionHeader'
+import logoCloudSection from './modules/logoCloudSection'
+
 export const schema: SchemaPluginOptions = {
   types: [
     // Documents
@@ -78,6 +83,10 @@ export const schema: SchemaPluginOptions = {
     mediaSection,
     documentAsset,
     teamSection,
+    // SchemaUI Components
+    splitSection,
+    sectionHeader,
+    logoCloudSection,
   ],
 }
 

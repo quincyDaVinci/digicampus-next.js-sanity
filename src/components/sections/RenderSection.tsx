@@ -16,6 +16,11 @@ import MediaSection from "./MediaSection";
 import DocumentAssetSection from "./DocumentAssetSection";
 import TeamSection from "./TeamSection";
 
+// SchemaUI sections
+import SplitSection from "./SplitSection";
+import SectionHeader from "./SectionHeader";
+import LogoCloudSection from "./LogoCloudSection";
+
 // Import existing pageBuilder component renderers
 import RichTextBlock from "../pageBuilder/RichTextBlock";
 import ImageBlock from "../pageBuilder/ImageBlock";
@@ -29,7 +34,7 @@ import type { SectionProps } from "@/types/sections";
 import type { PageComponent } from "@/types/pageBuilder";
 
 interface RenderSectionProps {
-  section: SectionProps | PageComponent | {_type: string; _key: string; [key: string]: unknown}
+  section: SectionProps | PageComponent | { _type: string; _key: string;[key: string]: unknown }
 }
 
 /**
@@ -41,43 +46,51 @@ export default function RenderSection({ section }: RenderSectionProps) {
   switch (section._type) {
     // New modular sections
     case "heroSection":
-      return <HeroSection {...(section as Extract<SectionProps, {_type: 'heroSection'}>)} />;
+      return <HeroSection {...(section as Extract<SectionProps, { _type: 'heroSection' }>)} />;
     case "featureSection":
-      return <FeatureSection {...(section as Extract<SectionProps, {_type: 'featureSection'}>)} />;
+      return <FeatureSection {...(section as Extract<SectionProps, { _type: 'featureSection' }>)} />;
     case "blogSection":
-      return <BlogSection {...(section as Extract<SectionProps, {_type: 'blogSection'}>)} />;
+      return <BlogSection {...(section as Extract<SectionProps, { _type: 'blogSection' }>)} />;
     case "testimonialsSection":
-      return <TestimonialsSection {...(section as Extract<SectionProps, {_type: 'testimonialsSection'}>)} />;
+      return <TestimonialsSection {...(section as Extract<SectionProps, { _type: 'testimonialsSection' }>)} />;
     case "pricingSection":
-      return <PricingSection {...(section as Extract<SectionProps, {_type: 'pricingSection'}>)} />;
+      return <PricingSection {...(section as Extract<SectionProps, { _type: 'pricingSection' }>)} />;
     case "ctaSection":
-      return <CTASection {...(section as Extract<SectionProps, {_type: 'ctaSection'}>)} />;
+      return <CTASection {...(section as Extract<SectionProps, { _type: 'ctaSection' }>)} />;
     case "faqSection":
-      return <FAQSection {...(section as Extract<SectionProps, {_type: 'faqSection'}>)} />;
+      return <FAQSection {...(section as Extract<SectionProps, { _type: 'faqSection' }>)} />;
     case "contactSection":
-      return <ContactSection {...(section as Extract<SectionProps, {_type: 'contactSection'}>)} />;
+      return <ContactSection {...(section as Extract<SectionProps, { _type: 'contactSection' }>)} />;
     case "newsletterSection":
-      return <NewsletterSection {...(section as Extract<SectionProps, {_type: 'newsletterSection'}>)} />;
+      return <NewsletterSection {...(section as Extract<SectionProps, { _type: 'newsletterSection' }>)} />;
     case "mediaSection":
-      return <MediaSection {...(section as Extract<SectionProps, {_type: 'mediaSection'}>)} />;
+      return <MediaSection {...(section as Extract<SectionProps, { _type: 'mediaSection' }>)} />;
     case "documentAsset":
-      return <DocumentAssetSection {...(section as Extract<SectionProps, {_type: 'documentAsset'}>)} />;
+      return <DocumentAssetSection {...(section as Extract<SectionProps, { _type: 'documentAsset' }>)} />;
     case "teamSection":
-      return <TeamSection {...(section as Extract<SectionProps, {_type: 'teamSection'}>)} />;
+      return <TeamSection {...(section as Extract<SectionProps, { _type: 'teamSection' }>)} />;
+
+    // SchemaUI sections
+    case "splitSection":
+      return <SplitSection {...(section as Extract<SectionProps, { _type: 'splitSection' }>)} />;
+    case "sectionHeader":
+      return <SectionHeader {...(section as Extract<SectionProps, { _type: 'sectionHeader' }>)} />;
+    case "logoCloudSection":
+      return <LogoCloudSection {...(section as Extract<SectionProps, { _type: 'logoCloudSection' }>)} />;
 
     // Existing pageBuilder component types
     case "richTextComponent":
-      return <RichTextBlock component={section as Extract<PageComponent, {_type: 'richTextComponent'}>} />;
+      return <RichTextBlock component={section as Extract<PageComponent, { _type: 'richTextComponent' }>} />;
     case "imageComponent":
-      return <ImageBlock component={section as Extract<PageComponent, {_type: 'imageComponent'}>} />;
+      return <ImageBlock component={section as Extract<PageComponent, { _type: 'imageComponent' }>} />;
     case "videoComponent":
-      return <VideoBlock component={section as Extract<PageComponent, {_type: 'videoComponent'}>} />;
+      return <VideoBlock component={section as Extract<PageComponent, { _type: 'videoComponent' }>} />;
     case "buttonComponent":
-      return <ButtonBlock component={section as Extract<PageComponent, {_type: 'buttonComponent'}>} />;
+      return <ButtonBlock component={section as Extract<PageComponent, { _type: 'buttonComponent' }>} />;
     case "blogCardComponent":
-      return <BlogCard component={section as Extract<PageComponent, {_type: 'blogCardComponent'}>} />;
+      return <BlogCard component={section as Extract<PageComponent, { _type: 'blogCardComponent' }>} />;
     case "carouselComponent": {
-      const carouselSection = section as Extract<PageComponent, {_type: 'carouselComponent'}>;
+      const carouselSection = section as Extract<PageComponent, { _type: 'carouselComponent' }>;
       return (
         <Carousel
           ariaLabel={carouselSection.ariaLabel}

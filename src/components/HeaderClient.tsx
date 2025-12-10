@@ -219,7 +219,7 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
         <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-4 items-start w-full" style={{ minHeight: "8rem" }}>
           {/* Top-left: Logo */}
           <div className="col-start-1 row-start-1 flex items-start min-w-0">
-            <Link href={homeHref} className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
+            <Link href={homeHref} className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity duration-200 hover:opacity-90">
               <span className="sr-only">Digicampus homepage</span>
               {logoData ? (
                 <Image
@@ -253,7 +253,7 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
                 setLiveMessage(dark ? (language === 'nl' ? 'Lichtmodus actief' : 'Light mode active') : (language === 'nl' ? 'Donkere modus actief' : 'Dark mode active'))
                 setTimeout(() => setLiveMessage(''), 2000)
               }}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:text-[hsl(var(--dc-brand))] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
             >
               {dark ? <MoonIcon aria-hidden focusable="false" /> : <SunIcon aria-hidden focusable="false" />}
               <span className="sr-only">{dark ? (language === 'nl' ? 'Donkere modus actief' : 'Dark mode active') : (language === 'nl' ? 'Lichtmodus actief' : 'Light mode active')}</span>
@@ -263,11 +263,11 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
 
             <form role="search" className="relative min-w-0" action={searchAction} method="get">
               <label htmlFor="q" className="sr-only">{searchLabel}</label>
-              <input id="q" name="q" type="search" placeholder={searchLabel} className="w-28 sm:w-44 rounded-full outline-none px-4 py-2 pr-24 min-w-0 text-fluid-sm" style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', color: 'hsl(var(--dc-text))', border: '1px solid hsl(var(--dc-border) / 0.2)' }} onFocus={(e) => { e.currentTarget.style.boxShadow = `0 0 0 4px hsl(var(--dc-focus))`; }} onBlur={(e) => { e.currentTarget.style.boxShadow = ''; }} />
+              <input id="q" name="q" type="search" placeholder={searchLabel} className="w-28 sm:w-44 rounded-full outline-none px-4 py-2 pr-10 min-w-0 text-fluid-sm transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:text-[hsl(var(--dc-brand))]" style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', color: 'hsl(var(--dc-text))', border: '1px solid hsl(var(--dc-border) / 0.2)' }} onFocus={(e) => { e.currentTarget.style.boxShadow = `0 0 0 4px hsl(var(--dc-focus))`; e.currentTarget.style.backgroundColor = 'hsl(var(--dc-brand) / 0.08)'; e.currentTarget.style.color = 'hsl(var(--dc-brand))'; }} onBlur={(e) => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = ''; }} />
               <button
                 type="submit"
-                className="absolute right-1 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 rounded-full px-4 py-1 text-fluid-sm text-[hsl(var(--dc-text))] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-colors hover:bg-[hsl(var(--dc-text)/0.08)]"
-                style={{ backgroundColor: 'hsl(var(--dc-text) / 0.06)', border: '1px solid hsl(var(--dc-border) / 0.2)' }}
+                aria-label={searchLabel}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[hsl(var(--dc-text)/0.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--dc-focus))] rounded transition-all duration-200 hover:text-[hsl(var(--dc-brand))] hover:scale-110"
               >
                 <SearchIcon aria-hidden focusable="false" />
                 <span className="sr-only">{searchLabel}</span>
@@ -285,21 +285,23 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
                 <Link
                   key={idx}
                   href={cta.href}
-                  className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
-                  style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
+                  className="group relative inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden"
+                  style={{ background: 'linear-gradient(135deg, hsl(var(--dc-brand)) 0%, hsl(var(--dc-brand) / 0.85) 100%)', color: 'hsl(var(--dc-on-primary))', boxShadow: '0 4px 14px 0 hsl(var(--dc-brand) / 0.25)' }}
                 >
-                  <span>{cta.label}</span>
-                  <ArrowRightIcon aria-hidden focusable="false" />
+                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <span className="relative">{cta.label}</span>
+                  <ArrowRightIcon aria-hidden focusable="false" className="relative transition-transform group-hover:translate-x-1" />
                 </Link>
               ))
             ) : (
               <Link
                 href={`/${language}/contact`}
-                className="inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
-                style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
+                className="group relative inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden"
+                style={{ background: 'linear-gradient(135deg, hsl(var(--dc-brand)) 0%, hsl(var(--dc-brand) / 0.85) 100%)', color: 'hsl(var(--dc-on-primary))', boxShadow: '0 4px 14px 0 hsl(var(--dc-brand) / 0.25)' }}
               >
-                <span>Contact</span>
-                <ArrowRightIcon aria-hidden focusable="false" />
+                <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                <span className="relative">Contact</span>
+                <ArrowRightIcon aria-hidden focusable="false" className="relative transition-transform group-hover:translate-x-1" />
               </Link>
             )}
           </div>
@@ -312,13 +314,13 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
             onClick={() => setMobileOpen(v => !v)}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition-colors duration-200 hover:bg-[hsl(var(--dc-text)/0.08)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
             aria-label={mobileOpen ? (language === 'nl' ? 'Sluit menu' : 'Close menu') : (language === 'nl' ? 'Open menu' : 'Open menu')}
           >
             {mobileOpen ? <CloseIcon aria-hidden focusable="false" /> : <MenuIcon aria-hidden focusable="false" />}
           </button>
 
-          <Link href={homeHref} className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity hover:opacity-80">
+          <Link href={homeHref} className="flex items-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg transition-opacity duration-200 hover:opacity-90">
             {logoData ? (
               <Image src={logoData.url} alt={logoData.alt} width={logoData.width || 160} height={logoData.height || 40} className="h-10 w-auto drop-shadow" style={{ maxWidth: "40vw" }} />
             ) : (
@@ -335,14 +337,14 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
               }}
               aria-pressed={dark}
               aria-label={dark ? (language === 'nl' ? 'Schakel lichtmodus in' : 'Switch to light mode') : (language === 'nl' ? 'Schakel donker modus in' : 'Switch to dark mode')}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition hover:bg-[hsl(var(--dc-text)/0.06)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[hsl(var(--dc-border)/0.2)] text-[hsl(var(--dc-text))] transition-all duration-200 hover:bg-[hsl(var(--dc-brand)/0.08)] hover:text-[hsl(var(--dc-brand))] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]"
             >
               {dark ? <MoonIcon aria-hidden focusable="false" /> : <SunIcon aria-hidden focusable="false" />}
               <span className="sr-only">{dark ? (language === 'nl' ? 'Donkere modus actief' : 'Dark mode active') : (language === 'nl' ? 'Lichtmodus actief' : 'Light mode active')}</span>
             </button>
             <div className="flex items-center gap-1">
-              <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors", language === "nl" ? "" : "hover:bg-[hsl(var(--dc-text)/0.06)]"].join(" ")} style={language === "nl" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>NL</button>
-              <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors", language === "en" ? "" : "hover:bg-[hsl(var(--dc-text)/0.06)]"].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>EN</button>
+              <button onClick={() => changeLanguage("nl")} aria-pressed={language === "nl"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors duration-200", language === "nl" ? "" : "hover:bg-[hsl(var(--dc-text)/0.08)]"].join(" ")} style={language === "nl" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>NL</button>
+              <button onClick={() => changeLanguage("en")} aria-pressed={language === "en"} className={["px-2 py-1 rounded-lg font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] text-fluid-sm transition-colors duration-200", language === "en" ? "" : "hover:bg-[hsl(var(--dc-text)/0.08)]"].join(" ")} style={language === "en" ? { backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))' } : { border: '1px solid hsl(var(--dc-border)/0.18)', color: 'hsl(var(--dc-text))' }}>EN</button>
             </div>
           </div>
         </div>
@@ -360,10 +362,10 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
               {menuData.map(m => (
                 <li key={m.label}>
                   <details className="group">
-                    <summary className="cursor-pointer list-none rounded-lg px-3 py-2 transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" style={{ color: 'hsl(var(--dc-text))' }}>{m.label}</summary>
+                    <summary className="cursor-pointer list-none rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-[hsl(var(--dc-text)/0.08)]" style={{ color: 'hsl(var(--dc-text))' }}>{m.label}</summary>
                     <ul className="mt-1 ml-2 space-y-1">
                       {m.items.map((it, idx) => (
-                        <li key={`${m.label}-mobile-${idx}`}><Link href={it.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-fluid-sm transition-colors hover:bg-[hsl(var(--dc-text)/0.06)]" style={{ color: 'hsl(var(--dc-text))' }}>{it.label}</Link></li>
+                        <li key={`${m.label}-mobile-${idx}`}><Link href={it.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2 text-fluid-sm transition-colors duration-200 hover:bg-[hsl(var(--dc-text)/0.08)]" style={{ color: 'hsl(var(--dc-text))' }}>{it.label}</Link></li>
                       ))}
                     </ul>
                   </details>
@@ -379,21 +381,23 @@ export default function Header({ menus, logo, ctas = [] }: HeaderProps): React.R
                   <Link
                     key={idx}
                     href={cta.href}
-                    className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
-                    style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
+                    className="group relative ml-auto inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden"
+                    style={{ background: 'linear-gradient(135deg, hsl(var(--dc-brand)) 0%, hsl(var(--dc-brand) / 0.85) 100%)', color: 'hsl(var(--dc-on-primary))', boxShadow: '0 4px 14px 0 hsl(var(--dc-brand) / 0.25)' }}
                   >
-                    <span>{cta.label}</span>
-                    <ArrowRightIcon aria-hidden focusable="false" />
+                    <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                    <span className="relative">{cta.label}</span>
+                    <ArrowRightIcon aria-hidden focusable="false" className="relative transition-transform group-hover:translate-x-1" />
                   </Link>
                 ))
               ) : (
                 <Link
                   href={`/${language}/contact`}
-                  className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all hover:scale-105 hover:shadow-lg"
-                  style={{ backgroundColor: 'hsl(var(--dc-brand))', color: 'hsl(var(--dc-on-primary))', border: '1px solid hsl(var(--dc-border)/0.2)' }}
+                  className="group relative ml-auto inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden"
+                  style={{ background: 'linear-gradient(135deg, hsl(var(--dc-brand)) 0%, hsl(var(--dc-brand) / 0.85) 100%)', color: 'hsl(var(--dc-on-primary))', boxShadow: '0 4px 14px 0 hsl(var(--dc-brand) / 0.25)' }}
                 >
-                  <span>Contact</span>
-                  <ArrowRightIcon aria-hidden focusable="false" />
+                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <span className="relative">Contact</span>
+                  <ArrowRightIcon aria-hidden focusable="false" className="relative transition-transform group-hover:translate-x-1" />
                 </Link>
               )}
             </div>

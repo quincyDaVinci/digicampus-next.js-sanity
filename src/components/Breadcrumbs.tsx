@@ -1,4 +1,14 @@
 import Link from 'next/link'
+import { Home } from "lucide-react"
+
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 export type BreadcrumbItem = {
   label: string
@@ -14,30 +24,35 @@ export default function Breadcrumbs({ items, className }: BreadcrumbsProps) {
   if (!items.length) return null
 
   return (
-    <nav
-      aria-label="Breadcrumb"
-      className={`text-sm text-[hsl(var(--dc-text)/0.75)] ${className || ''}`.trim()}
-    >
-      <ol className="flex flex-wrap items-center gap-2">
+    <Breadcrumb className={className}>
+      <BreadcrumbList>
+        {/* Home icon as first item */}
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/" asChild>
+            <Link href="/">
+              <Home className="size-4" />
+            </Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+
         {items.map((item, index) => {
           const isLast = index === items.length - 1
           return (
-            <li key={`${item.href ?? item.label}-${index}`} className="flex items-center gap-2">
-              {isLast || !item.href ? (
-                <span className="font-medium text-[hsl(var(--dc-text))]">{item.label}</span>
-              ) : (
-                <Link
-                  href={item.href}
-                  className="transition-colors hover:text-[hsl(var(--dc-brand))] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))] rounded"
-                >
-                  {item.label}
-                </Link>
-              )}
-              {!isLast && <span aria-hidden="true" className="text-[hsl(var(--dc-border))]">/</span>}
-            </li>
+            <span key={`${item.href ?? item.label}-${index}`} className="flex items-center gap-1.5">
+              <BreadcrumbSeparator>•</BreadcrumbSeparator>
+              <BreadcrumbItem>
+                {isLast || !item.href ? (
+                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink href={item.href} asChild>
+                    <Link href={item.href}>{item.label}</Link>
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+            </span>
           )
         })}
-      </ol>
-    </nav>
+      </BreadcrumbList>
+    </Breadcrumb>
   )
 }

@@ -1,5 +1,5 @@
-import {defineField, defineType} from 'sanity'
-import {HomeIcon} from '../../lib/featherIcons'
+import { defineField, defineType } from 'sanity'
+import { HomeIcon } from '../../lib/featherIcons'
 
 /**
  * Homepage - Singleton document
@@ -11,9 +11,9 @@ export default defineType({
   type: 'document',
   icon: HomeIcon,
   groups: [
-    {name: 'content', title: 'Inhoud', default: true},
-    {name: 'translations', title: 'Vertalingen'},
-    {name: 'metadata', title: 'SEO & metadata'},
+    { name: 'content', title: 'Inhoud', default: true },
+    { name: 'translations', title: 'Vertalingen' },
+    { name: 'metadata', title: 'SEO & metadata' },
   ],
   fields: [
     defineField({
@@ -31,17 +31,21 @@ export default defineType({
       type: 'array',
       description: 'Stel de startpagina samen door secties toe te voegen',
       of: [
-        {type: 'heroSection'},
-        {type: 'featureSection'},
-        {type: 'blogSection'},
-        {type: 'testimonialsSection'},
-        {type: 'pricingSection'},
-        {type: 'ctaSection'},
-        {type: 'faqSection'},
-        {type: 'contactSection'},
-        {type: 'newsletterSection'},
-        {type: 'mediaSection'},
-        {type: 'documentAsset'},
+        { type: 'heroSection' },
+        { type: 'featureSection' },
+        { type: 'blogSection' },
+        { type: 'testimonialsSection' },
+        { type: 'pricingSection' },
+        { type: 'ctaSection' },
+        { type: 'faqSection' },
+        { type: 'contactSection' },
+        { type: 'newsletterSection' },
+        { type: 'mediaSection' },
+        { type: 'documentAsset' },
+        // SchemaUI sections
+        { type: 'splitSection' },
+        { type: 'sectionHeader' },
+        { type: 'logoCloudSection' },
       ],
       group: 'content',
       validation: (Rule) => Rule.min(1).error('Voeg minimaal één sectie toe aan de startpagina'),
@@ -50,7 +54,7 @@ export default defineType({
       name: 'translations',
       title: 'Vertalingen',
       type: 'object',
-      options: {collapsible: true, collapsed: true},
+      options: { collapsible: true, collapsed: true },
       description:
         'Groep alle vertaalde tekst op één plek. Laat leeg als je de Nederlandse canonieke tekst wilt gebruiken.',
       fields: [
@@ -58,10 +62,10 @@ export default defineType({
           name: 'en',
           title: 'English',
           type: 'object',
-          options: {columns: 1},
+          options: { columns: 1 },
           fields: [
-            defineField({name: 'title', title: 'Titel (EN)', type: 'string'}),
-            defineField({name: 'metadataTitle', title: 'Metatitel (EN)', type: 'string'}),
+            defineField({ name: 'title', title: 'Titel (EN)', type: 'string' }),
+            defineField({ name: 'metadataTitle', title: 'Metatitel (EN)', type: 'string' }),
             defineField({
               name: 'metadataDescription',
               title: 'Metabeschrijving (EN)',
@@ -72,7 +76,7 @@ export default defineType({
               name: 'modules',
               title: 'Module-tekst overschrijvingen',
               type: 'array',
-              of: [{type: 'moduleTextOverride'}],
+              of: [{ type: 'moduleTextOverride' }],
               description:
                 'Alleen tekst. Gebruik de module _key en veldnaam (bijv. heading of buttons.0.label) om copy te vertalen.',
             }),
@@ -92,7 +96,7 @@ export default defineType({
     select: {
       title: 'title',
     },
-    prepare: ({title}) => ({
+    prepare: ({ title }) => ({
       title: title || 'Startpagina',
       subtitle: 'Startpagina (singleton)',
       media: HomeIcon,

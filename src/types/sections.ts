@@ -11,10 +11,11 @@ export interface BaseSection {
 
 export interface HeroSectionProps extends BaseSection {
   _type: 'heroSection'
-  variant?: string
+  variant?: 'centered' | 'split' | 'minimal' | 'buttonBanner' | 'badgeBanner' | 'gridGallery' // old values for backward compat
   heading?: string
   subheading?: string
   badgeText?: string
+  textColor?: 'auto' | 'light' | 'dark'
   buttons?: Array<{
     _key: string
     label?: string
@@ -211,7 +212,7 @@ export interface DocumentAssetProps extends BaseSection {
   htmlAlternativePortableText?: Array<{
     _key: string
     _type: string
-    children?: Array<{_key: string; _type: string; text?: string}>
+    children?: Array<{ _key: string; _type: string; text?: string }>
   }>
   wcagStatus?: boolean
   language?: string
@@ -242,6 +243,46 @@ export interface TeamSectionProps extends BaseSection {
   // When autoIncludeAll is false the section will not show any members (manual selection removed)
 }
 
+export interface SplitSectionProps extends BaseSection {
+  _type: 'splitSection'
+  layout?: 'imageLeft' | 'imageRight' | 'imageTop' | 'imageBottom'
+  tagline?: string
+  heading?: string
+  body?: string
+  infoList?: string[]
+  cta?: {
+    label?: string
+    url?: string
+    variant?: 'default' | 'outline'
+  }
+  image?: import('@sanity/image-url').SanityImageSource & {
+    alt?: string
+    caption?: string
+    objectFit?: 'cover' | 'contain'
+    aspectRatio?: 'auto' | '16/9' | '4/3' | '1/1' | '3/2'
+  }
+}
+
+export interface SectionHeaderProps extends BaseSection {
+  _type: 'sectionHeader'
+  tagline?: string
+  title?: string
+  body?: string
+  alignment?: 'left' | 'center'
+}
+
+export interface LogoCloudSectionProps extends BaseSection {
+  _type: 'logoCloudSection'
+  title?: string
+  logos?: Array<{
+    _key: string
+    image?: import('@sanity/image-url').SanityImageSource
+    alt?: string
+    url?: string
+  }>
+  grayscale?: boolean
+}
+
 export type SectionProps =
   | HeroSectionProps
   | FeatureSectionProps
@@ -255,4 +296,7 @@ export type SectionProps =
   | MediaSectionProps
   | DocumentAssetProps
   | TeamSectionProps
+  | SplitSectionProps
+  | SectionHeaderProps
+  | LogoCloudSectionProps
 

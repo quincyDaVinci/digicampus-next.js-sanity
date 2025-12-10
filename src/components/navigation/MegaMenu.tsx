@@ -178,10 +178,10 @@ export default function MegaMenu({ menus, language, currentPath }: Props) {
                 className={`
                   relative inline-flex items-center gap-2 rounded-lg px-4 py-2.5
                   focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]
-                  whitespace-nowrap transition-all duration-200
+                  whitespace-nowrap transition-[background-color,transform] duration-200
                   ${isActive
                     ? 'text-[hsl(var(--dc-brand))] font-semibold after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-3/4 after:h-0.5 after:bg-[hsl(var(--dc-brand))] after:rounded-full'
-                    : 'hover:text-[hsl(var(--dc-brand))] hover:bg-[hsl(var(--dc-brand)/0.05)]'
+                    : 'hover:text-[hsl(var(--dc-brand))] hover:bg-[hsl(var(--dc-brand)/0.08)]'
                   }
                 `}
                 style={{ minWidth: '44px', minHeight: '44px' }}
@@ -213,12 +213,12 @@ export default function MegaMenu({ menus, language, currentPath }: Props) {
                   className={`
                     relative inline-flex items-center gap-2 rounded-lg px-4 py-2.5
                     focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]
-                    whitespace-nowrap transition-all duration-200
+                    whitespace-nowrap transition-[background-color,transform] duration-200
                     ${hasActiveItem
                       ? 'text-[hsl(var(--dc-brand))] font-semibold after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-3/4 after:h-0.5 after:bg-[hsl(var(--dc-brand))] after:rounded-full'
                       : openIndex === idx
                         ? 'text-[hsl(var(--dc-brand))] bg-[hsl(var(--dc-brand)/0.1)]'
-                        : 'hover:text-[hsl(var(--dc-brand))] hover:bg-[hsl(var(--dc-brand)/0.05)]'
+                        : 'hover:text-[hsl(var(--dc-brand))] hover:bg-[hsl(var(--dc-brand)/0.08)]'
                     }
                   `}
                   style={{ minWidth: '44px', minHeight: '44px' }}

@@ -65,12 +65,12 @@ export default function LanguageDropdown({ currentLang, onChangeLang }: Props) {
                 aria-haspopup="true"
                 aria-label={`Current language: ${currentLanguage?.label}. Click to change language`}
                 className={`
-          inline-flex items-center gap-2 rounded-lg px-3 py-2
+          group inline-flex items-center gap-2 rounded-lg px-3 py-2
           transition-all duration-200
           focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--dc-focus))]
           ${isOpen
                         ? 'bg-[hsl(var(--dc-brand)/0.1)] text-[hsl(var(--dc-brand))]'
-                        : 'hover:bg-[hsl(var(--dc-brand)/0.05)] hover:text-[hsl(var(--dc-brand))]'
+                        : 'hover:bg-[hsl(var(--dc-brand)/0.08)] hover:text-[hsl(var(--dc-brand))]'
                     }
         `}
                 style={{ minWidth: '44px', minHeight: '44px' }}
@@ -78,7 +78,7 @@ export default function LanguageDropdown({ currentLang, onChangeLang }: Props) {
                 <GlobeIcon className="h-5 w-5" />
                 <span className="text-sm font-medium">{currentLanguage?.short}</span>
                 <ChevronDownIcon
-                    className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                    className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : 'group-hover:rotate-180'}`}
                 />
             </button>
 
@@ -107,10 +107,10 @@ export default function LanguageDropdown({ currentLang, onChangeLang }: Props) {
                                 onClick={() => handleSelect(lang.code)}
                                 className={`
                   w-full text-left px-4 py-3 text-sm
-                  transition-colors duration-150
+                  transition-colors duration-200
                   ${lang.code === currentLang
                                         ? 'bg-[hsl(var(--dc-brand)/0.1)] text-[hsl(var(--dc-brand))] font-semibold'
-                                        : 'hover:bg-[hsl(var(--dc-brand)/0.05)] hover:text-[hsl(var(--dc-brand))]'
+                                        : 'hover:bg-[hsl(var(--dc-brand)/0.08)] hover:text-[hsl(var(--dc-brand))]'
                                     }
                 `}
                                 style={{ minHeight: '44px' }}
