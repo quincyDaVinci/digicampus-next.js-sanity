@@ -13,6 +13,7 @@ export default function SplitSection(props: SplitSectionProps) {
     const caption = (hasImage && 'caption' in image ? image.caption as string : '') || '';
     const objectFit = (hasImage && 'objectFit' in image ? image.objectFit as string : 'cover') || 'cover';
     const aspectRatio = (hasImage && 'aspectRatio' in image ? image.aspectRatio as string : 'auto') || 'auto';
+    const displaySize = (hasImage && 'displaySize' in image && typeof image.displaySize === 'number' ? image.displaySize : 100);
 
     // Build image URL with proper parameters based on objectFit
     const imageUrl = (() => {
@@ -103,11 +104,12 @@ export default function SplitSection(props: SplitSectionProps) {
         // When aspectRatio is auto and objectFit is contain, let image determine size naturally
         if (aspectRatio === 'auto' && objectFit === 'contain') {
             return (
-                <figure className="relative">
+                <figure className="relative flex justify-center">
                     <img
                         src={imageUrl}
                         alt={altText}
-                        className="w-full h-auto object-contain"
+                        className={`h-auto object-contain`}
+                        style={{ maxWidth: `${displaySize}%`, width: '100%' }}
                         loading="lazy"
                     />
                     {caption && (
@@ -123,7 +125,7 @@ export default function SplitSection(props: SplitSectionProps) {
         return (
             <figure className="relative">
                 <div
-                    className={`relative w-full ${objectFit === 'cover' ? 'rounded-2xl shadow-lg bg-[hsl(var(--dc-bg-soft))] overflow-hidden' : ''}`}
+                    className={`relative w-full flex justify-center ${objectFit === 'cover' ? 'rounded-2xl shadow-lg bg-[hsl(var(--dc-bg-soft))] overflow-hidden' : ''}`}
                     style={{
                         aspectRatio: aspectRatio === 'auto' ? '16/9' : aspectRatio,
                     }}
@@ -131,7 +133,8 @@ export default function SplitSection(props: SplitSectionProps) {
                     <img
                         src={imageUrl}
                         alt={altText}
-                        className={`${objectFit === 'contain' ? 'w-full h-full object-contain' : 'w-full h-full object-cover'}`}
+                        className={objectFit === 'contain' ? 'h-full object-contain' : 'w-full h-full object-cover'}
+                        style={objectFit === 'contain' ? { maxWidth: `${displaySize}%` } : {}}
                         loading="lazy"
                     />
                 </div>
@@ -172,11 +175,37 @@ export default function SplitSection(props: SplitSectionProps) {
         );
     }
 
+
+    // Calculate fractional widths based on displaySize (for contain mode only)
+    const getGridColumnClass = () => {
+        if (objectFit !== 'contain') {
+            return 'lg:grid-cols-2'; // Default 50/50 split for cover mode
+        }
+
+        // For contain mode, adjust based on displaySize percentage
+        // When imageLeft: image is column 1, text is column 2
+        // When imageRight: text is column 1, image is column 2
+        const isImageLeft = layout === 'imageLeft';
+
+        // Calculate fraction based on percentage (e.g., 25% = 1fr, 75% = 3fr)
+        const imageFr = Math.round(displaySize / 25) || 1; // Convert percentage to fraction
+        const textFr = Math.round((100 - displaySize) / 25) || 1;
+
+        if (imageFr === textFr) {
+            return 'lg:grid-cols-2'; // Equal split
+        }
+
+        return isImageLeft
+            ? `lg:grid-cols-[${imageFr}fr_${textFr}fr]`
+            : `lg:grid-cols-[${textFr}fr_${imageFr}fr]`;
+    };
+
     // Layout: Image Left or Right (two columns)
+    const gridColClass = getGridColumnClass();
     return (
         <section className="w-full py-16 sm:py-24">
             <div className="container mx-auto px-4 sm:px-6">
-                <div className={`grid lg:grid-cols-2 gap-12 lg:gap-16 items-center ${layout === 'imageRight' ? 'lg:grid-flow-dense' : ''
+                <div className={`grid ${gridColClass} gap-12 lg:gap-16 items-center ${layout === 'imageRight' ? 'lg:grid-flow-dense' : ''
                     }`}>
                     <div className={layout === 'imageRight' ? 'lg:col-start-2' : ''}>
                         <ImageBlock />

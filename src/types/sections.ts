@@ -121,6 +121,16 @@ export interface CTASectionProps extends BaseSection {
     accessibleVersionUrl?: string
     accessibilityNote?: string
   }>
+  bannerBackground?: boolean
+  backgroundColor?: 'soft' | 'accent' | 'none'
+  layout?: 'noImage' | 'imageLeft' | 'imageRight' | 'imageTop' | 'imageBottom'
+  image?: import('@sanity/image-url').SanityImageSource & {
+    alt?: string
+    caption?: string
+    objectFit?: 'cover' | 'contain'
+    aspectRatio?: 'auto' | '16/9' | '4/3' | '1/1' | '3/2'
+    displaySize?: number
+  }
 }
 
 export interface FAQSectionProps extends BaseSection {
@@ -260,6 +270,7 @@ export interface SplitSectionProps extends BaseSection {
     caption?: string
     objectFit?: 'cover' | 'contain'
     aspectRatio?: 'auto' | '16/9' | '4/3' | '1/1' | '3/2'
+    displaySize?: number
   }
 }
 

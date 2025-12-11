@@ -119,9 +119,14 @@ export function HomePagePreview({ query, params }: HomePagePreviewProps) {
 
   return (
     <section className="contents" aria-label="Home page preview">
-      {data.modules.map((module) => (
-        <RenderSection key={module._key} section={module} />
-      ))}
+      {data.modules.map((module) => {
+        // Create a stable but content-sensitive key to force re-render on changes
+        // This ensures React re-renders components when content changes in preview mode
+        const contentHash = JSON.stringify(module).length; // Simple hash based on content length
+        const stableKey = `${module._key}-${contentHash}`;
+
+        return <RenderSection key={stableKey} section={module} />;
+      })}
     </section>
   )
 }
