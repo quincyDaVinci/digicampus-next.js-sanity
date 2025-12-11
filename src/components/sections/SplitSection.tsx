@@ -7,9 +7,16 @@ import Link from 'next/link';
 export default function SplitSection(props: SplitSectionProps) {
     const { layout = 'imageLeft', tagline, heading, body, infoList, cta, image } = props;
 
-    // Build image URL
+    // Safely extract image metadata with proper null checks
+    const hasImage = image && typeof image === 'object';
+    const altText = (hasImage && 'alt' in image ? image.alt as string : '') || '';
+    const caption = (hasImage && 'caption' in image ? image.caption as string : '') || '';
+    const objectFit = (hasImage && 'objectFit' in image ? image.objectFit as string : 'cover') || 'cover';
+    const aspectRatio = (hasImage && 'aspectRatio' in image ? image.aspectRatio as string : 'auto') || 'auto';
+
+    // Build image URL with proper parameters based on objectFit
     const imageUrl = (() => {
-        if (!image || (typeof image === 'object' && !image.asset)) return null;
+        if (!hasImage || !image.asset) return null;
         try {
             const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
             const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
@@ -23,19 +30,21 @@ export default function SplitSection(props: SplitSectionProps) {
                 assetId = maybe._ref || maybe._id;
             }
             if (assetId && baseUrl) {
-                const srcObj = buildSrc({ id: assetId, baseUrl, width: 1200, height: 800, mode: 'cover' });
+                // When using contain, use contain mode without forced height to preserve aspect ratio
+                // When using cover, use cover mode with dimensions for proper cropping
+                const buildParams = objectFit === 'contain'
+                    ? { id: assetId, baseUrl, width: 1200, mode: 'contain' as const }
+                    : { id: assetId, baseUrl, width: 1200, height: 800, mode: 'cover' as const };
+
+                const srcObj = buildSrc(buildParams);
                 return srcObj?.src ?? null;
             }
         } catch (err) {
+            console.error('Error building image URL:', err);
             return null;
         }
         return null;
     })();
-
-    const altText = (typeof image === 'object' && image && 'alt' in image ? image.alt as string : '') || '';
-    const caption = (typeof image === 'object' && image && 'caption' in image ? image.caption as string : '') || '';
-    const objectFit = (typeof image === 'object' && image && 'objectFit' in image ? image.objectFit as string : 'cover') || 'cover';
-    const aspectRatio = (typeof image === 'object' && image && 'aspectRatio' in image ? image.aspectRatio as string : 'auto') || 'auto';
 
     // Render content block
     const ContentBlock = () => (
@@ -76,8 +85,8 @@ export default function SplitSection(props: SplitSectionProps) {
                     <Link
                         href={cta.url}
                         className={`inline-flex items-center justify-center gap-2 rounded-lg px-6 py-2.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[hsl(var(--dc-focus))] ${cta.variant === 'outline'
-                                ? 'border border-[hsl(var(--dc-border))] hover:bg-[hsl(var(--dc-bg-soft))]'
-                                : 'bg-[hsl(var(--dc-brand))] text-[hsl(var(--dc-on-primary))] hover:opacity-90 shadow-sm'
+                            ? 'border border-[hsl(var(--dc-border))] hover:bg-[hsl(var(--dc-bg-soft))]'
+                            : 'bg-[hsl(var(--dc-brand))] text-[hsl(var(--dc-on-primary))] hover:opacity-90 shadow-sm'
                             }`}
                     >
                         {cta.label}
@@ -114,7 +123,7 @@ export default function SplitSection(props: SplitSectionProps) {
         return (
             <figure className="relative">
                 <div
-                    className="relative w-full overflow-hidden rounded-2xl shadow-lg bg-[hsl(var(--dc-bg-soft))]"
+                    className={`relative w-full rounded-2xl shadow-lg bg-[hsl(var(--dc-bg-soft))] ${objectFit === 'contain' ? 'p-4' : 'overflow-hidden'}`}
                     style={{
                         aspectRatio: aspectRatio === 'auto' ? '16/9' : aspectRatio,
                     }}
@@ -122,7 +131,7 @@ export default function SplitSection(props: SplitSectionProps) {
                     <img
                         src={imageUrl}
                         alt={altText}
-                        className={`w-full h-full ${objectFit === 'contain' ? 'object-contain' : 'object-cover'}`}
+                        className={`${objectFit === 'contain' ? 'w-full h-full object-contain' : 'w-full h-full object-cover'}`}
                         loading="lazy"
                     />
                 </div>
