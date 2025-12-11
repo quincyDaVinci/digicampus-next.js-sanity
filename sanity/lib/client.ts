@@ -15,13 +15,14 @@ export const client = createClient({
 })
 
 // Client for preview/draft mode with live updates
+// Use NEXT_PUBLIC_ prefixed variable for client-side access, fallback to server-side variable
 export const previewClient = createClient({
   projectId,
   dataset,
   apiVersion,
   useCdn: false,
   perspective: 'previewDrafts',
-  token: process.env.SANITY_API_READ_TOKEN,
+  token: process.env.NEXT_PUBLIC_SANITY_API_READ_TOKEN || process.env.SANITY_API_READ_TOKEN,
   stega: {
     enabled: true,
     studioUrl,
