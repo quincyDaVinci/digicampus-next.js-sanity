@@ -9,6 +9,10 @@ import {applyModuleTextOverrides} from '@/lib/applyModuleTranslations'
 import {PagePreview} from './PagePreview'
 import { buildSrc } from 'sanity-image'
 
+// Refresh Sanity-backed pages regularly and allow webhook-based revalidation
+export const revalidate = 300
+const REVALIDATE_SECONDS = revalidate
+
 // Lightweight types for Sanity image-like shapes we handle here
 type SanityImageLike = { asset?: { _ref?: string; _id?: string } } | string | null | undefined
 
@@ -164,7 +168,7 @@ export async function generateMetadata({ params }: PageParams) {
     >(metadataQuery, {
       slug,
       lang,
-    })
+    }, { next: { revalidate: REVALIDATE_SECONDS } })
     if (!data) return { title: slug }
     const localizedTitle = data.localized?.title ?? data.title ?? slug
     const localizedDescription = data.localized?.metadataDescription ?? data.metadata?.description
@@ -195,6 +199,7 @@ export default async function Page({ params }: PageParams) {
 
   // Use previewClient in draft mode to see unpublished changes
   const activeClient = draft.isEnabled ? previewClient : client
+  const fetchOptions = draft.isEnabled ? { cache: 'no-store' } : { next: { revalidate: REVALIDATE_SECONDS } }
   const page = await activeClient.fetch<
     | {
         _id: string
@@ -206,7 +211,7 @@ export default async function Page({ params }: PageParams) {
         }
       }
     | null
-  >(pageQuery, {slug, lang})
+  >(pageQuery, {slug, lang}, fetchOptions)
 
   if (!page) {
     notFound()
