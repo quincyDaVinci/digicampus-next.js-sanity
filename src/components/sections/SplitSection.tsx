@@ -107,7 +107,7 @@ export default function SplitSection(props: SplitSectionProps) {
                     <img
                         src={imageUrl}
                         alt={altText}
-                        className="w-full h-auto object-contain rounded-2xl shadow-lg"
+                        className="w-full h-auto object-contain"
                         loading="lazy"
                     />
                     {caption && (
@@ -123,7 +123,7 @@ export default function SplitSection(props: SplitSectionProps) {
         return (
             <figure className="relative">
                 <div
-                    className={`relative w-full rounded-2xl shadow-lg bg-[hsl(var(--dc-bg-soft))] ${objectFit === 'contain' ? 'p-4' : 'overflow-hidden'}`}
+                    className={`relative w-full ${objectFit === 'cover' ? 'rounded-2xl shadow-lg bg-[hsl(var(--dc-bg-soft))] overflow-hidden' : ''}`}
                     style={{
                         aspectRatio: aspectRatio === 'auto' ? '16/9' : aspectRatio,
                     }}
