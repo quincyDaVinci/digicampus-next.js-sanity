@@ -29,8 +29,10 @@ export const previewClient = createClient({
 })
 
 // Helper: fetch queries with Next.js ISR-compatible options by default
-export async function fetchQuery<T = unknown>(query: string, params?: Record<string, unknown> | undefined, revalidateSeconds = 300): Promise<T> {
+export async function fetchQuery<T = unknown>(query: string, params?: Record<string, unknown> | undefined, revalidateSeconds?: number): Promise<T> {
   // Use an empty params object when none is provided to satisfy type overloads
   const safeParams = params ?? {}
-  return client.fetch<T>(query, safeParams as any, { next: { revalidate: revalidateSeconds } } as any)
+  // In development, disable caching for fresh data. In production, default to 300s (5 min) cache
+  const revalidate = revalidateSeconds !== undefined ? revalidateSeconds : (process.env.NODE_ENV === 'production' ? 300 : 0)
+  return client.fetch<T>(query, safeParams as any, { next: { revalidate } } as any)
 }

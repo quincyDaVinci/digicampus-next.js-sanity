@@ -1,12 +1,12 @@
-import {groq} from 'next-sanity'
-import {notFound} from 'next/navigation'
-import {draftMode} from 'next/headers'
+import { groq } from 'next-sanity'
+import { notFound } from 'next/navigation'
+import { draftMode } from 'next/headers'
 
 import RenderSection from '@/components/sections/RenderSection'
-import {client, previewClient} from '@sanity/lib/client'
-import {defaultLanguage, supportedLanguages} from '@/lib/i18n'
-import {applyModuleTextOverrides} from '@/lib/applyModuleTranslations'
-import {PagePreview} from './PagePreview'
+import { client, previewClient } from '@sanity/lib/client'
+import { defaultLanguage, supportedLanguages } from '@/lib/i18n'
+import { applyModuleTextOverrides } from '@/lib/applyModuleTranslations'
+import { PagePreview } from './PagePreview'
 import { buildSrc } from 'sanity-image'
 
 // Refresh Sanity-backed pages regularly and allow webhook-based revalidation
@@ -59,7 +59,7 @@ async function generateBlurDataURL(source: SanityImageLike) {
 
 async function attachBlurDataToModule(module: Record<string, unknown>) {
   // Clone shallow
-  const m = {...module} as Record<string, unknown>
+  const m = { ...module } as Record<string, unknown>
 
   const tasks: Promise<void>[] = []
 
@@ -74,7 +74,7 @@ async function attachBlurDataToModule(module: Record<string, unknown>) {
     tasks.push((async () => {
       const blur = await generateBlurDataURL(maybeImage as unknown as SanityImageLike)
       if (blur) {
-        ;(obj as Record<string, unknown>)[key] = ({...(maybeImage as Record<string, unknown>), blurDataURL: blur} as unknown) as unknown
+        ; (obj as Record<string, unknown>)[key] = ({ ...(maybeImage as Record<string, unknown>), blurDataURL: blur } as unknown) as unknown
       }
     })())
   }
@@ -84,20 +84,20 @@ async function attachBlurDataToModule(module: Record<string, unknown>) {
   if (m.media && typeof m.media === 'object') setBlur(m.media as Record<string, unknown>, 'image')
   if (m.author && typeof m.author === 'object') setBlur(m.author as Record<string, unknown>, 'image')
   if (Array.isArray(m.allTeamMembers)) {
-    ;(m.allTeamMembers as unknown[]).forEach((member) => setBlur(member as Record<string, unknown>, 'image'))
+    ; (m.allTeamMembers as unknown[]).forEach((member) => setBlur(member as Record<string, unknown>, 'image'))
   }
   if (Array.isArray(m.gallery)) {
-    const gallery = (m.gallery as unknown[]).map((img) => ({...(img as Record<string, unknown>)}))
+    const gallery = (m.gallery as unknown[]).map((img) => ({ ...(img as Record<string, unknown>) }))
     gallery.forEach((img, idx) => {
       tasks.push((async () => {
         const maybeImg = img as Record<string, unknown>
         if (maybeImg?.asset) {
           const blur = await generateBlurDataURL(maybeImg as unknown as SanityImageLike)
-          if (blur) gallery[idx] = ({...maybeImg, blurDataURL: blur})
+          if (blur) gallery[idx] = ({ ...maybeImg, blurDataURL: blur })
         }
       })())
     })
-    ;(m as Record<string, unknown>).gallery = gallery as unknown
+      ; (m as Record<string, unknown>).gallery = gallery as unknown
   }
 
   await Promise.all(tasks)
@@ -137,12 +137,12 @@ export async function generateStaticParams() {
   if (!hasSanityCredentials) return []
   try {
     const pages = await client.fetch<
-      Array<{localizedSlugs?: Record<string, {current?: string}>}>
+      Array<{ localizedSlugs?: Record<string, { current?: string }> }>
     >(groq`*[_type == "page" && (defined(metadata.localizedSlugs.en.current) || defined(metadata.localizedSlugs.nl.current))]{
       "localizedSlugs": metadata.localizedSlugs
     }`)
 
-    return pages.flatMap(({localizedSlugs}) =>
+    return pages.flatMap(({ localizedSlugs }) =>
       supportedLanguages.map((lang) => ({
         lang,
         slug: localizedSlugs?.[lang]?.current ?? '',
@@ -163,7 +163,7 @@ export async function generateMetadata({ params }: PageParams) {
 
   try {
     const data = await client.fetch<
-      | {title?: string; metadata?: {language?: string; description?: string}; localized?: {title?: string; metadataDescription?: string}}
+      | { title?: string; metadata?: { language?: string; description?: string }; localized?: { title?: string; metadataDescription?: string } }
       | null
     >(metadataQuery, {
       slug,
@@ -202,23 +202,23 @@ export default async function Page({ params }: PageParams) {
   const fetchOptions = draft.isEnabled ? { cache: 'no-store' } : { next: { revalidate: REVALIDATE_SECONDS } }
   const page = await activeClient.fetch<
     | {
-        _id: string
-        title: string
-        modules?: Array<{_key: string; _type: string}>
-        localized?: {
-          title?: string
-          modules?: Array<{moduleKey?: string; fieldPath?: string; text?: string}>
-        }
+      _id: string
+      title: string
+      modules?: Array<{ _key: string; _type: string }>
+      localized?: {
+        title?: string
+        modules?: Array<{ moduleKey?: string; fieldPath?: string; text?: string }>
       }
+    }
     | null
-  >(pageQuery, {slug, lang}, fetchOptions)
+  >(pageQuery, { slug, lang }, fetchOptions)
 
   if (!page) {
     notFound()
   }
 
   if (draft.isEnabled) {
-    return <PagePreview initial={{ data: page, sourceMap: undefined }} query={pageQuery} params={{ slug, lang }} />
+    return <PagePreview query={pageQuery} params={{ slug, lang }} />
   }
 
   const overrides = page.localized?.modules

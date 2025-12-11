@@ -110,11 +110,11 @@ type HomePageData = {
   _id: string
   title?: string
   metadata?: Record<string, unknown>
-  modules?: Array<{_key: string; _type: string}>
+  modules?: Array<{ _key: string; _type: string }>
   localized?: {
     title?: string
     metadataDescription?: string
-    modules?: Array<{moduleKey?: string; fieldPath?: string; text?: string}>
+    modules?: Array<{ moduleKey?: string; fieldPath?: string; text?: string }>
   }
 }
 
@@ -159,7 +159,7 @@ export default async function Page({ params }: HomeParams) {
 
   // If in draft mode, use the live preview component
   if (draft.isEnabled && page) {
-    return <HomePagePreview initial={{ data: page, sourceMap: undefined }} query={homePageQuery} params={{ lang }} />
+    return <HomePagePreview query={homePageQuery} params={{ lang }} />
   }
 
   // If no home page exists yet, show a welcome message
