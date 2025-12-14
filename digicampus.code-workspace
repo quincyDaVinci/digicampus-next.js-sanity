@@ -1,0 +1,180 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "packages/web",
+      "name": "Web App (Next.js)"
+    },
+    {
+      "path": "packages/studio",
+      "name": "Studio (Sanity)"
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/dist": true,
+      "**/.sanity": true
+    },
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/.turbo": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "bradlc.vscode-tailwindcss",
+      "dsznajder.es7-react-js-snippets",
+      "mgmcdermott.vscode-language-babel",
+      "sanity-io.sanity"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Web Dev Server",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/packages/web/node_modules/.bin/next",
+        "args": ["dev", "--turbopack"],
+        "cwd": "${workspaceFolder}/packages/web",
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Studio Dev Server",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/packages/studio/node_modules/.bin/sanity",
+        "args": ["dev"],
+        "cwd": "${workspaceFolder}/packages/studio",
+        "console": "integratedTerminal"
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Install Dependencies",
+        "type": "shell",
+        "command": "npm",
+        "args": ["install"],
+        "isBackground": false
+      },
+      {
+        "label": "Dev: Web App",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "dev"],
+        "isBackground": true,
+        "problemMatcher": {
+          "pattern": {
+            "regexp": "^(.*)$",
+            "file": 1
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^.*Next.js.*ready on.*",
+            "endsPattern": "^.*Next.js.*ready on.*"
+          }
+        },
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": true
+        }
+      },
+      {
+        "label": "Dev: Studio",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "studio:dev"],
+        "isBackground": true,
+        "problemMatcher": {
+          "pattern": {
+            "regexp": "^(.*)$",
+            "file": 1
+          }
+        },
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false
+        }
+      },
+      {
+        "label": "Dev: Both (Web + Studio)",
+        "type": "shell",
+        "command": "npm run dev & npm run studio:dev",
+        "isBackground": true,
+        "presentation": {
+          "echo": true,
+          "reveal": "always"
+        }
+      },
+      {
+        "label": "Build: Web",
+        "type": "shell",
+        "command": "npm",
+        "args": ["--workspace=@digicampus/web", "run", "build"],
+        "problemMatcher": ["$tsc"]
+      },
+      {
+        "label": "Build: Studio",
+        "type": "shell",
+        "command": "npm",
+        "args": ["--workspace=@digicampus/studio", "run", "build"],
+        "problemMatcher": ["$tsc"]
+      },
+      {
+        "label": "Lint",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "lint"],
+        "problemMatcher": ["$eslint-stylish"]
+      },
+      {
+        "label": "Type Check",
+        "type": "shell",
+        "command": "npx",
+        "args": ["tsc", "--noEmit"],
+        "problemMatcher": ["$tsc"]
+      },
+      {
+        "label": "Generate Types (Sanity)",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "typegen"]
+      },
+      {
+        "label": "Deploy: Web",
+        "type": "shell",
+        "command": "npm",
+        "args": ["--workspace=@digicampus/web", "run", "build"]
+      },
+      {
+        "label": "Deploy: Studio",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "studio:deploy"]
+      }
+    ]
+  }
+}

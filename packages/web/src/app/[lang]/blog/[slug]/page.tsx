@@ -1,0 +1,458 @@
+import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { client } from '@sanity/lib/client'
+import { groq } from 'next-sanity'
+import Link from 'next/link'
+// url building now handled via `sanity-image` plugin
+import { buildSrc } from 'sanity-image'
+import { CalendarIcon, ClockIcon, ChevronLeftIcon } from '@/components/icons/FeatherIcons'
+import Breadcrumbs from '@/components/Breadcrumbs'
+import { PortableText, type PortableTextBlock } from 'next-sanity'
+import ImageLightbox from '@/components/ImageLightbox'
+import AuthorCard from '@/components/AuthorCard'
+import ParallaxImage from '@/components/ParallaxImage'
+import BlogSection from '@/components/sections/BlogSection'
+import { defaultLanguage } from '@/lib/i18n'
+import { getBlogTranslation } from '@/lib/blogTranslations'
+
+// Revalidate this page every 300 seconds (ISR). Use the webhook to revalidate immediately when content changes.
+export const revalidate = 300
+
+
+
+type BlogPost = {
+  _id: string
+  title: string
+  slug: string
+  publishedAt: string
+  estimatedReadTime?: number
+  viewCount?: number
+  mainImage?: {
+    asset: {
+      _id: string
+      url: string
+    }
+    alt?: string
+  }
+  author?: {
+    _id: string
+    name: string
+    role?: string
+    company?: string
+    bio?: string
+    image?: {
+      asset: {
+        _id: string
+        url: string
+      }
+    }
+  }
+  categories?: Array<{
+    _id: string
+    title: string
+    slug: string
+  }>
+  tags?: Array<{ _ref?: string }>
+  relatedPosts?: {
+    heading?: string
+    subheading?: string
+    relationMode?: 'recent' | 'tags' | 'author' | 'readTime'
+  }
+  body?: PortableTextBlock[]
+  excerpt?: string
+}
+
+const blogPostQuery = groq`
+  *[_type == "blogPost" && slug.current == $slug][0]{
+    _id,
+    "title": select(
+      $lang == "en" && defined(translations.en.title) => translations.en.title,
+      title
+    ),
+    "slug": slug.current,
+    publishedAt,
+    "excerpt": select(
+      $lang == "en" && defined(translations.en.excerpt) => translations.en.excerpt,
+      excerpt
+    ),
+    "body": select(
+      $lang == "en" && defined(translations.en.body) => translations.en.body,
+      body
+    ),
+    estimatedReadTime,
+    viewCount,
+    mainImage{
+      asset->{
+        _id,
+        url,
+        metadata {
+          dimensions,
+          lqip
+        }
+      },
+      hotspot,
+      alt
+    },
+    tags[]{_ref, _type},
+    relatedPosts,
+    author->{
+      _id,
+      name,
+      "slug": slug.current,
+      role,
+      company,
+      bio,
+      image{
+        asset->{
+          _id,
+          url,
+          metadata {
+            dimensions,
+            lqip
+          }
+        },
+        hotspot
+      }
+    },
+    categories[]->{
+      _id,
+      title,
+      "slug": slug.current
+    }
+  }
+`
+
+type PageProps = {
+  params: Promise<{ slug: string; lang: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug, lang = defaultLanguage } = await params
+
+  try {
+    const post = await client.fetch<BlogPost | null>(blogPostQuery, { slug, lang }, { next: { revalidate: 300 } })
+
+    if (!post) {
+      return {
+        title: 'Blog niet gevonden',
+      }
+    }
+
+    return {
+      title: post.title,
+      description: post.excerpt || `Lees ${post.title} op Digicampus`,
+      openGraph: { locale: lang === 'nl' ? 'nl_NL' : 'en_US' },
+      alternates: {
+        languages: {
+          en: `/en/blog/${slug}`,
+          nl: `/nl/blog/${slug}`,
+        },
+      },
+    }
+  } catch (error) {
+    console.error('Error generating metadata:', error)
+    return {
+      title: 'Blog',
+    }
+  }
+}
+
+export default async function BlogPostPage({ params }: PageProps) {
+  const { slug, lang = defaultLanguage } = await params
+  const t = (key: Parameters<typeof getBlogTranslation>[1]) => getBlogTranslation(lang, key)
+
+  try {
+    const post = await client.fetch<BlogPost | null>(blogPostQuery, { slug, lang }, { next: { revalidate: 300 } })
+
+    if (!post) {
+      notFound()
+    }
+
+    // Format date on server only to avoid hydration mismatch
+    const formattedDate = post.publishedAt
+      ? new Date(post.publishedAt).toLocaleDateString(lang === 'nl' ? 'nl-NL' : 'en-US', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'Europe/Amsterdam',
+      })
+      : null
+
+    type SanityImageLike = { asset?: { _ref?: string; _id?: string } } | string | null | undefined
+
+    const makeSrc = (img: SanityImageLike, w?: number, h?: number, mode: 'cover' | 'contain' = 'cover') => {
+      if (!img) return null
+      try {
+        const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+        const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+        const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+        let assetId: string | undefined
+        if (typeof img === 'string') {
+          assetId = img
+        } else if (img && typeof img === 'object') {
+          const maybeAsset = (img as { asset?: unknown }).asset as unknown
+          if (maybeAsset && typeof maybeAsset === 'object') {
+            const a = maybeAsset as { _ref?: string; _id?: string }
+            assetId = a._ref || a._id
+          }
+        }
+        if (assetId && baseUrl) {
+          const srcObj = buildSrc({ id: assetId, baseUrl, width: w, height: h, mode })
+          return srcObj?.src ?? null
+        }
+      } catch (err) {
+        // fall through; plugin couldn't build URL
+      }
+      return null
+    }
+
+    const imageUrl = makeSrc(post.mainImage, 1200, 630, 'cover')
+    const imageFullSrc = makeSrc(post.mainImage, 2000, 1200, 'cover')
+    const authorImageUrl = makeSrc(post.author?.image, 96, 96, 'cover')
+
+    const breadcrumbs = [
+      { label: t('home'), href: `/${lang}` },
+      { label: t('blog'), href: `/${lang}/blog` },
+      { label: post.title },
+    ]
+
+    return (
+      <>
+        <div className="border-b border-dc bg-dc-surface-98">
+          <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+            <Breadcrumbs items={breadcrumbs} />
+          </div>
+        </div>
+
+        <article className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+          {/* Back link */}
+          <Link
+            href={`/${lang}/blog`}
+            className="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-[hsl(var(--dc-brand))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--dc-focus))] rounded-lg mb-8"
+            style={{ color: 'hsl(var(--dc-text) / 0.7)' }}
+          >
+            <ChevronLeftIcon className="h-4 w-4" aria-hidden />
+            {t('backToBlog')}
+          </Link>
+
+          {/* Categories */}
+          {post.categories && post.categories.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {post.categories.map((category) => (
+                <Link
+                  key={category._id}
+                  href={`/${lang}/blog?category=${category.slug}`}
+                  className="rounded-full px-3 py-1 text-sm font-medium transition-colors hover:bg-[hsl(var(--dc-brand)/0.15)]"
+                  style={{
+                    backgroundColor: 'hsl(var(--dc-brand)/0.1)',
+                    color: 'hsl(var(--dc-brand))',
+                  }}
+                >
+                  {category.title}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Title */}
+          <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight sm:text-5xl" style={{ color: 'hsl(var(--dc-text))' }}>
+            {post.title}
+          </h1>
+
+          {/* Meta info */}
+          <div className="mb-8 flex flex-wrap items-center gap-4 text-sm" style={{ color: 'hsl(var(--dc-text) / 0.7)' }}>
+            {formattedDate && (
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" aria-hidden />
+                <time dateTime={post.publishedAt}>{formattedDate}</time>
+              </div>
+            )}
+            {post.estimatedReadTime && (
+              <div className="flex items-center gap-2">
+                <ClockIcon className="h-4 w-4" aria-hidden />
+                <span>{post.estimatedReadTime} {t('minRead')}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Author */}
+          {post.author && (
+            <AuthorCard author={post.author} authorImageUrl={authorImageUrl} />
+          )}
+
+          {/* Main image */}
+          {imageUrl && (
+            <ParallaxImage
+              src={imageUrl}
+              fullSrc={imageFullSrc ?? undefined}
+              alt={post.mainImage?.alt || post.title}
+              displayHeight={630}
+              extraHeight={300}
+            />
+          )}
+
+          {/* Body content */}
+          {post.body && post.body.length > 0 && (
+            <div className="prose prose-lg max-w-none" style={{ color: 'hsl(var(--dc-text))' }}>
+              <PortableText
+                value={post.body}
+                components={{
+                  block: {
+                    h2: ({ children }) => <h2 className="text-3xl font-bold mt-12 mb-4">{children}</h2>,
+                    h3: ({ children }) => <h3 className="text-2xl font-bold mt-10 mb-4">{children}</h3>,
+                    h4: ({ children }) => <h4 className="text-xl font-bold mt-8 mb-3">{children}</h4>,
+                    blockquote: ({ children }) => (
+                      <blockquote
+                        className="border-l-4 pl-4 my-6 italic"
+                        style={{ borderColor: 'hsl(var(--dc-brand))' }}
+                      >
+                        {children}
+                      </blockquote>
+                    ),
+                    normal: ({ children }) => <p className="mb-4 leading-relaxed">{children}</p>,
+                  },
+                  list: {
+                    bullet: ({ children }) => <ul className="list-disc list-outside ml-6 mb-4 space-y-2">{children}</ul>,
+                    number: ({ children }) => <ol className="list-decimal list-outside ml-6 mb-4 space-y-2">{children}</ol>,
+                  },
+                  listItem: {
+                    bullet: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                    number: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                  },
+                  types: {
+                    image: ({ value }) => {
+                      const imageUrl = ((): string | null => {
+                        if (!value?.asset) return null
+                        try {
+                          const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+                          const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+                          const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+                          const asset = value.asset
+                          const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+                          if (assetId && baseUrl) {
+                            const srcObj = buildSrc({ id: assetId, baseUrl, width: 1200, height: 675, mode: 'cover' })
+                            return srcObj?.src ?? null
+                          }
+                        } catch (err) {
+                          // fallback
+                        }
+                        if (!value?.asset) return null
+                        try {
+                          const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+                          const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+                          const baseUrl = projectId && dataset ? `https://cdn.sanity.io/images/${projectId}/${dataset}/` : undefined
+                          const asset = value.asset
+                          const assetId = asset?._ref || asset?._id || (typeof asset === 'string' ? asset : undefined)
+                          if (assetId && baseUrl) {
+                            const srcObj = buildSrc({ id: assetId, baseUrl, width: 1200, height: 675, mode: 'cover' })
+                            return srcObj?.src ?? null
+                          }
+                        } catch (err) {
+                          return null
+                        }
+                        return null
+                      })()
+                      if (!imageUrl) return null
+
+                      // Size classes based on the size field
+                      const sizeClasses = {
+                        small: 'max-w-sm mx-auto',
+                        medium: 'max-w-2xl mx-auto',
+                        large: 'w-full',
+                      }
+                      const sizeClass = sizeClasses[value?.size as keyof typeof sizeClasses] || sizeClasses.large
+
+                      return (
+                        <ImageLightbox
+                          src={imageUrl}
+                          alt={value?.alt || ''}
+                          width={1200}
+                          height={675}
+                          className="rounded-lg w-full"
+                          caption={value?.caption}
+                          sizeClass={sizeClass}
+                        />
+                      )
+                    },
+                  },
+                  marks: {
+                    link: ({ value, children }) => {
+                      const href = value?.href || '#'
+                      return (
+                        <a
+                          href={href}
+                          className="text-[hsl(var(--dc-brand))] hover:underline"
+                          target={href.startsWith('http') ? '_blank' : undefined}
+                          rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        >
+                          {children}
+                        </a>
+                      )
+                    },
+                  },
+                }}
+              />
+            </div>
+          )}
+
+          {/* Back to blog link */}
+          <div className="mt-12 pt-8 border-t" style={{ borderColor: 'hsl(var(--dc-border) / 0.3)' }}>
+            <Link
+              href={`/${lang}/blog`}
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors hover:bg-[hsl(var(--dc-brand)/0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--dc-focus))]"
+              style={{ color: 'hsl(var(--dc-brand))' }}
+            >
+              <ChevronLeftIcon className="h-4 w-4" aria-hidden />
+              {t('backToAllBlogs')}
+            </Link>
+          </div>
+        </article>
+
+        {/* Blogs section (more posts) */}
+        {/* Related / configurable BlogSection (always displayed) */}
+        {
+          (() => {
+            const rp = post.relatedPosts || {}
+
+            // Determine tags to use (post.tags when useTags is true)
+            // Determine relation mode
+            const mode = rp.relationMode || 'tags'
+
+            const mappedTags = mode === 'tags' && Array.isArray(post.tags) ? post.tags.map((t) => ({ _ref: t._ref || (t as Record<string, unknown>)._id as string || t as string })) : undefined
+
+            // Author reference if requested
+            const authorRef = mode === 'author' && post.author ? { _ref: post.author._id } : undefined
+
+            // If readTime mode, compute a small window around the current post's estimatedReadTime
+            let minReadTime: number | undefined
+            let maxReadTime: number | undefined
+            if (mode === 'readTime' && typeof post.estimatedReadTime === 'number') {
+              const delta = Math.max(1, Math.round(post.estimatedReadTime * 0.25)) // 25% tolerance
+              minReadTime = Math.max(1, Math.round(post.estimatedReadTime - delta))
+              maxReadTime = Math.round(post.estimatedReadTime + delta)
+            }
+
+            return (
+              <BlogSection
+                _type="blogSection"
+                _key="more-blogs"
+                heading={rp.heading || t('moreBlogs')}
+                subheading={rp.subheading ? rp.subheading : undefined}
+                // Let BlogSection decide limit/responsiveness; pass relation flags and filters
+                useContextTags={mode === 'tags'}
+                useContextAuthor={mode === 'author'}
+                tags={mappedTags}
+                author={authorRef}
+                minReadTime={minReadTime}
+                maxReadTime={maxReadTime}
+              />
+            )
+          })()
+        }
+      </>
+    )
+  } catch (error) {
+    console.error('Error fetching blog post:', error)
+    notFound()
+  }
+}

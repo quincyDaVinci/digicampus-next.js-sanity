@@ -1,0 +1,17 @@
+export {
+  ArrowRightIcon,
+  BookOpenIcon,
+  FileTextIcon,
+  FlagIcon,
+  HomeIcon,
+  ImageIcon,
+  LayersIcon,
+  PackageIcon,
+  SettingsIcon,
+  ShieldIcon,
+  TagIcon,
+  UserIcon,
+  UsersIcon,
+  VideoIcon,
+  ZapIcon,
+} from '../components/FeatherIcons'
