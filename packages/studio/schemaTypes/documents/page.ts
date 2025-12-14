@@ -12,7 +12,6 @@ export default defineType({
   icon: FileTextIcon,
   groups: [
     { name: 'content', title: 'Inhoud', default: true },
-    { name: 'translations', title: 'Vertalingen' },
     { name: 'metadata', title: 'SEO & metadata' },
   ],
   fields: [
@@ -23,6 +22,21 @@ export default defineType({
       description: 'De hoofd­titel van de pagina',
       group: 'content',
       validation: (Rule) => Rule.required().max(100),
+    }),
+    defineField({
+      name: 'language',
+      title: 'Taal',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Nederlands', value: 'nl'},
+          {title: 'English', value: 'en'},
+        ],
+        layout: 'radio',
+      },
+      description: 'Taal van het paginacontent (gebruik voor filtering in Studio)',
+      initialValue: 'nl',
+      group: 'content',
     }),
     defineField({
       name: 'modules',
@@ -49,41 +63,6 @@ export default defineType({
       ],
       group: 'content',
       validation: (Rule) => Rule.min(1).error('Voeg minimaal één sectie toe aan de pagina'),
-    }),
-    defineField({
-      name: 'translations',
-      title: 'Vertalingen',
-      type: 'object',
-      options: { collapsible: true, collapsed: true },
-      description:
-        'Alle vertaalde tekst staat hier. Laat velden leeg om automatisch terug te vallen op de Nederlandse versie.',
-      fields: [
-        defineField({
-          name: 'en',
-          title: 'English',
-          type: 'object',
-          options: { columns: 1 },
-          fields: [
-            defineField({ name: 'title', title: 'Titel (EN)', type: 'string' }),
-            defineField({ name: 'metadataTitle', title: 'Metatitel (EN)', type: 'string' }),
-            defineField({
-              name: 'metadataDescription',
-              title: 'Metabeschrijving (EN)',
-              type: 'text',
-              rows: 3,
-            }),
-            defineField({
-              name: 'modules',
-              title: 'Module-tekst overschrijvingen',
-              type: 'array',
-              of: [{ type: 'moduleTextOverride' }],
-              description:
-                'Alleen tekst. Gebruik de module _key en veldnaam (bijv. heading of buttons.0.label) om copy te vertalen.',
-            }),
-          ],
-        }),
-      ],
-      group: 'translations',
     }),
     defineField({
       name: 'metadata',

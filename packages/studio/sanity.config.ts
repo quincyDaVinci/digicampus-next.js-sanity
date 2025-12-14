@@ -8,6 +8,8 @@ import {visionTool} from '@sanity/vision'
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {presentationTool, defineLocations} from 'sanity/presentation'
+import {documentInternationalization} from '@sanity/document-internationalization'
+import {languageFilter} from '@sanity/language-filter'
 
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
 import {apiVersion, dataset, projectId, studioBasePath} from './env'
@@ -70,28 +72,26 @@ export default defineConfig({
     } catch (err) {
       // not installed — no-op
     }
-    try {
-      // Language filter plugin for single-language editing view
-      // install with `npm install @sanity/language-filter`
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      // @ts-ignore
-      const languageFilterMod = require('@sanity/language-filter')
-      const languageFilter = languageFilterMod?.languageFilter
-      if (typeof languageFilter === 'function') {
-        optional.push(
-          languageFilter({
-            supportedLanguages: [
-              {id: 'nl', title: 'Nederlands'},
-              {id: 'en', title: 'English'},
-            ],
-            defaultLanguages: ['nl'],
-            documentTypes: ['page', 'homePage', 'blogPost', 'site'],
-          })
-        )
-      }
-    } catch (err) {
-      // optional plugin not installed
-    }
+    optional.push(
+      // Only enable document-level internationalization for non-singleton content types.
+      // Singletons (homePage, blogPage, site, etc.) should use field-level translation
+      // or a different workflow to avoid the Translate toolbar interfering with singletons.
+      documentInternationalization({
+        supportedLanguages: [
+          {id: 'nl', title: 'Nederlands'},
+          {id: 'en', title: 'English'},
+        ],
+        schemaTypes: ['page', 'blogPost'],
+      }),
+      languageFilter({
+        supportedLanguages: [
+          {id: 'nl', title: 'Nederlands'},
+          {id: 'en', title: 'English'},
+        ],
+        defaultLanguages: ['nl'],
+        documentTypes: ['blogCategory', 'teamMember', 'author', 'site'],
+      })
+    )
     return [
       structureTool({structure}),
       presentationTool({

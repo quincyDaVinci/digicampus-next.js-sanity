@@ -8,6 +8,7 @@ import blogPage from './documents/blogPage'
 import blogPost from './documents/blogPost'
 import blogCategory from './documents/blogCategory'
 import navigation from './documents/navigation'
+import navigationSettings from './documents/navigationSettings'
 import author from './documents/author'
 import teamCategory from './documents/teamCategory'
 import teamSettings from './documents/teamSettings'
@@ -54,6 +55,7 @@ export const schema: SchemaPluginOptions = {
     blogPost,
     blogCategory,
     navigation,
+    navigationSettings,
     author,
     teamCategory,
     teamSettings,
@@ -91,4 +93,4 @@ export const schema: SchemaPluginOptions = {
 }
 
 // Document types that should only have one instance
-const singletonTypes = ['site', 'homePage', 'blogPage', 'devSettings']
+const singletonTypes = ['site', 'homePage', 'blogPage', 'devSettings', 'navigationSettings']

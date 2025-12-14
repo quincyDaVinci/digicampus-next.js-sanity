@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "dev": "npm --workspace=@digicampus/web run dev",
+    "dev:all": "concurrently \"npm run dev\" \"npm run studio:dev\" --names \"web,studio\" --prefix-colors \"cyan,magenta\"",
     "build": "npm --workspace=@digicampus/web run build",
     "start": "npm --workspace=@digicampus/web run start",
     "lint": "npm --workspace=@digicampus/web run lint",
@@ -22,6 +23,7 @@
     "studio:deploy": "npm --workspace=@digicampus/studio run deploy"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "typescript": "^5"
   }
 }

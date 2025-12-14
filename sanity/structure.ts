@@ -108,24 +108,71 @@ export const structure: StructureResolver = (S) =>
 
       // Navigatie (multiple menus)
       S.listItem()
-        .title('Navigatie')
+        .title('Navigation')
         .icon(LayersIcon)
         .child(
           S.list()
-            .title('Navigatie')
+            .title('Navigation')
             .items([
               S.listItem()
-                .title('Alle menu\'s')
+                .title('Navigation settings')
                 .icon(LayersIcon)
                 .child(
-                  S.documentTypeList('navigation')
-                    .title('Alle menu\'s')
+                  S.document()
+                    .schemaType('navigationSettings')
+                    .documentId('navigationSettings')
+                    .title('Navigation settings')
+                ),
+              S.divider(),
+              S.listItem()
+                .title('Header')
+                .icon(LayersIcon)
+                .child(
+                  S.list()
+                    .title('Header navigation')
+                    .items([
+                      S.listItem()
+                        .title('Nederlands')
+                        .child(
+                          S.documentTypeList('navigation')
+                            .title('Header — Nederlands')
+                            .filter('_type == "navigation" && role == $role && (language == $lang || !defined(language))')
+                            .params({role: 'header', lang: 'nl'})
+                        ),
+                      S.listItem()
+                        .title('English')
+                        .child(
+                          S.documentTypeList('navigation')
+                            .title('Header — English')
+                            .filter('_type == "navigation" && role == $role && language == $lang')
+                            .params({role: 'header', lang: 'en'})
+                        ),
+                    ])
                 ),
               S.listItem()
-                .title('Translate menus')
+                .title('Footer')
                 .icon(LayersIcon)
                 .child(
-                  S.component(TranslationFixer).id('translateMenus').title('Translate menus')
+                  S.list()
+                    .title('Footer navigation')
+                    .items([
+                      S.listItem()
+                        .title('Nederlands')
+                        .child(
+                          S.documentTypeList('navigation')
+                            .title('Footer — Nederlands')
+                            .filter('_type == "navigation" && role == $role && (language == $lang || !defined(language))')
+                            .params({role: 'footer', lang: 'nl'})
+                        ),
+                      S.listItem()
+                        .title('English')
+                        .child(
+                          S.documentTypeList('navigation')
+                            .title('Footer — English')
+                            .filter('_type == "navigation" && role == $role && language == $lang')
+                            .params({role: 'footer', lang: 'en'})
+                        ),
+                    ])
                 ),
             ])
         ),

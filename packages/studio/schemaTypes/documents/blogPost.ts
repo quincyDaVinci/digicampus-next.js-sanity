@@ -10,16 +10,28 @@ export default defineType({
   icon: BookOpenIcon,
   groups: [
     {name: 'content', title: 'Inhoud', default: true},
-    {name: 'translations', title: 'Vertalingen'},
   ],
   fields: [
-    // The canonical content fields on this document are Dutch originals.
-    // We intentionally hide the language selector to avoid editors changing the canonical language.
     defineField({
       name: 'title',
       title: 'Titel',
       type: 'string',
       validation: (Rule) => Rule.required(),
+      group: 'content',
+    }),
+    defineField({
+      name: 'language',
+      title: 'Taal',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Nederlands', value: 'nl'},
+          {title: 'English', value: 'en'},
+        ],
+        layout: 'radio',
+      },
+      description: 'Taal van het bericht (gebruik voor filtering in Studio)',
+      initialValue: 'nl',
       group: 'content',
     }),
     defineField({
@@ -323,22 +335,6 @@ export default defineType({
       ],
       description: 'Configure how the related posts section should find similar articles. The section is shown by default on the blog page; choose the relation method and heading/subheading.',
       group: 'content',
-    }),
-    defineField({
-      name: 'translations',
-      title: 'Vertalingen',
-      type: 'object',
-      description:
-        'Alleen tekstuele overschrijvingen. Laat leeg om de Nederlandse canonieke tekst te gebruiken.',
-      options: {collapsible: true, collapsed: true},
-      fields: [
-        defineField({
-          name: 'en',
-          title: 'English',
-          type: 'blogPostTranslation',
-        }),
-      ],
-      group: 'translations',
     }),
   ],
   preview: {

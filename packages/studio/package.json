@@ -12,8 +12,10 @@
   "dependencies": {
     "@digicampus/studio": "file:",
     "@sanity/assist": "^5.0.2",
+    "@sanity/document-internationalization": "^4.1.0",
     "@sanity/language-filter": "^3.0.0",
     "@sanity/vision": "^4.20.0",
+    "digicampus": "file:../..",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "sanity": "^4.20.0",
