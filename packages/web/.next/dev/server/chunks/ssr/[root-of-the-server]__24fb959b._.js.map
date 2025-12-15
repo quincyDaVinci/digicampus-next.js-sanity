@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/quinc/OneDrive/Desktop/Websites/Digicampus/digicampus-next.js-sanity/packages/web/src/app/page.tsx"],"sourcesContent":["import { redirect } from 'next/navigation'\r\nimport { defaultLanguage } from '@/lib/i18n'\r\n\r\nexport default function RedirectHome() {\r\n  redirect(`/${defaultLanguage}`)\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;AAAA;AACA;;;AAEe,SAAS;IACtB,IAAA,iMAAQ,EAAC,CAAC,CAAC,EAAE,wJAAe,EAAE;AAChC"}}]
-}

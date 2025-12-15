@@ -15,6 +15,10 @@ node_modules/
 
 # next.js
 /.next/
+
+# monorepo: ignore per-package Next.js build output
+packages/web/.next/
+packages/*/.next/
 /out/
 
 # production
